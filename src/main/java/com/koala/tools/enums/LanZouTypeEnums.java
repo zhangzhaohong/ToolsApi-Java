@@ -13,7 +13,8 @@ import java.util.Optional;
  */
 @Getter
 public enum LanZouTypeEnums {
-    INFO("info", 0);
+    INFO("info", 0),
+    INVALID_TYPE("invalid_type", -1);
 
     private final String type;
     private final int typeId;
@@ -23,7 +24,7 @@ public enum LanZouTypeEnums {
         this.typeId = typeId;
     }
 
-    public int getTypeIdByType(String type) {
+    public static int getTypeIdByType(String type) {
         Optional<LanZouTypeEnums> optional = Arrays.stream(LanZouTypeEnums.values()).filter(item -> item.getType().equals(type)).findFirst();
         if (optional.isPresent()) {
             return optional.get().getTypeId();

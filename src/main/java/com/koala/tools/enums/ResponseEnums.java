@@ -12,7 +12,8 @@ import lombok.Getter;
 public enum ResponseEnums {
     SUCCESS(0, null),
     FAILURE(-1, "KNOWN_ERROR"),
-    INVALID_URL(101, "INVALID_URL");
+    INVALID_URL(101, "INVALID_URL"),
+    INVALID_TYPE(102, "INVALID_TYPE");
 
     private final int code;
     private final String message;
