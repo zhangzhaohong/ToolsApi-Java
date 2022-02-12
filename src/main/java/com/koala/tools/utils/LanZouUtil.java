@@ -11,6 +11,7 @@ import java.net.URISyntaxException;
 import java.util.*;
 
 import static com.koala.tools.enums.ResponseEnums.GET_FILE_SUCCESS;
+import static com.koala.tools.utils.IpUtil.getRandomIpAddress;
 import static com.koala.tools.utils.RespUtil.formatRespData;
 
 /**
@@ -100,6 +101,8 @@ public class LanZouUtil {
         header.put("Accept-Encoding", "gzip, deflate");
         header.put("Accept-Language", "zh-CN,zh;q=0.8");
         header.put("User-Agent", "Mozilla/5.0 (iPhone; CPU iPhone OS 6_0 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/6.0 Mobile/10A5376e Safari/8536.25");
+        header.put("X-FORWARDED-FOR", getRandomIpAddress());
+        header.put("CLIENT-IP", getRandomIpAddress());
         return header;
     }
 
