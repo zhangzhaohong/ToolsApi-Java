@@ -14,6 +14,7 @@ import java.util.Optional;
 @Getter
 public enum LanZouTypeEnums {
     INFO("info", 0),
+    DOWNLOAD("download", 1),
     INVALID_TYPE("invalid_type", -1);
 
     private final String type;
@@ -30,5 +31,13 @@ public enum LanZouTypeEnums {
             return optional.get().getTypeId();
         }
         return -1;
+    }
+
+    public static LanZouTypeEnums getEnumsByType(String type) {
+        Optional<LanZouTypeEnums> optional = Arrays.stream(LanZouTypeEnums.values()).filter(item -> item.getType().equals(type)).findFirst();
+        if (optional.isPresent()) {
+            return optional.get();
+        }
+        return null;
     }
 }

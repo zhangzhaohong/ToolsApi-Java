@@ -2,14 +2,17 @@ package com.koala.tools.controller;
 
 import com.koala.tools.enums.LanZouTypeEnums;
 import com.koala.tools.enums.ResponseEnums;
+import com.koala.tools.models.file.FileInfoModel;
 import com.koala.tools.utils.LanZouUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Map;
@@ -34,7 +37,7 @@ public class LanZouToolsController {
     private static final String LANZOU = "lanzou";
 
     @GetMapping("api")
-    public Object getLanZouInfos(@RequestParam(value = "url", required = false) String url, @RequestParam(value = "password", required = false) String password, @RequestParam(value = "type", required = false, defaultValue = "info") String type) throws IOException, URISyntaxException {
+    public Object getLanZouInfos(@RequestParam(value = "url", required = false) String url, @RequestParam(value = "password", required = false) String password, @RequestParam(value = "type", required = false, defaultValue = "info") String type, HttpServletResponse response) throws IOException, URISyntaxException {
         logger.info("LanZouApi: params: {url={}, password={}, type={}}", url, password, type);
         if (Boolean.FALSE.equals(checkLanZouUrl(url))) {
             return formatRespData(ResponseEnums.INVALID_URL, null);
@@ -48,10 +51,26 @@ public class LanZouToolsController {
             return lanZouUtil.getResponse();
         }
         Optional<Map.Entry<Integer, String>> optional = lanZouUtil.checkStatus().entrySet().stream().findFirst();
-        if (optional.isPresent() && !Objects.equals(optional.get().getKey(), ResponseEnums.GET_FILE_SUCCESS.getCode())){
+        if (optional.isPresent() && !Objects.equals(optional.get().getKey(), ResponseEnums.GET_FILE_SUCCESS.getCode())) {
             return formatRespDataWithCustomMsg(optional.get().getKey(), optional.get().getValue(), null);
         }
-        return formatRespData(ResponseEnums.SUCCESS, lanZouUtil.getFileInfo());
+        FileInfoModel fileInfo = lanZouUtil.getFileInfo();
+        if (Objects.isNull(fileInfo)) {
+            return formatRespData(ResponseEnums.FAILURE, null);
+        }
+        switch (Objects.requireNonNull(LanZouTypeEnums.getEnumsByType(type))) {
+            case DOWNLOAD:
+                if (StringUtils.isEmpty(fileInfo.getDownloadUrl())) {
+                    return formatRespData(ResponseEnums.FAILURE, fileInfo);
+                } else {
+                    response.sendRedirect(fileInfo.getDownloadUrl());
+                    return formatRespData(ResponseEnums.REDIRECT_TO_DOWNLOAD, fileInfo);
+                }
+            case INFO:
+                return formatRespData(ResponseEnums.GET_FILE_SUCCESS, fileInfo);
+            default:
+                return formatRespData(ResponseEnums.INVALID_TYPE, null);
+        }
     }
 
     private Boolean checkLanZouUrl(String url) {
