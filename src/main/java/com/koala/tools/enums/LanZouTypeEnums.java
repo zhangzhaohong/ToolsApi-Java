@@ -13,8 +13,8 @@ import java.util.Optional;
  */
 @Getter
 public enum LanZouTypeEnums {
-    INFO("info", 0),
     DOWNLOAD("download", 1),
+    INFO("info", 0),
     INVALID_TYPE("invalid_type", -1);
 
     private final String type;

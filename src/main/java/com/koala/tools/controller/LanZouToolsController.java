@@ -51,26 +51,38 @@ public class LanZouToolsController {
             return lanZouUtil.getResponse();
         }
         Optional<Map.Entry<Integer, String>> optional = lanZouUtil.checkStatus().entrySet().stream().findFirst();
-        if (optional.isPresent() && !Objects.equals(optional.get().getKey(), ResponseEnums.GET_FILE_SUCCESS.getCode())) {
-            return formatRespDataWithCustomMsg(optional.get().getKey(), optional.get().getValue(), null);
-        }
-        FileInfoModel fileInfo = lanZouUtil.getFileInfo();
-        if (Objects.isNull(fileInfo)) {
-            return formatRespData(ResponseEnums.FAILURE, null);
-        }
-        switch (Objects.requireNonNull(LanZouTypeEnums.getEnumsByType(type))) {
-            case DOWNLOAD:
-                if (StringUtils.isEmpty(fileInfo.getDownloadUrl())) {
-                    return formatRespData(ResponseEnums.FAILURE, fileInfo);
-                } else {
-                    response.sendRedirect(fileInfo.getDownloadUrl());
-                    return formatRespData(ResponseEnums.REDIRECT_TO_DOWNLOAD, fileInfo);
+        if (optional.isPresent()) {
+            // 先校验密码
+            if (Objects.equals(optional.get().getKey(), ResponseEnums.GET_FILE_WITH_PASSWORD.getCode()) && StringUtils.isEmpty(password)) {
+                return formatRespData(ResponseEnums.GET_FILE_WITH_PASSWORD, null);
+            }
+            if (!Objects.equals(optional.get().getKey(), ResponseEnums.GET_FILE_SUCCESS.getCode())) {
+                return formatRespDataWithCustomMsg(optional.get().getKey(), optional.get().getValue(), null);
+            }
+            // 处理数据
+            if (Objects.equals(optional.get().getKey(), ResponseEnums.GET_FILE_WITH_PASSWORD.getCode()) && StringUtils.isEmpty(password)) {
+
+            } else {
+                FileInfoModel fileInfo = lanZouUtil.getFileInfo();
+                if (Objects.isNull(fileInfo)) {
+                    return formatRespData(ResponseEnums.FAILURE, null);
                 }
-            case INFO:
-                return formatRespData(ResponseEnums.GET_FILE_SUCCESS, fileInfo);
-            default:
-                return formatRespData(ResponseEnums.INVALID_TYPE, null);
+                switch (Objects.requireNonNull(LanZouTypeEnums.getEnumsByType(type))) {
+                    case DOWNLOAD:
+                        if (StringUtils.isEmpty(fileInfo.getDownloadUrl())) {
+                            return formatRespData(ResponseEnums.FAILURE, fileInfo);
+                        } else {
+                            response.sendRedirect(fileInfo.getDownloadUrl());
+                            return formatRespData(ResponseEnums.REDIRECT_TO_DOWNLOAD, fileInfo);
+                        }
+                    case INFO:
+                        return formatRespData(ResponseEnums.GET_FILE_SUCCESS, fileInfo);
+                    default:
+                        return formatRespData(ResponseEnums.INVALID_TYPE, null);
+                }
+            }
         }
+        return formatRespData(ResponseEnums.FAILURE, null);
     }
 
     private Boolean checkLanZouUrl(String url) {

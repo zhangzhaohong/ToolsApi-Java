@@ -40,8 +40,7 @@ public class LanZouUtil {
         hostList.add("https://wwx.lanzouj.com");
         invalidList.put(201, Arrays.asList("文件取消分享了", "文件不存在", "访问地址错误，请核查"));
         invalidList.put(202, List.of("输入密码"));
-        invalidList.put(203, List.of("输入密码"));
-        invalidList.put(204, List.of("显示更多文件"));
+        invalidList.put(203, List.of("显示更多文件"));
     }
 
     public LanZouUtil(String url, String password) throws IOException, URISyntaxException {
