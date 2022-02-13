@@ -15,8 +15,9 @@ public class PatternUtil {
         Pattern pattern= Pattern.compile(regex);
         Matcher matcher = pattern.matcher(data);
         if (matcher.find()) {
-            return matcher.group(1);
+            return matcher.group(1).trim();
         }
         return null;
     }
+
 }

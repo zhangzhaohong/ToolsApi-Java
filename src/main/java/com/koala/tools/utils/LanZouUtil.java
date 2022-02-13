@@ -1,6 +1,7 @@
 package com.koala.tools.utils;
 
 import com.koala.tools.enums.ResponseEnums;
+import com.koala.tools.models.file.FileInfoModel;
 import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,7 +85,8 @@ public class LanZouUtil {
     private String getUrl(int index, String id, int mode) throws IOException, URISyntaxException {
         StringJoiner joiner = new StringJoiner("");
         joiner.add(hostList.get(index));
-        if (Objects.equals(mode, 1L)) {
+        logger.info("mode: {}", mode);
+        if (Objects.equals(mode, 1)) {
             joiner.add("/tp/");
         } else {
             joiner.add("/");
@@ -117,5 +119,24 @@ public class LanZouUtil {
             result.put(GET_FILE_SUCCESS.getCode(), GET_FILE_SUCCESS.getMessage());
         }
         return result;
+    }
+
+    public FileInfoModel getFileInfo() {
+        FileInfoModel fileInfo = new FileInfoModel();
+        fileInfo.setFileName(PatternUtil.matchData("<div class=\"md\">(.*?)<span class=\"mtt\">", this.pageInfo));
+        fileInfo.setFileSize(PatternUtil.matchData("<span class=\"mtt\">\\((.*?)\\)</span>", this.pageInfo));
+        String updateTime = PatternUtil.matchData("<span class=\"mt2\"></span>(.*?)<span class=\"mt2\">", this.pageInfo);
+        if (Objects.isNull(updateTime)) {
+            updateTime = PatternUtil.matchData("时间:<\\/span>(.*?)<span class=\"mt2\">", this.pageInfo);
+        }
+        fileInfo.setUpdateTime(updateTime);
+        fileInfo.setAuthor(PatternUtil.matchData("发布者:<\\/span>(.*?)<span class=\"mt2\">", this.pageInfo));
+        String down1 = PatternUtil.matchData("var\\ loaddown\\ =\\ '(.*?)';", this.pageInfo);
+        String down2 = PatternUtil.matchData("var\\ downloads\\ =\\ '(.*?)';", this.pageInfo);
+        fileInfo.setDownloadHost(PatternUtil.matchData("submit.href\\ =\\ '(.*?)'" + (!Objects.isNull(down1) ? "\\ \\+\\ loaddown" : !Objects.isNull(down2) ? "\\ \\+\\ downloads" : ""), this.pageInfo));
+        fileInfo.setDownloadPath(!Objects.isNull(down1) ? down1 : down2);
+        fileInfo.setDownloadUrl(!Objects.isNull(fileInfo.getDownloadHost()) && !Objects.isNull(fileInfo.getDownloadPath()) ? fileInfo.getDownloadHost() + fileInfo.getDownloadPath() : null);
+        logger.info("fileInfo: {}", GsonUtil.toString(fileInfo));
+        return fileInfo;
     }
 }

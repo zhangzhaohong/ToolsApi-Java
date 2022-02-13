@@ -51,8 +51,7 @@ public class LanZouToolsController {
         if (optional.isPresent() && !Objects.equals(optional.get().getKey(), ResponseEnums.GET_FILE_SUCCESS.getCode())){
             return formatRespDataWithCustomMsg(optional.get().getKey(), optional.get().getValue(), null);
         }
-
-        return formatRespData(ResponseEnums.SUCCESS, lanZouUtil.checkStatus());
+        return formatRespData(ResponseEnums.SUCCESS, lanZouUtil.getFileInfo());
     }
 
     private Boolean checkLanZouUrl(String url) {
