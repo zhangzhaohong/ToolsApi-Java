@@ -13,6 +13,7 @@ import java.net.URISyntaxException;
 import java.util.*;
 
 import static com.koala.tools.enums.ResponseEnums.GET_FILE_SUCCESS;
+import static com.koala.tools.utils.HeaderUtil.*;
 import static com.koala.tools.utils.IpUtil.getRandomIpAddress;
 import static com.koala.tools.utils.RespUtil.formatRespData;
 
@@ -98,31 +99,6 @@ public class LanZouUtil {
         return HttpClientUtil.doGet(tmp, getHeader(), new HashMap<>(0));
     }
 
-    private HashMap<String, String> getHeader() {
-        HashMap<String, String> header = new HashMap<>(0);
-        header.put("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
-        header.put("Accept-Encoding", "gzip, deflate");
-        header.put("Accept-Language", "zh-CN,zh;q=0.8");
-        header.put("User-Agent", "Mozilla/5.0 (iPhone; CPU iPhone OS 6_0 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/6.0 Mobile/10A5376e Safari/8536.25");
-        header.put("X-FORWARDED-FOR", getRandomIpAddress());
-        header.put("CLIENT-IP", getRandomIpAddress());
-        return header;
-    }
-
-    private Map<String, String> getRedirectHeader() {
-        HashMap<String, String> header = new HashMap<>(0);
-        header.put("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
-        header.put("Accept-Encoding", "gzip, deflate");
-        header.put("Accept-Language", "zh-CN,zh;q=0.9");
-        header.put("Cache-Control", "no-cache");
-        header.put("Connection", "keep-alive");
-        header.put("Pragma", "no-cache");
-        header.put("Upgrade-Insecure-Requests", "1");
-        header.put("X-FORWARDED-FOR", getRandomIpAddress());
-        header.put("CLIENT-IP", getRandomIpAddress());
-        return header;
-    }
-
     public Map<Integer, String> checkStatus() {
         HashMap<Integer, String> result = new HashMap<>(0);
         INVALID_LIST.forEach((key, item) -> item.forEach(value -> {
@@ -147,7 +123,7 @@ public class LanZouUtil {
             passwordData.put("action", "downprocess");
             passwordData.put("sign", sign);
             passwordData.put("p", password);
-            String verifyPasswordResponseData = HttpClientUtil.doPost(host + "/ajaxm.php", passwordData);
+            String verifyPasswordResponseData = HttpClientUtil.doPost(host + "/ajaxm.php", getVerifyPasswordHeader(host), passwordData);
             VerifyPasswordResp verifyPasswordData = GsonUtil.toBean(verifyPasswordResponseData, VerifyPasswordResp.class);
             logger.info("verifyPasswordResponseData: {}", verifyPasswordData);
             if (Objects.equals(verifyPasswordData.getZt(), 1)) {
