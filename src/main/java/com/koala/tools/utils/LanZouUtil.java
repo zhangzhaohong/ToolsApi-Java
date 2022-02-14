@@ -4,7 +4,6 @@ import com.koala.tools.enums.ResponseEnums;
 import com.koala.tools.models.file.FileInfoModel;
 import com.koala.tools.models.lanzou.VerifyPasswordResp;
 import lombok.Getter;
-import org.apache.logging.log4j.util.PropertiesUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -30,7 +29,7 @@ public class LanZouUtil {
     private final String password;
     private final String url;
     private final String urlId;
-    private String pageInfo;
+    private final String pageInfo;
     private String host;
     private String response;
     private static final Logger logger = LoggerFactory.getLogger(LanZouUtil.class);
