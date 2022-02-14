@@ -12,7 +12,10 @@ import static com.koala.tools.utils.IpUtil.getRandomIpAddress;
  * @description
  */
 public class HeaderUtil {
-    public static HashMap<String, String> getHeader() {
+
+    private HeaderUtil() {}
+
+    public static Map<String, String> getHeader() {
         HashMap<String, String> header = new HashMap<>(0);
         header.put("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
         header.put("Accept-Encoding", "gzip, deflate");
