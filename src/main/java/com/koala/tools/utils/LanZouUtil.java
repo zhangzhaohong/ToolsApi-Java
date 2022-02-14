@@ -42,6 +42,7 @@ public class LanZouUtil {
         HOST_LIST.add("https://www.lanzoui.com");
         HOST_LIST.add("https://www.lanzouw.com");
         HOST_LIST.add("https://wwx.lanzouj.com");
+        HOST_LIST.add("https://wwi.lanzouj.com");
         INVALID_LIST.put(201, Arrays.asList("文件取消分享了", "文件不存在", "访问地址错误，请核查"));
         INVALID_LIST.put(202, List.of("输入密码"));
         INVALID_LIST.put(203, List.of("显示更多文件"));
@@ -65,8 +66,8 @@ public class LanZouUtil {
     }
 
     private String getInfo(int index, String id, int mode) throws IOException, URISyntaxException {
-        if (Objects.equals(index, (long) HOST_LIST.size() - 1)) {
-            if (Objects.equals(mode, 2L)) {
+        if (Objects.equals(index, HOST_LIST.size() - 1)) {
+            if (Objects.equals(mode, 2)) {
                 response = formatRespData(ResponseEnums.GET_DATA_ERROR, null);
                 return null;
             } else {
@@ -117,10 +118,26 @@ public class LanZouUtil {
         String sign = PatternUtil.matchData("'sign':'(.*?)'", this.pageInfo);
         logger.info("sign: {}", sign);
         if (StringUtils.isEmpty(sign)) {
-
+            // 目录
+            String scriptData = PatternUtil.matchData("<script type=\"text/javascript\">(.*?)</script>", this.pageInfo.replace("\n", ""));
+            String paramsData = PatternUtil.matchData("data:\\{(.*?)\\},", this.pageInfo.replace(" ", "").replace("\n", ""));
+            logger.info("scriptData: {}, paramsData: {}", scriptData, paramsData);
+            HashMap<String, String> params = new HashMap<>(0);
+            params.put("lx", PatternUtil.matchData("'lx':(.*?),", paramsData));
+            params.put("fid", PatternUtil.matchData("'fid':(.*?),", paramsData));
+            params.put("uid", PatternUtil.matchData("'uid':'(.*?)',", paramsData));
+            params.put("pg", PatternUtil.matchData(PatternUtil.matchData("'pg':(.*?),", paramsData) + "\\ =(.*?);", scriptData));
+            params.put("rep", PatternUtil.matchData("'rep':'(.*?)',", paramsData));
+            params.put("t", PatternUtil.matchData("var\\ " + PatternUtil.matchData("'t':(.*?),", paramsData) + "\\ =\\ '(.*?)';", scriptData));
+            params.put("k", PatternUtil.matchData("var\\ " + PatternUtil.matchData("'k':(.*?),", paramsData) + "\\ =\\ '(.*?)';", scriptData));
+            params.put("up", PatternUtil.matchData("'up':(.*?),", paramsData));
+            params.put("ls", PatternUtil.matchData("'ls':(.*?),", paramsData));
+            params.put("pwd", password);
+            String getFolderResponse = HttpClientUtil.doPost(host + "/filemoreajax.php", getVerifyPasswordHeader(host), params);
+            logger.info("params: {}, getFolderResponse: {}", params, getFolderResponse);
         } else {
             // 单文件
-            HashMap<String, String> passwordData = new HashMap<>();
+            HashMap<String, String> passwordData = new HashMap<>(0);
             passwordData.put("action", "downprocess");
             passwordData.put("sign", sign);
             passwordData.put("p", password);
