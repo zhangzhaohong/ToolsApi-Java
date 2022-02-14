@@ -129,7 +129,8 @@ public class LanZouUtil {
             if (Objects.equals(verifyPasswordData.getZt(), 1)) {
                 String filePath = verifyPasswordData.getHost() + "/file/" + verifyPasswordData.getPath();
                 logger.info("filePath: {}", filePath);
-                this.pageInfo = HttpClientUtil.doGet(verifyPasswordData.getHost() + "/file/" + verifyPasswordData.getPath(), getRedirectHeader(), new HashMap<>(0));
+                Map<String, Object> redirectResult = HttpClientUtil.doRedirect(verifyPasswordData.getHost() + "/file/" + verifyPasswordData.getPath(), getRedirectHeader(), new HashMap<>(0));
+                logger.info("result: {}", redirectResult.get("redirect"));
                 return getFileInfo();
             }
         }

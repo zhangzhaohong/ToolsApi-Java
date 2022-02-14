@@ -1,10 +1,13 @@
 package com.koala.tools.utils;
 
+import org.apache.http.HttpHost;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.*;
+import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.client.utils.URIUtils;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -15,8 +18,10 @@ import org.springframework.util.ObjectUtils;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -192,6 +197,40 @@ public class HttpClientUtil {
      */
     public static String doDelete(String url) throws IOException, URISyntaxException {
         return doDelete(url, null, null);
+    }
+
+    public static Map<String, Object> doRedirect(String url, Map<String, String> headers, Map<String, String> params) throws IOException, URISyntaxException {
+        HashMap<String, Object> result = new HashMap<>();
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            HttpClientContext context = HttpClientContext.create();
+            URIBuilder uriBuilder = new URIBuilder(url);
+            if (!ObjectUtils.isEmpty(params)) {
+                params.forEach(uriBuilder::setParameter);
+            }
+            // 创建http对象
+            HttpGet httpGet = new HttpGet(uriBuilder.build());
+            // 设置请求超时时间及响应超时时间
+            RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(CONNECT_TIMEOUT).setSocketTimeout(SOCKET_TIMEOUT).build();
+            httpGet.setConfig(requestConfig);
+            // 设置请求头
+            packageHeader(headers, httpGet);
+            // 执行请求获取响应体并释放资源
+            String response = getHttpClientResult(httpClient, httpGet);
+            result.put("response", response);
+            HttpHost target = context.getTargetHost();
+            List<URI> redirectLocations = context.getRedirectLocations();
+            URI location = URIUtils.resolve(httpGet.getURI(), target, redirectLocations);
+            result.put("redirect", location.toASCIIString());
+            return result;
+        }
+    }
+
+    public static Map<String, Object> doRedirect(String url, Map<String, String> params) throws IOException, URISyntaxException {
+        return doRedirect(url, null, params);
+    }
+
+    public static Map<String, Object> doRedirect(String url) throws IOException, URISyntaxException {
+        return doRedirect(url, null, null);
     }
 
     /**
