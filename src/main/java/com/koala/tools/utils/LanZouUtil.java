@@ -2,6 +2,7 @@ package com.koala.tools.utils;
 
 import com.koala.tools.enums.ResponseEnums;
 import com.koala.tools.models.file.FileInfoModel;
+import com.koala.tools.models.lanzou.VerifyPasswordResp;
 import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,20 +28,21 @@ public class LanZouUtil {
     private final String password;
     private final String url;
     private final String urlId;
-    private final String pageInfo;
+    private String pageInfo;
+    private String host;
     private String response;
     private static final Logger logger = LoggerFactory.getLogger(LanZouUtil.class);
-    private static final ArrayList<String> hostList = new ArrayList<>();
-    private static final HashMap<Integer, List<String>> invalidList = new HashMap<>();
+    private static final ArrayList<String> HOST_LIST = new ArrayList<>();
+    private static final HashMap<Integer, List<String>> INVALID_LIST = new HashMap<>();
 
     static {
-        hostList.add("https://wwwx.lanzoux.com");
-        hostList.add("https://www.lanzoui.com");
-        hostList.add("https://www.lanzouw.com");
-        hostList.add("https://wwx.lanzouj.com");
-        invalidList.put(201, Arrays.asList("文件取消分享了", "文件不存在", "访问地址错误，请核查"));
-        invalidList.put(202, List.of("输入密码"));
-        invalidList.put(203, List.of("显示更多文件"));
+        HOST_LIST.add("https://wwwx.lanzoux.com");
+        HOST_LIST.add("https://www.lanzoui.com");
+        HOST_LIST.add("https://www.lanzouw.com");
+        HOST_LIST.add("https://wwx.lanzouj.com");
+        INVALID_LIST.put(201, Arrays.asList("文件取消分享了", "文件不存在", "访问地址错误，请核查"));
+        INVALID_LIST.put(202, List.of("输入密码"));
+        INVALID_LIST.put(203, List.of("显示更多文件"));
     }
 
     public LanZouUtil(String url, String password) throws IOException, URISyntaxException {
@@ -61,7 +63,7 @@ public class LanZouUtil {
     }
 
     private String getInfo(int index, String id, int mode) throws IOException, URISyntaxException {
-        if (Objects.equals(index, (long) hostList.size() - 1)) {
+        if (Objects.equals(index, (long) HOST_LIST.size() - 1)) {
             if (Objects.equals(mode, 2L)) {
                 response = formatRespData(ResponseEnums.GET_DATA_ERROR, null);
                 return null;
@@ -75,7 +77,7 @@ public class LanZouUtil {
                 index++;
                 return getInfo(index, id, mode);
             } else {
-                // $GLOBALS['right'] = urls[$key];
+                host = HOST_LIST.get(index);
                 return info;
             }
         }
@@ -83,7 +85,7 @@ public class LanZouUtil {
 
     private String getUrl(int index, String id, int mode) throws IOException, URISyntaxException {
         StringJoiner joiner = new StringJoiner("");
-        joiner.add(hostList.get(index));
+        joiner.add(HOST_LIST.get(index));
         logger.info("mode: {}", mode);
         if (Objects.equals(mode, 1)) {
             joiner.add("/tp/");
@@ -107,9 +109,23 @@ public class LanZouUtil {
         return header;
     }
 
+    private Map<String, String> getRedirectHeader() {
+        HashMap<String, String> header = new HashMap<>(0);
+        header.put("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
+        header.put("Accept-Encoding", "gzip, deflate");
+        header.put("Accept-Language", "zh-CN,zh;q=0.9");
+        header.put("Cache-Control", "no-cache");
+        header.put("Connection", "keep-alive");
+        header.put("Pragma", "no-cache");
+        header.put("Upgrade-Insecure-Requests", "1");
+        header.put("X-FORWARDED-FOR", getRandomIpAddress());
+        header.put("CLIENT-IP", getRandomIpAddress());
+        return header;
+    }
+
     public Map<Integer, String> checkStatus() {
         HashMap<Integer, String> result = new HashMap<>(0);
-        invalidList.forEach((key, item) -> item.forEach(value -> {
+        INVALID_LIST.forEach((key, item) -> item.forEach(value -> {
             if (this.pageInfo.contains(value)) {
                 result.put(key, value);
             }
@@ -118,6 +134,30 @@ public class LanZouUtil {
             result.put(GET_FILE_SUCCESS.getCode(), GET_FILE_SUCCESS.getMessage());
         }
         return result;
+    }
+
+    public FileInfoModel getFileWithPassword() throws IOException, URISyntaxException {
+        String sign = PatternUtil.matchData("'sign':'(.*?)'", this.pageInfo);
+        logger.info("sign: {}", sign);
+        if (StringUtils.isEmpty(sign)) {
+
+        } else {
+            // 单文件
+            HashMap<String, String> passwordData = new HashMap<>();
+            passwordData.put("action", "downprocess");
+            passwordData.put("sign", sign);
+            passwordData.put("p", password);
+            String verifyPasswordResponseData = HttpClientUtil.doPost(host + "/ajaxm.php", passwordData);
+            VerifyPasswordResp verifyPasswordData = GsonUtil.toBean(verifyPasswordResponseData, VerifyPasswordResp.class);
+            logger.info("verifyPasswordResponseData: {}", verifyPasswordData);
+            if (Objects.equals(verifyPasswordData.getZt(), 1)) {
+                String filePath = verifyPasswordData.getHost() + "/file/" + verifyPasswordData.getPath();
+                logger.info("filePath: {}", filePath);
+                this.pageInfo = HttpClientUtil.doGet(verifyPasswordData.getHost() + "/file/" + verifyPasswordData.getPath(), getRedirectHeader(), new HashMap<>(0));
+                return getFileInfo();
+            }
+        }
+        return null;
     }
 
     public FileInfoModel getFileInfo() {

@@ -12,7 +12,7 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class RespModel {
-    private int code;
+    private Integer code;
     private String message;
     private Object data;
 }

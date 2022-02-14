@@ -56,12 +56,13 @@ public class LanZouToolsController {
             if (Objects.equals(optional.get().getKey(), ResponseEnums.GET_FILE_WITH_PASSWORD.getCode()) && StringUtils.isEmpty(password)) {
                 return formatRespData(ResponseEnums.GET_FILE_WITH_PASSWORD, null);
             }
-            if (!Objects.equals(optional.get().getKey(), ResponseEnums.GET_FILE_SUCCESS.getCode())) {
+            if (!Objects.equals(optional.get().getKey(), ResponseEnums.GET_FILE_SUCCESS.getCode()) && !Objects.equals(optional.get().getKey(), ResponseEnums.GET_FILE_WITH_PASSWORD.getCode())) {
                 return formatRespDataWithCustomMsg(optional.get().getKey(), optional.get().getValue(), null);
             }
             // 处理数据
-            if (Objects.equals(optional.get().getKey(), ResponseEnums.GET_FILE_WITH_PASSWORD.getCode()) && StringUtils.isEmpty(password)) {
-
+            if (Objects.equals(optional.get().getKey(), ResponseEnums.GET_FILE_WITH_PASSWORD.getCode()) && !StringUtils.isEmpty(password)) {
+                FileInfoModel fileInfo = lanZouUtil.getFileWithPassword();
+                logger.info("fileInfo: {}", fileInfo);
             } else {
                 FileInfoModel fileInfo = lanZouUtil.getFileInfo();
                 if (Objects.isNull(fileInfo)) {
