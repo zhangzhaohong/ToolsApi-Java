@@ -15,9 +15,9 @@ import java.io.Serializable;
 public class VerifyPasswordResp implements Serializable {
     private Integer zt;
     @SerializedName("dom")
-    private String host;
+    private String downloadHost;
     @SerializedName("url")
-    private String path;
+    private String downloadPath;
     @SerializedName("inf")
     private String fileName;
 }

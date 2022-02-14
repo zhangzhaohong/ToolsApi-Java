@@ -63,6 +63,9 @@ public class LanZouToolsController {
             if (Objects.equals(optional.get().getKey(), ResponseEnums.GET_FILE_WITH_PASSWORD.getCode()) && !StringUtils.isEmpty(password)) {
                 FileInfoModel fileInfo = lanZouUtil.getFileWithPassword();
                 logger.info("fileInfo: {}", fileInfo);
+                if (!Objects.isNull(fileInfo)) {
+                    return formatRespData(ResponseEnums.GET_FILE_SUCCESS, fileInfo);
+                }
             } else {
                 FileInfoModel fileInfo = lanZouUtil.getFileInfo();
                 if (Objects.isNull(fileInfo)) {

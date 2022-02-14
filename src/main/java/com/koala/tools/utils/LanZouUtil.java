@@ -4,8 +4,10 @@ import com.koala.tools.enums.ResponseEnums;
 import com.koala.tools.models.file.FileInfoModel;
 import com.koala.tools.models.lanzou.VerifyPasswordResp;
 import lombok.Getter;
+import org.apache.logging.log4j.util.PropertiesUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
@@ -14,7 +16,6 @@ import java.util.*;
 
 import static com.koala.tools.enums.ResponseEnums.GET_FILE_SUCCESS;
 import static com.koala.tools.utils.HeaderUtil.*;
-import static com.koala.tools.utils.IpUtil.getRandomIpAddress;
 import static com.koala.tools.utils.RespUtil.formatRespData;
 
 /**
@@ -127,11 +128,14 @@ public class LanZouUtil {
             VerifyPasswordResp verifyPasswordData = GsonUtil.toBean(verifyPasswordResponseData, VerifyPasswordResp.class);
             logger.info("verifyPasswordResponseData: {}", verifyPasswordData);
             if (Objects.equals(verifyPasswordData.getZt(), 1)) {
-                String filePath = verifyPasswordData.getHost() + "/file/" + verifyPasswordData.getPath();
+                String filePath = verifyPasswordData.getDownloadHost() + "/file/" + verifyPasswordData.getDownloadPath();
                 logger.info("filePath: {}", filePath);
-                Map<String, Object> redirectResult = HttpClientUtil.doRedirect(verifyPasswordData.getHost() + "/file/" + verifyPasswordData.getPath(), getRedirectHeader(), new HashMap<>(0));
-                logger.info("result: {}", redirectResult.get("redirect"));
-                return getFileInfo();
+                String redirectLocation = HttpClientUtil.doGetRedirectLocation(verifyPasswordData.getDownloadHost() + "/file/" + verifyPasswordData.getDownloadPath(), getRedirectHeader(), new HashMap<>(0));
+                logger.info("redirectToLocation: {}", redirectLocation);
+                FileInfoModel fileInfo = getFileInfo();
+                BeanUtils.copyProperties(verifyPasswordData, fileInfo);
+                fileInfo.setDownloadUrl(redirectLocation);
+                return fileInfo;
             }
         }
         return null;
@@ -152,7 +156,7 @@ public class LanZouUtil {
         fileInfo.setDownloadHost(PatternUtil.matchData("submit.href\\ =\\ '(.*?)'" + (!Objects.isNull(down1) ? "\\ \\+\\ loaddown" : !Objects.isNull(down2) ? "\\ \\+\\ downloads" : ""), this.pageInfo));
         fileInfo.setDownloadPath(!Objects.isNull(down1) ? down1 : down2);
         fileInfo.setDownloadUrl(!Objects.isNull(fileInfo.getDownloadHost()) && !Objects.isNull(fileInfo.getDownloadPath()) ? fileInfo.getDownloadHost() + fileInfo.getDownloadPath() : null);
-        logger.info("fileInfo: {}", GsonUtil.toString(fileInfo));
+        logger.info("fileInfo: {}", fileInfo);
         return fileInfo;
     }
 }
