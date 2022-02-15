@@ -1,10 +1,11 @@
-package com.koala.tools.utils;
+package com.koala.tools.factory.product;
 
-import com.koala.tools.enums.ResponseEnums;
 import com.koala.tools.models.file.FileInfoModel;
 import com.koala.tools.models.lanzou.FolderDataRespModel;
 import com.koala.tools.models.lanzou.VerifyPasswordRespModel;
-import lombok.Getter;
+import com.koala.tools.utils.GsonUtil;
+import com.koala.tools.utils.HttpClientUtil;
+import com.koala.tools.utils.PatternUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -16,24 +17,20 @@ import java.util.*;
 
 import static com.koala.tools.enums.ResponseEnums.GET_FILE_SUCCESS;
 import static com.koala.tools.utils.HeaderUtil.*;
-import static com.koala.tools.utils.RespUtil.formatRespData;
 
 /**
  * @author koala
  * @version 1.0
- * @date 2022/2/11 18:30
+ * @date 2022/2/15 16:08
  * @description
  */
-@Getter
-public class LanZouUtil {
-
-    private final String password;
-    private final String url;
-    private final String urlId;
-    private final String pageInfo;
+public class LanZouApiProduct {
+    private static final Logger logger = LoggerFactory.getLogger(LanZouApiProduct.class);
+    private String id;
+    private String url;
     private String host;
-    private String response;
-    private static final Logger logger = LoggerFactory.getLogger(LanZouUtil.class);
+    private String password;
+    private String pageData;
     private static final ArrayList<String> HOST_LIST = new ArrayList<>();
     private static final HashMap<Integer, List<String>> INVALID_LIST = new HashMap<>();
 
@@ -48,42 +45,76 @@ public class LanZouUtil {
         INVALID_LIST.put(203, List.of("显示更多文件"));
     }
 
-    public LanZouUtil(String url, String password) throws IOException, URISyntaxException {
+    public void setUrl(String url) {
         this.url = url;
+    }
+
+    public void setPassword(String password) {
         this.password = password;
-        this.urlId = getUrlId();
-        logger.info("current urlId: {}", this.urlId);
-        this.pageInfo = getInfo(0, this.urlId, 1);
-        logger.info("current pageInfo: {}", this.pageInfo);
     }
 
-    private String getUrlId() {
-        if (StringUtils.isEmpty(this.url)) {
-            return null;
+    public void getIdByUrl() {
+        if (!StringUtils.isEmpty(this.url)) {
+            String rule = "com/";
+            this.id = this.url.substring(this.url.lastIndexOf(rule) + rule.length(), Objects.equals(this.url.lastIndexOf("/"), this.url.lastIndexOf(rule) + rule.length() - 1) ? this.url.length() : this.url.lastIndexOf("/"));
         }
-        String rule = "com/";
-        return this.url.substring(this.url.lastIndexOf(rule) + rule.length(), Objects.equals(this.url.lastIndexOf("/"), this.url.lastIndexOf(rule) + rule.length() - 1) ? this.url.length() : this.url.lastIndexOf("/"));
     }
 
-    private String getInfo(int index, String id, int mode) throws IOException, URISyntaxException {
+    public void initPageData() throws IOException, URISyntaxException {
+        if (!StringUtils.isEmpty(this.id)) {
+            this.pageData = getPageInfo(0, this.id, 1);
+        }
+    }
+
+    private String getPageInfo(int index, String id, int mode) throws IOException, URISyntaxException {
         if (Objects.equals(index, HOST_LIST.size() - 1)) {
             if (Objects.equals(mode, 2)) {
-                response = formatRespData(ResponseEnums.GET_DATA_ERROR, null);
                 return null;
             } else {
                 mode++;
-                return getInfo(0, id, mode);
+                return getPageInfo(0, id, mode);
             }
         } else {
-            String info = getUrl(index, id, mode);
-            if (StringUtils.isEmpty(info)) {
+            String data = requestPageData(index, id, mode);
+            if (StringUtils.isEmpty(data)) {
                 index++;
-                return getInfo(index, id, mode);
+                return getPageInfo(index, id, mode);
             } else {
                 host = HOST_LIST.get(index);
-                return info;
+                return data;
             }
         }
+    }
+
+    private String requestPageData(int index, String id, int mode) throws IOException, URISyntaxException {
+        StringJoiner joiner = new StringJoiner("");
+        joiner.add(HOST_LIST.get(index));
+        logger.info("[LanZouApiProduct]({}) mode: {}", id, mode);
+        if (Objects.equals(mode, 1)) {
+            joiner.add("/tp/");
+        } else {
+            joiner.add("/");
+        }
+        joiner.add(id);
+        String tmp = joiner.toString();
+        logger.info("[LanZouApiProduct]({}) tmpFilePath: {}", id, tmp);
+        return HttpClientUtil.doGet(tmp, getHeader(), new HashMap<>(0));
+    }
+
+    public Map<Integer, String> checkStatus() {
+        HashMap<Integer, String> result = new HashMap<>(0);
+        INVALID_LIST.forEach((key, item) -> {
+            for (String value : item) {
+                if (this.pageData.contains(value)) {
+                    result.put(key, value);
+                    break;
+                }
+            }
+        });
+        if (result.size() <= 0) {
+            result.put(GET_FILE_SUCCESS.getCode(), GET_FILE_SUCCESS.getMessage());
+        }
+        return result;
     }
 
     private String getPageData(String id, int mode) throws IOException, URISyntaxException {
@@ -94,7 +125,7 @@ public class LanZouUtil {
         while (index <= HOST_LIST.size() - 1) {
             StringJoiner joiner = new StringJoiner("");
             joiner.add(HOST_LIST.get(index));
-            logger.info("mode: {}", mode);
+            logger.info("[LanZouApiProduct]({}) mode: {}", id, mode);
             if (Objects.equals(mode, 1)) {
                 joiner.add("/tp/");
             } else {
@@ -102,7 +133,7 @@ public class LanZouUtil {
             }
             joiner.add(id);
             String tmp = joiner.toString();
-            logger.info("tmp file: {}", tmp);
+            logger.info("[LanZouApiProduct]({}) tmpFilePath: {}", id, tmp);
             String response = HttpClientUtil.doGet(tmp, getHeader(), new HashMap<>(0));
             if (!Objects.isNull(response)) {
                 return response;
@@ -116,42 +147,14 @@ public class LanZouUtil {
         return null;
     }
 
-    private String getUrl(int index, String id, int mode) throws IOException, URISyntaxException {
-        StringJoiner joiner = new StringJoiner("");
-        joiner.add(HOST_LIST.get(index));
-        logger.info("mode: {}", mode);
-        if (Objects.equals(mode, 1)) {
-            joiner.add("/tp/");
-        } else {
-            joiner.add("/");
-        }
-        joiner.add(id);
-        String tmp = joiner.toString();
-        logger.info("current file: {}", tmp);
-        return HttpClientUtil.doGet(tmp, getHeader(), new HashMap<>(0));
-    }
-
-    public Map<Integer, String> checkStatus() {
-        HashMap<Integer, String> result = new HashMap<>(0);
-        INVALID_LIST.forEach((key, item) -> item.forEach(value -> {
-            if (this.pageInfo.contains(value)) {
-                result.put(key, value);
-            }
-        }));
-        if (result.size() <= 0) {
-            result.put(GET_FILE_SUCCESS.getCode(), GET_FILE_SUCCESS.getMessage());
-        }
-        return result;
-    }
-
     public Object getFileWithPassword() throws IOException, URISyntaxException {
-        String sign = PatternUtil.matchData("'sign':'(.*?)'", this.pageInfo);
-        logger.info("sign: {}", sign);
+        String sign = PatternUtil.matchData("'sign':'(.*?)'", this.pageData);
+        logger.info("[LanZouApiProduct]({}) sign: {}", id, sign);
         if (StringUtils.isEmpty(sign)) {
             // 目录
-            String scriptData = PatternUtil.matchData("<script type=\"text/javascript\">(.*?)</script>", this.pageInfo.replace("\n", ""));
-            String paramsData = PatternUtil.matchData("data:\\{(.*?)\\},", this.pageInfo.replace(" ", "").replace("\n", ""));
-            logger.info("scriptData: {}, paramsData: {}", scriptData, paramsData);
+            String scriptData = PatternUtil.matchData("<script type=\"text/javascript\">(.*?)</script>", this.pageData.replace("\n", ""));
+            String paramsData = PatternUtil.matchData("data:\\{(.*?)\\},", this.pageData.replace(" ", "").replace("\n", ""));
+            logger.info("[LanZouApiProduct]({}) scriptData: {}, paramsData: {}", id, scriptData, paramsData);
             HashMap<String, String> params = new HashMap<>(0);
             params.put("lx", PatternUtil.matchData("'lx':(.*?),", paramsData));
             params.put("fid", PatternUtil.matchData("'fid':(.*?),", paramsData));
@@ -164,7 +167,7 @@ public class LanZouUtil {
             params.put("ls", PatternUtil.matchData("'ls':(.*?),", paramsData));
             params.put("pwd", password);
             String getFolderResponse = HttpClientUtil.doPost(host + "/filemoreajax.php", getVerifyPasswordHeader(host), params);
-            logger.info("params: {}, getFolderResponse: {}", params, getFolderResponse);
+            logger.info("[LanZouApiProduct]({}) params: {}, getFolderResponse: {}", id, params, getFolderResponse);
             if (!Objects.isNull(getFolderResponse)) {
                 FolderDataRespModel folderData = GsonUtil.toBean(getFolderResponse, FolderDataRespModel.class);
                 if (Objects.equals(folderData.getZt(), 1)) {
@@ -173,7 +176,6 @@ public class LanZouUtil {
                         try {
                             String filePageInfo = getPageData(item.getId(), 1);
                             FileInfoModel fileInfo = getFileInfo(filePageInfo);
-                            logger.info("folderFileInfo: {}", fileInfo);
                             fileInfoList.add(fileInfo);
                         } catch (IOException | URISyntaxException e) {
                             e.printStackTrace();
@@ -193,10 +195,10 @@ public class LanZouUtil {
             passwordData.put("p", password);
             String verifyPasswordResponseData = HttpClientUtil.doPost(host + "/ajaxm.php", getVerifyPasswordHeader(host), passwordData);
             VerifyPasswordRespModel verifyPasswordData = GsonUtil.toBean(verifyPasswordResponseData, VerifyPasswordRespModel.class);
-            logger.info("verifyPasswordResponseData: {}", verifyPasswordData);
+            logger.info("[LanZouApiProduct]({}) verifyPasswordResponseData: {}", id, verifyPasswordData);
             if (Objects.equals(verifyPasswordData.getZt(), 1)) {
                 String filePath = verifyPasswordData.getDownloadHost() + "/file/" + verifyPasswordData.getDownloadPath();
-                logger.info("filePath: {}", filePath);
+                logger.info("[LanZouApiProduct]({}) filePath: {}", id, filePath);
                 FileInfoModel fileInfo = getFileInfo(null);
                 BeanUtils.copyProperties(verifyPasswordData, fileInfo);
                 fileInfo.setDownloadUrl(!Objects.isNull(verifyPasswordData.getDownloadHost()) && !Objects.isNull(verifyPasswordData.getDownloadPath()) ? verifyPasswordData.getDownloadHost() + "/file/" + verifyPasswordData.getDownloadPath() : null);
@@ -210,7 +212,7 @@ public class LanZouUtil {
     public FileInfoModel getFileInfo(String pageData) throws IOException, URISyntaxException {
         String inputPageInfo = pageData;
         if (Objects.isNull(inputPageInfo)) {
-            inputPageInfo = this.pageInfo;
+            inputPageInfo = this.pageData;
         }
         FileInfoModel fileInfo = new FileInfoModel();
         fileInfo.setFileName(PatternUtil.matchData("<div class=\"md\">(.*?)<span class=\"mtt\">", inputPageInfo));
@@ -227,7 +229,7 @@ public class LanZouUtil {
         fileInfo.setDownloadPath(!Objects.isNull(down1) ? down1 : down2);
         fileInfo.setDownloadUrl(!Objects.isNull(fileInfo.getDownloadHost()) && !Objects.isNull(fileInfo.getDownloadPath()) ? fileInfo.getDownloadHost() + fileInfo.getDownloadPath() : null);
         fileInfo.setRedirectUrl(!Objects.isNull(fileInfo.getDownloadHost()) && !Objects.isNull(fileInfo.getDownloadPath()) ? getRedirectUrl(fileInfo.getDownloadHost() + fileInfo.getDownloadPath()) : null);
-        logger.info("fileInfo: {}", fileInfo);
+        logger.info("[LanZouApiProduct]({}) fileInfo: {}", id, fileInfo);
         return fileInfo;
     }
 
@@ -236,6 +238,21 @@ public class LanZouUtil {
             return null;
         }
         return HttpClientUtil.doGetRedirectLocation(url, getRedirectHeader(), new HashMap<>(0));
+    }
+
+    public String getPageData() {
+        return pageData;
+    }
+
+    /**
+     * 下面是打印log区域
+     */
+    public void printParams() {
+        logger.info("[LanZouApiProduct]({}) inputParams: {url={}, password={}}", id, url, password);
+    }
+
+    public void printPageData() {
+        logger.info("[LanZouApiProduct]({}) pageData: {}}", id, pageData);
     }
 
 }
