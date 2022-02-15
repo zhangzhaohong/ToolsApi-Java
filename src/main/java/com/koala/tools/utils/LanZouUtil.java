@@ -121,18 +121,18 @@ public class LanZouUtil {
             String scriptData = PatternUtil.matchData("<script type=\"text/javascript\">(.*?)</script>", this.pageInfo.replace("\n", ""));
             String paramsData = PatternUtil.matchData("data:\\{(.*?)\\},", this.pageInfo.replace(" ", "").replace("\n", ""));
             logger.info("scriptData: {}, paramsData: {}", scriptData, paramsData);
-            HashMap<String, Object> params = new HashMap<>(0);
-            params.put("lx", formatStringToInt(PatternUtil.matchData("'lx':(.*?),", paramsData)));
-            params.put("fid", formatStringToInt(PatternUtil.matchData("'fid':(.*?),", paramsData)));
+            HashMap<String, String> params = new HashMap<>(0);
+            params.put("lx", PatternUtil.matchData("'lx':(.*?),", paramsData));
+            params.put("fid", PatternUtil.matchData("'fid':(.*?),", paramsData));
             params.put("uid", PatternUtil.matchData("'uid':'(.*?)',", paramsData));
-            params.put("pg", formatStringToInt(PatternUtil.matchData(PatternUtil.matchData("'pg':(.*?),", paramsData) + "\\ =(.*?);", scriptData)));
+            params.put("pg", PatternUtil.matchData(PatternUtil.matchData("'pg':(.*?),", paramsData) + "\\ =(.*?);", scriptData));
             params.put("rep", PatternUtil.matchData("'rep':'(.*?)',", paramsData));
             params.put("t", PatternUtil.matchData("var\\ " + PatternUtil.matchData("'t':(.*?),", paramsData) + "\\ =\\ '(.*?)';", scriptData));
             params.put("k", PatternUtil.matchData("var\\ " + PatternUtil.matchData("'k':(.*?),", paramsData) + "\\ =\\ '(.*?)';", scriptData));
-            params.put("up", formatStringToInt(PatternUtil.matchData("'up':(.*?),", paramsData)));
-            params.put("ls", formatStringToInt(PatternUtil.matchData("'ls':(.*?),", paramsData)));
+            params.put("up", PatternUtil.matchData("'up':(.*?),", paramsData));
+            params.put("ls", PatternUtil.matchData("'ls':(.*?),", paramsData));
             params.put("pwd", password);
-            String getFolderResponse = HttpClientUtil.doPostJson(host + "/filemoreajax.php", getVerifyPasswordHeader(host), GsonUtil.toString(params));
+            String getFolderResponse = HttpClientUtil.doPost(host + "/filemoreajax.php", getVerifyPasswordHeader(host), params);
             logger.info("params: {}, getFolderResponse: {}", params, getFolderResponse);
         } else {
             // 单文件
@@ -176,10 +176,4 @@ public class LanZouUtil {
         return fileInfo;
     }
 
-    private Integer formatStringToInt(String input) {
-        if (Objects.isNull(input)) {
-            return null;
-        }
-        return Integer.valueOf(input);
-    }
 }
