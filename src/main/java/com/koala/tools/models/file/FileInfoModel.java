@@ -20,4 +20,5 @@ public class FileInfoModel implements Serializable {
     private String downloadHost;
     private String downloadPath;
     private String downloadUrl;
+    private String redirectUrl;
 }

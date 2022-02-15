@@ -146,18 +146,17 @@ public class LanZouUtil {
             if (Objects.equals(verifyPasswordData.getZt(), 1)) {
                 String filePath = verifyPasswordData.getDownloadHost() + "/file/" + verifyPasswordData.getDownloadPath();
                 logger.info("filePath: {}", filePath);
-                String redirectLocation = HttpClientUtil.doGetRedirectLocation(verifyPasswordData.getDownloadHost() + "/file/" + verifyPasswordData.getDownloadPath(), getRedirectHeader(), new HashMap<>(0));
-                logger.info("redirectToLocation: {}", redirectLocation);
                 FileInfoModel fileInfo = getFileInfo();
                 BeanUtils.copyProperties(verifyPasswordData, fileInfo);
-                fileInfo.setDownloadUrl(redirectLocation);
+                fileInfo.setDownloadUrl(!Objects.isNull(verifyPasswordData.getDownloadHost()) && !Objects.isNull(verifyPasswordData.getDownloadPath()) ? verifyPasswordData.getDownloadHost() + "/file/" + verifyPasswordData.getDownloadPath() : null);
+                fileInfo.setRedirectUrl(!Objects.isNull(verifyPasswordData.getDownloadHost()) && !Objects.isNull(verifyPasswordData.getDownloadPath()) ? getRedirectUrl(verifyPasswordData.getDownloadHost() + "/file/" + verifyPasswordData.getDownloadPath()) : null);
                 return fileInfo;
             }
         }
         return null;
     }
 
-    public FileInfoModel getFileInfo() {
+    public FileInfoModel getFileInfo() throws IOException, URISyntaxException {
         FileInfoModel fileInfo = new FileInfoModel();
         fileInfo.setFileName(PatternUtil.matchData("<div class=\"md\">(.*?)<span class=\"mtt\">", this.pageInfo));
         fileInfo.setFileSize(PatternUtil.matchData("<span class=\"mtt\">\\((.*?)\\)</span>", this.pageInfo));
@@ -172,8 +171,16 @@ public class LanZouUtil {
         fileInfo.setDownloadHost(PatternUtil.matchData("submit.href\\ =\\ '(.*?)'" + (!Objects.isNull(down1) ? "\\ \\+\\ loaddown" : !Objects.isNull(down2) ? "\\ \\+\\ downloads" : ""), this.pageInfo));
         fileInfo.setDownloadPath(!Objects.isNull(down1) ? down1 : down2);
         fileInfo.setDownloadUrl(!Objects.isNull(fileInfo.getDownloadHost()) && !Objects.isNull(fileInfo.getDownloadPath()) ? fileInfo.getDownloadHost() + fileInfo.getDownloadPath() : null);
+        fileInfo.setRedirectUrl(!Objects.isNull(fileInfo.getDownloadHost()) && !Objects.isNull(fileInfo.getDownloadPath()) ? getRedirectUrl(fileInfo.getDownloadHost() + fileInfo.getDownloadPath()) : null);
         logger.info("fileInfo: {}", fileInfo);
         return fileInfo;
+    }
+
+    public String getRedirectUrl(String url) throws IOException, URISyntaxException {
+        if (Objects.isNull(url)) {
+            return null;
+        }
+        return HttpClientUtil.doGetRedirectLocation(url, getRedirectHeader(), new HashMap<>(0));
     }
 
 }

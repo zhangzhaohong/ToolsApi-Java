@@ -76,7 +76,11 @@ public class LanZouToolsController {
                         if (StringUtils.isEmpty(fileInfo.getDownloadUrl())) {
                             return formatRespData(ResponseEnums.FAILURE, fileInfo);
                         } else {
-                            response.sendRedirect(fileInfo.getDownloadUrl());
+                            if (!Objects.isNull(fileInfo.getRedirectUrl())) {
+                                response.sendRedirect(fileInfo.getRedirectUrl());
+                            } else if (!Objects.isNull(fileInfo.getDownloadUrl())) {
+                                response.sendRedirect(fileInfo.getDownloadUrl());
+                            }
                             return formatRespData(ResponseEnums.REDIRECT_TO_DOWNLOAD, fileInfo);
                         }
                     case INFO:
