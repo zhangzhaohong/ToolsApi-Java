@@ -13,7 +13,8 @@ import static com.koala.tools.utils.IpUtil.getRandomIpAddress;
  */
 public class HeaderUtil {
 
-    private HeaderUtil() {}
+    private HeaderUtil() {
+    }
 
     public static Map<String, String> getHeader() {
         HashMap<String, String> header = new HashMap<>(0);
@@ -42,9 +43,10 @@ public class HeaderUtil {
 
     public static Map<String, String> getVerifyPasswordHeader(String host) {
         HashMap<String, String> header = new HashMap<>(0);
-        header.put("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
+        header.put("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
         header.put("Accept-Encoding", "gzip, deflate");
-        header.put("Accept-Language", "zh-CN,zh;q=0.9");
+        header.put("Accept-Language", "zh-CN,zh;q=0.8");
+        header.put("User-Agent", "Mozilla/5.0 (iPhone; CPU iPhone OS 6_0 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/6.0 Mobile/10A5376e Safari/8536.25");
         header.put("Referer", host);
         header.put("X-FORWARDED-FOR", getRandomIpAddress());
         header.put("CLIENT-IP", getRandomIpAddress());

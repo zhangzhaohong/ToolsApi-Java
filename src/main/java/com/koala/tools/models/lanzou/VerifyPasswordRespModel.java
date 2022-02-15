@@ -12,7 +12,7 @@ import java.io.Serializable;
  * @description
  */
 @Data
-public class VerifyPasswordResp implements Serializable {
+public class VerifyPasswordRespModel implements Serializable {
     private Integer zt;
     @SerializedName("dom")
     private String downloadHost;
