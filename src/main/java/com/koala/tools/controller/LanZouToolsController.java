@@ -2,8 +2,11 @@ package com.koala.tools.controller;
 
 import com.koala.tools.enums.LanZouTypeEnums;
 import com.koala.tools.enums.ResponseEnums;
+import com.koala.tools.factory.builder.ConcreteLanZouApiBuilder;
+import com.koala.tools.factory.builder.LanZouApiBuilder;
+import com.koala.tools.factory.director.LanZouApiManager;
+import com.koala.tools.factory.product.LanZouApiProduct;
 import com.koala.tools.models.file.FileInfoModel;
-import com.koala.tools.utils.LanZouUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
@@ -37,6 +40,15 @@ public class LanZouToolsController {
 
     private static final String LANZOU = "lanzou";
 
+    /**
+     * @param url
+     * @param password
+     * @param type
+     * @param response
+     * @return
+     * @throws IOException
+     * @throws URISyntaxException
+     */
     @GetMapping("api")
     public Object getLanZouInfos(@RequestParam(value = "url", required = false) String url, @RequestParam(value = "password", required = false) String password, @RequestParam(value = "type", required = false, defaultValue = "info") String type, HttpServletResponse response) throws IOException, URISyntaxException {
         logger.info("LanZouApi: params: {url={}, password={}, type={}}", url, password, type);
@@ -47,13 +59,15 @@ public class LanZouToolsController {
         if (Objects.equals(typeId, LanZouTypeEnums.INVALID_TYPE.getTypeId())) {
             return formatRespData(ResponseEnums.INVALID_TYPE, null);
         }
-        LanZouUtil lanZouUtil = new LanZouUtil(url, password);
-        if (!Objects.isNull(lanZouUtil.getResponse())) {
-            return lanZouUtil.getResponse();
+        // 初始化product
+        LanZouApiBuilder builder = new ConcreteLanZouApiBuilder();
+        LanZouApiManager manager = new LanZouApiManager(builder);
+        LanZouApiProduct product = manager.construct(url, password);
+        if (Objects.isNull(product.getPageData())) {
+            return formatRespData(ResponseEnums.GET_DATA_ERROR, null);
         }
-        Optional<Map.Entry<Integer, String>> optional = lanZouUtil.checkStatus().entrySet().stream().findFirst();
+        Optional<Map.Entry<Integer, String>> optional = product.checkStatus().entrySet().stream().findFirst();
         if (optional.isPresent()) {
-            // 先校验密码
             if (Objects.equals(optional.get().getKey(), ResponseEnums.GET_FILE_WITH_PASSWORD.getCode()) && StringUtils.isEmpty(password)) {
                 return formatRespData(ResponseEnums.GET_FILE_WITH_PASSWORD, null);
             }
@@ -62,7 +76,7 @@ public class LanZouToolsController {
             }
             // 处理数据
             if (Objects.equals(optional.get().getKey(), ResponseEnums.GET_FILE_WITH_PASSWORD.getCode()) && !StringUtils.isEmpty(password)) {
-                Object fileInfo = lanZouUtil.getFileWithPassword();
+                Object fileInfo = product.getFileWithPassword();
                 logger.info("fileInfo: {}", fileInfo);
                 if (fileInfo instanceof FileInfoModel) {
                     switch (Objects.requireNonNull(LanZouTypeEnums.getEnumsByType(type))) {
@@ -86,7 +100,7 @@ public class LanZouToolsController {
                     return formatRespData(ResponseEnums.GET_FILE_SUCCESS, fileInfo);
                 }
             } else {
-                FileInfoModel fileInfo = lanZouUtil.getFileInfo(null);
+                FileInfoModel fileInfo = product.getFileInfo(null);
                 if (Objects.isNull(fileInfo)) {
                     return formatRespData(ResponseEnums.FAILURE, null);
                 }
