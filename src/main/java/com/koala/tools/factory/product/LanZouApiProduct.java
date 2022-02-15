@@ -2,6 +2,7 @@ package com.koala.tools.factory.product;
 
 import com.koala.tools.models.file.FileInfoModel;
 import com.koala.tools.models.lanzou.FolderDataRespModel;
+import com.koala.tools.models.lanzou.FolderFileInfoRespModel;
 import com.koala.tools.models.lanzou.VerifyPasswordRespModel;
 import com.koala.tools.utils.GsonUtil;
 import com.koala.tools.utils.HttpClientUtil;
@@ -42,7 +43,7 @@ public class LanZouApiProduct {
         HOST_LIST.add("https://wwi.lanzouj.com");
         INVALID_LIST.put(201, Arrays.asList("文件取消分享了", "文件不存在", "访问地址错误，请核查"));
         INVALID_LIST.put(202, List.of("输入密码"));
-        INVALID_LIST.put(203, List.of("显示更多文件"));
+        INVALID_LIST.put(204, List.of("显示更多文件"));
     }
 
     public void setUrl(String url) {
@@ -172,15 +173,20 @@ public class LanZouApiProduct {
                 FolderDataRespModel folderData = GsonUtil.toBean(getFolderResponse, FolderDataRespModel.class);
                 if (Objects.equals(folderData.getZt(), 1)) {
                     ArrayList<FileInfoModel> fileInfoList = new ArrayList<>(0);
-                    folderData.getText().forEach(item -> {
-                        try {
-                            String filePageInfo = getPageData(item.getId(), 1);
-                            FileInfoModel fileInfo = getFileInfo(filePageInfo);
-                            fileInfoList.add(fileInfo);
-                        } catch (IOException | URISyntaxException e) {
-                            e.printStackTrace();
-                        }
-                    });
+                    Object folderFileData = folderData.getText();
+                    if (folderFileData instanceof ArrayList) {
+                        ((ArrayList<?>) folderFileData).forEach(item -> {
+                            if (item instanceof FolderFileInfoRespModel) {
+                                try {
+                                    String filePageInfo = getPageData(((FolderFileInfoRespModel) item).getId(), 1);
+                                    FileInfoModel fileInfo = getFileInfo(filePageInfo);
+                                    fileInfoList.add(fileInfo);
+                                } catch (IOException | URISyntaxException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+                    }
                     return fileInfoList;
                 } else {
                     return null;
