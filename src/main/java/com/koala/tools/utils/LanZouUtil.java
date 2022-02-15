@@ -2,7 +2,8 @@ package com.koala.tools.utils;
 
 import com.koala.tools.enums.ResponseEnums;
 import com.koala.tools.models.file.FileInfoModel;
-import com.koala.tools.models.lanzou.VerifyPasswordResp;
+import com.koala.tools.models.lanzou.FolderDataRespModel;
+import com.koala.tools.models.lanzou.VerifyPasswordRespModel;
 import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,6 +86,36 @@ public class LanZouUtil {
         }
     }
 
+    private String getPageData(String id, int mode) throws IOException, URISyntaxException {
+        if (mode < 0) {
+            return null;
+        }
+        int index = 0;
+        while (index <= HOST_LIST.size() - 1) {
+            StringJoiner joiner = new StringJoiner("");
+            joiner.add(HOST_LIST.get(index));
+            logger.info("mode: {}", mode);
+            if (Objects.equals(mode, 1)) {
+                joiner.add("/tp/");
+            } else {
+                joiner.add("/");
+            }
+            joiner.add(id);
+            String tmp = joiner.toString();
+            logger.info("tmp file: {}", tmp);
+            String response = HttpClientUtil.doGet(tmp, getHeader(), new HashMap<>(0));
+            if (!Objects.isNull(response)) {
+                return response;
+            }
+            if (Objects.equals(index, HOST_LIST.size() - 1)) {
+                mode--;
+                return getPageData(id, mode);
+            }
+            index++;
+        }
+        return null;
+    }
+
     private String getUrl(int index, String id, int mode) throws IOException, URISyntaxException {
         StringJoiner joiner = new StringJoiner("");
         joiner.add(HOST_LIST.get(index));
@@ -113,7 +144,7 @@ public class LanZouUtil {
         return result;
     }
 
-    public FileInfoModel getFileWithPassword() throws IOException, URISyntaxException {
+    public Object getFileWithPassword() throws IOException, URISyntaxException {
         String sign = PatternUtil.matchData("'sign':'(.*?)'", this.pageInfo);
         logger.info("sign: {}", sign);
         if (StringUtils.isEmpty(sign)) {
@@ -134,19 +165,39 @@ public class LanZouUtil {
             params.put("pwd", password);
             String getFolderResponse = HttpClientUtil.doPost(host + "/filemoreajax.php", getVerifyPasswordHeader(host), params);
             logger.info("params: {}, getFolderResponse: {}", params, getFolderResponse);
+            if (!Objects.isNull(getFolderResponse)) {
+                FolderDataRespModel folderData = GsonUtil.toBean(getFolderResponse, FolderDataRespModel.class);
+                if (Objects.equals(folderData.getZt(), 1)) {
+                    ArrayList<FileInfoModel> fileInfoList = new ArrayList<>(0);
+                    folderData.getText().forEach(item -> {
+                        try {
+                            String filePageInfo = getPageData(item.getId(), 1);
+                            FileInfoModel fileInfo = getFileInfo(filePageInfo);
+                            logger.info("folderFileInfo: {}", fileInfo);
+                            fileInfoList.add(fileInfo);
+                        } catch (IOException | URISyntaxException e) {
+                            e.printStackTrace();
+                        }
+                    });
+                    return fileInfoList;
+                } else {
+                    return null;
+                }
+            }
         } else {
             // 单文件
             HashMap<String, String> passwordData = new HashMap<>(0);
             passwordData.put("action", "downprocess");
+            passwordData.put("signs", "?ctdf");
             passwordData.put("sign", sign);
             passwordData.put("p", password);
             String verifyPasswordResponseData = HttpClientUtil.doPost(host + "/ajaxm.php", getVerifyPasswordHeader(host), passwordData);
-            VerifyPasswordResp verifyPasswordData = GsonUtil.toBean(verifyPasswordResponseData, VerifyPasswordResp.class);
+            VerifyPasswordRespModel verifyPasswordData = GsonUtil.toBean(verifyPasswordResponseData, VerifyPasswordRespModel.class);
             logger.info("verifyPasswordResponseData: {}", verifyPasswordData);
             if (Objects.equals(verifyPasswordData.getZt(), 1)) {
                 String filePath = verifyPasswordData.getDownloadHost() + "/file/" + verifyPasswordData.getDownloadPath();
                 logger.info("filePath: {}", filePath);
-                FileInfoModel fileInfo = getFileInfo();
+                FileInfoModel fileInfo = getFileInfo(null);
                 BeanUtils.copyProperties(verifyPasswordData, fileInfo);
                 fileInfo.setDownloadUrl(!Objects.isNull(verifyPasswordData.getDownloadHost()) && !Objects.isNull(verifyPasswordData.getDownloadPath()) ? verifyPasswordData.getDownloadHost() + "/file/" + verifyPasswordData.getDownloadPath() : null);
                 fileInfo.setRedirectUrl(!Objects.isNull(verifyPasswordData.getDownloadHost()) && !Objects.isNull(verifyPasswordData.getDownloadPath()) ? getRedirectUrl(verifyPasswordData.getDownloadHost() + "/file/" + verifyPasswordData.getDownloadPath()) : null);
@@ -156,19 +207,23 @@ public class LanZouUtil {
         return null;
     }
 
-    public FileInfoModel getFileInfo() throws IOException, URISyntaxException {
+    public FileInfoModel getFileInfo(String pageData) throws IOException, URISyntaxException {
+        String inputPageInfo = pageData;
+        if (Objects.isNull(inputPageInfo)) {
+            inputPageInfo = this.pageInfo;
+        }
         FileInfoModel fileInfo = new FileInfoModel();
-        fileInfo.setFileName(PatternUtil.matchData("<div class=\"md\">(.*?)<span class=\"mtt\">", this.pageInfo));
-        fileInfo.setFileSize(PatternUtil.matchData("<span class=\"mtt\">\\((.*?)\\)</span>", this.pageInfo));
-        String updateTime = PatternUtil.matchData("<span class=\"mt2\"></span>(.*?)<span class=\"mt2\">", this.pageInfo);
+        fileInfo.setFileName(PatternUtil.matchData("<div class=\"md\">(.*?)<span class=\"mtt\">", inputPageInfo));
+        fileInfo.setFileSize(PatternUtil.matchData("<span class=\"mtt\">\\((.*?)\\)</span>", inputPageInfo));
+        String updateTime = PatternUtil.matchData("<span class=\"mt2\"></span>(.*?)<span class=\"mt2\">", inputPageInfo);
         if (Objects.isNull(updateTime)) {
-            updateTime = PatternUtil.matchData("时间:<\\/span>(.*?)<span class=\"mt2\">", this.pageInfo);
+            updateTime = PatternUtil.matchData("时间:<\\/span>(.*?)<span class=\"mt2\">", inputPageInfo);
         }
         fileInfo.setUpdateTime(updateTime);
-        fileInfo.setAuthor(PatternUtil.matchData("发布者:<\\/span>(.*?)<span class=\"mt2\">", this.pageInfo));
-        String down1 = PatternUtil.matchData("var\\ loaddown\\ =\\ '(.*?)';", this.pageInfo);
-        String down2 = PatternUtil.matchData("var\\ downloads\\ =\\ '(.*?)';", this.pageInfo);
-        fileInfo.setDownloadHost(PatternUtil.matchData("submit.href\\ =\\ '(.*?)'" + (!Objects.isNull(down1) ? "\\ \\+\\ loaddown" : !Objects.isNull(down2) ? "\\ \\+\\ downloads" : ""), this.pageInfo));
+        fileInfo.setAuthor(PatternUtil.matchData("发布者:<\\/span>(.*?)<span class=\"mt2\">", inputPageInfo));
+        String down1 = PatternUtil.matchData("var\\ loaddown\\ =\\ '(.*?)';", inputPageInfo);
+        String down2 = PatternUtil.matchData("var\\ downloads\\ =\\ '(.*?)';", inputPageInfo);
+        fileInfo.setDownloadHost(PatternUtil.matchData("submit.href\\ =\\ '(.*?)'" + (!Objects.isNull(down1) ? "\\ \\+\\ loaddown" : !Objects.isNull(down2) ? "\\ \\+\\ downloads" : ""), inputPageInfo));
         fileInfo.setDownloadPath(!Objects.isNull(down1) ? down1 : down2);
         fileInfo.setDownloadUrl(!Objects.isNull(fileInfo.getDownloadHost()) && !Objects.isNull(fileInfo.getDownloadPath()) ? fileInfo.getDownloadHost() + fileInfo.getDownloadPath() : null);
         fileInfo.setRedirectUrl(!Objects.isNull(fileInfo.getDownloadHost()) && !Objects.isNull(fileInfo.getDownloadPath()) ? getRedirectUrl(fileInfo.getDownloadHost() + fileInfo.getDownloadPath()) : null);
