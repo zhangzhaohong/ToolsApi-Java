@@ -15,5 +15,5 @@ import java.util.ArrayList;
 public class FolderDataRespModel implements Serializable {
     private Integer zt;
     private String info;
-    private ArrayList<FolderFileInfoRespModel> text = new ArrayList<>(0);
+    private Object text = new ArrayList<FolderFileInfoRespModel>(0);
 }

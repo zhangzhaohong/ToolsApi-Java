@@ -97,6 +97,8 @@ public class LanZouToolsController {
                     }
                 } else if (fileInfo instanceof ArrayList) {
                     return formatRespData(ResponseEnums.GET_FILE_SUCCESS, fileInfo);
+                } else {
+                    return formatRespData(ResponseEnums.GET_FILE_ERROR_WITH_PASSWORD, null);
                 }
             } else {
                 FileInfoModel fileInfo = product.getFileInfo(null);
