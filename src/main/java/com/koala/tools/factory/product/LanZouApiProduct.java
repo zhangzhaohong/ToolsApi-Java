@@ -176,7 +176,6 @@ public class LanZouApiProduct {
                         try {
                             String filePageInfo = getPageData(item.getId(), 1);
                             FileInfoModel fileInfo = getFileInfo(filePageInfo);
-                            logger.info("[LanZouApiProduct]({}) folderFileInfo: {}", id, fileInfo);
                             fileInfoList.add(fileInfo);
                         } catch (IOException | URISyntaxException e) {
                             e.printStackTrace();

@@ -77,7 +77,6 @@ public class LanZouToolsController {
             // 处理数据
             if (Objects.equals(optional.get().getKey(), ResponseEnums.GET_FILE_WITH_PASSWORD.getCode()) && !StringUtils.isEmpty(password)) {
                 Object fileInfo = product.getFileWithPassword();
-                logger.info("fileInfo: {}", fileInfo);
                 if (fileInfo instanceof FileInfoModel) {
                     switch (Objects.requireNonNull(LanZouTypeEnums.getEnumsByType(type))) {
                         case DOWNLOAD:
