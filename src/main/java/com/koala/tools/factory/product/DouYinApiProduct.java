@@ -71,4 +71,8 @@ public class DouYinApiProduct {
     public void printParams() {
         logger.info("[DouYinApiProduct]({}, {}) params: {url={}, directPath={}}", id, itemId, url, directUrl);
     }
+
+    public void generateData() {
+        // TODO: 生成数据
+    }
 }

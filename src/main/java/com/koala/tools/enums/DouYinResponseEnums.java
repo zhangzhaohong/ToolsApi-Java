@@ -12,6 +12,7 @@ import lombok.Getter;
 @Getter
 public enum DouYinResponseEnums {
     FAILURE(-1, "UNKNOWN_ERROR"),
+    INVALID_URL(101, "INVALID_URL"),
     GET_INFO_ERROR(201, "GET_INFO_ERROR");
 
     private final Integer code;

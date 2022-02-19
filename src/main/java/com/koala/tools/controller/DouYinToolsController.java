@@ -7,6 +7,7 @@ import com.koala.tools.factory.director.DouYinApiManager;
 import com.koala.tools.factory.product.DouYinApiProduct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -17,8 +18,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Objects;
 
-import static com.koala.tools.enums.DouYinResponseEnums.FAILURE;
-import static com.koala.tools.enums.DouYinResponseEnums.GET_INFO_ERROR;
+import static com.koala.tools.enums.DouYinResponseEnums.*;
 import static com.koala.tools.utils.RespUtil.formatRespData;
 
 /**
@@ -35,12 +35,19 @@ public class DouYinToolsController {
 
     @GetMapping("api")
     public Object getDouYinInfos(@RequestParam(value = "url", required = false) String url, @RequestParam(value = "type", required = false, defaultValue = "info") String type, HttpServletResponse response) throws IOException, URISyntaxException {
+        if (StringUtils.isEmpty(url)) {
+            return formatRespData(INVALID_URL, null);
+        }
         // 初始化product
         DouYinApiBuilder builder = new ConcreteDouYinApiBuilder();
         DouYinApiManager manager = new DouYinApiManager(builder);
-        DouYinApiProduct product = manager.construct(url);
+        DouYinApiProduct product = manager.construct(url.trim());
         if (!Objects.isNull(product.getItemInfo())) {
-            
+            if (!Objects.equals(product.getItemInfo().getStatusCode(), 0)) {
+                return formatRespData(GET_INFO_ERROR, null);
+            } else {
+                product.generateData();
+            }
         } else {
             return formatRespData(GET_INFO_ERROR, null);
         }
