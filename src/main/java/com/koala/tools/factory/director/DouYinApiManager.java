@@ -1,6 +1,10 @@
 package com.koala.tools.factory.director;
 
 import com.koala.tools.factory.builder.DouYinApiBuilder;
+import com.koala.tools.factory.product.DouYinApiProduct;
+
+import java.io.IOException;
+import java.net.URISyntaxException;
 
 /**
  * @author koala
@@ -13,5 +17,11 @@ public class DouYinApiManager {
 
     public DouYinApiManager(DouYinApiBuilder builder) {
         this.builder = builder;
+    }
+
+    public DouYinApiProduct construct(String url) throws IOException, URISyntaxException {
+        builder.url(url).getIdByUrl().getRedirectUrl().getItemIdByDirectUrl();
+        builder.printParams();
+        return builder.getProduct();
     }
 }

@@ -1,0 +1,19 @@
+package com.koala.tools.models.douyin;
+
+import com.google.gson.annotations.SerializedName;
+import lombok.Data;
+
+import java.io.Serializable;
+
+/**
+ * @author koala
+ * @version 1.0
+ * @date 2022/2/19 14:37
+ * @description
+ */
+@Data
+public class ItemInfoDataModel implements Serializable {
+    @SerializedName("aweme_type")
+    private Integer awemeType;
+    private VideoItemInfoDataModel video;
+}

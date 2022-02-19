@@ -2,6 +2,9 @@ package com.koala.tools.factory.builder;
 
 import com.koala.tools.factory.product.DouYinApiProduct;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+
 /**
  * @author koala
  * @version 1.0
@@ -16,6 +19,23 @@ public abstract class DouYinApiBuilder {
      * @return
      */
     public abstract DouYinApiBuilder url(String url);
+
+    public abstract DouYinApiBuilder getRedirectUrl() throws IOException, URISyntaxException;
+
+    /**
+     * @return Builder
+     */
+    public abstract DouYinApiBuilder getIdByUrl();
+
+    /**
+     * @return Builder
+     */
+    public abstract DouYinApiBuilder getItemIdByDirectUrl();
+
+    /**
+     * 打印初始化入参
+     */
+    public abstract void printParams();
 
     public DouYinApiProduct getProduct() {
         return product;
