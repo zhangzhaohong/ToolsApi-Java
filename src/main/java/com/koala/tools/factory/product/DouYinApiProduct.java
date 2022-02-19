@@ -1,5 +1,6 @@
 package com.koala.tools.factory.product;
 
+import com.koala.tools.enums.DouYinTypeEnums;
 import com.koala.tools.models.douyin.ItemInfoRespModel;
 import com.koala.tools.utils.GsonUtil;
 import com.koala.tools.utils.HeaderUtil;
@@ -7,6 +8,7 @@ import com.koala.tools.utils.HttpClientUtil;
 import com.koala.tools.utils.PatternUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -72,7 +74,34 @@ public class DouYinApiProduct {
         logger.info("[DouYinApiProduct]({}, {}) params: {url={}, directPath={}}", id, itemId, url, directUrl);
     }
 
-    public void generateData() {
-        // TODO: 生成数据
+    public ItemInfoRespModel generateData() {
+        this.itemInfo.getItemList().forEach(item -> {
+            try {
+                switch (Objects.requireNonNull(DouYinTypeEnums.getEnumsByCode(item.getAwemeType()))) {
+                    case VIDEO_TYPE:
+                        String vid = item.getVideo().getVid();
+                        String ratio = item.getVideo().getRatio();
+                        if (StringUtils.isEmpty(ratio) || Objects.equals(ratio, "default")) {
+                            ratio = "540p";
+                        }
+                        if (!StringUtils.isEmpty(vid)) {
+                            String link = "https://aweme.snssdk.com/aweme/v1/play/?video_id=" + vid + "&line=0&ratio=" + ratio + "&media_type=4&vr_type=0&improve_bitrate=0&is_play_url=1&is_support_h265=0&source=PackSourceEnum_PUBLISH";
+                            item.getVideo().setRealPath(link);
+                        }
+                        break;
+                    case IMAGE_TYPE:
+                        item.setVideo(null);
+                        break;
+                    default:
+                        item.setVideo(null);
+                        item.setImages(null);
+                        break;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+        logger.info("[DouYinApiProduct]({}, {}) itemInfo: {}", id, itemId, this.itemInfo);
+        return this.itemInfo;
     }
 }

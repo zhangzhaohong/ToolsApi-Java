@@ -16,7 +16,7 @@ public class MusicItemInfoDataModel implements Serializable {
     private String title;
     @SerializedName("play_url")
     private MusicUrlInfoDataModel playUrl;
-    private Integer id;
+    private Long id;
     private String mid;
     private Integer duration;
     private Integer status;

@@ -16,6 +16,9 @@ import java.util.ArrayList;
 public class ItemInfoDataModel implements Serializable {
     @SerializedName("aweme_type")
     private Integer awemeType;
+    private MusicItemInfoDataModel music;
     private VideoItemInfoDataModel video;
     private ArrayList<ImageItemInfoDataModel> images;
+    private String desc;
+    private AuthorInfoDataModel author;
 }

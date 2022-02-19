@@ -18,4 +18,5 @@ public class VideoItemInfoDataModel implements Serializable {
     private Integer height;
     private Integer duration;
     private VideoCoverInfoDataModel cover;
+    private String realPath;
 }
