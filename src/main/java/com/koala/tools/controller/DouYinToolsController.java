@@ -1,11 +1,14 @@
 package com.koala.tools.controller;
 
+import com.koala.tools.config.BasicConfigProperties;
 import com.koala.tools.factory.builder.ConcreteDouYinApiBuilder;
 import com.koala.tools.factory.builder.DouYinApiBuilder;
 import com.koala.tools.factory.director.DouYinApiManager;
 import com.koala.tools.factory.product.DouYinApiProduct;
+import com.koala.tools.utils.HeaderUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,6 +37,26 @@ public class DouYinToolsController {
 
     private static final Logger logger = LoggerFactory.getLogger(DouYinToolsController.class);
 
+    private final BasicConfigProperties basicConfigProperties;
+
+    public DouYinToolsController(BasicConfigProperties basicConfigProperties) {
+        this.basicConfigProperties = basicConfigProperties;
+    }
+
+    @GetMapping("getVideo")
+    public Object getVideo(@RequestParam(value = "vid", required = false) String vid, @RequestParam(value = "ratio", required = false, defaultValue = "540p") String ratio, HttpServletResponse response) throws IOException {
+        if (StringUtils.isEmpty(vid)) {
+            return formatRespData(FAILURE, null);
+        }
+        if (StringUtils.isEmpty(ratio) || Objects.equals(ratio, "default")) {
+            ratio = "540p";
+        }
+        String link = "https://aweme.snssdk.com/aweme/v1/play/?video_id=" + vid + "&line=0&ratio=" + ratio + "&media_type=4&vr_type=0&improve_bitrate=0&is_play_url=1&is_support_h265=0&source=PackSourceEnum_PUBLISH";
+        HeaderUtil.getDouYinDownloadHeader().forEach(response::addHeader);
+        response.sendRedirect(link);
+        return formatRespData(FAILURE, null);
+    }
+
     @GetMapping("api")
     public Object getDouYinInfos(@RequestParam(value = "link", required = false) String link, HttpServletResponse response) throws IOException, URISyntaxException {
         if (StringUtils.isEmpty(link)) {
@@ -49,7 +72,7 @@ public class DouYinToolsController {
         // 初始化product
         DouYinApiBuilder builder = new ConcreteDouYinApiBuilder();
         DouYinApiManager manager = new DouYinApiManager(builder);
-        DouYinApiProduct product = manager.construct(url);
+        DouYinApiProduct product = manager.construct(basicConfigProperties.getHost(), url);
         try {
             if (!Objects.isNull(product.getItemInfo())) {
                 if (!Objects.equals(product.getItemInfo().getStatusCode(), 0)) {
