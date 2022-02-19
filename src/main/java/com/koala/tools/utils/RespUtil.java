@@ -1,6 +1,7 @@
 package com.koala.tools.utils;
 
-import com.koala.tools.enums.ResponseEnums;
+import com.koala.tools.enums.DouYinResponseEnums;
+import com.koala.tools.enums.LanZouResponseEnums;
 import com.koala.tools.models.lanzou.RespModel;
 
 import java.util.Objects;
@@ -12,11 +13,22 @@ import java.util.Objects;
  * @description
  */
 public class RespUtil {
-    public static String formatRespData(ResponseEnums enums, Object data) {
+
+    private RespUtil() {}
+
+    public static String formatRespData(DouYinResponseEnums enums, Object data) {
         if (!Objects.isNull(enums)) {
             return GsonUtil.toString(new RespModel(enums.getCode(), enums.getMessage(), data));
         }
-        return GsonUtil.toString(new RespModel(ResponseEnums.FAILURE.getCode(), ResponseEnums.FAILURE.getMessage(), data));
+        return GsonUtil.toString(new RespModel(DouYinResponseEnums.FAILURE.getCode(), DouYinResponseEnums.FAILURE.getMessage(), data));
+    }
+
+
+    public static String formatRespData(LanZouResponseEnums enums, Object data) {
+        if (!Objects.isNull(enums)) {
+            return GsonUtil.toString(new RespModel(enums.getCode(), enums.getMessage(), data));
+        }
+        return GsonUtil.toString(new RespModel(LanZouResponseEnums.FAILURE.getCode(), LanZouResponseEnums.FAILURE.getMessage(), data));
     }
 
     public static String formatRespDataWithCustomMsg(Integer code, String msg, Object data) {

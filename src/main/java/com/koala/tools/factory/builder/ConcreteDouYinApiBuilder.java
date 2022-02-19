@@ -35,6 +35,12 @@ public class ConcreteDouYinApiBuilder extends DouYinApiBuilder {
     }
 
     @Override
+    public DouYinApiBuilder getItemInfo() throws IOException, URISyntaxException {
+        product.getItemInfoData();
+        return this;
+    }
+
+    @Override
     public void printParams() {
         product.printParams();
     }

@@ -9,7 +9,7 @@ import lombok.Getter;
  * @description
  */
 @Getter
-public enum ResponseEnums {
+public enum LanZouResponseEnums {
     FAILURE(-1, "UNKNOWN_ERROR"),
     GET_DATA_ERROR(299, "GET_DATA_ERROR"),
     GET_FILE_ERROR(201, "GET_FILE_ERROR"),
@@ -25,7 +25,7 @@ public enum ResponseEnums {
     private final int code;
     private final String message;
 
-    ResponseEnums(int code, String message) {
+    LanZouResponseEnums(int code, String message) {
         this.code = code;
         this.message = message;
     }

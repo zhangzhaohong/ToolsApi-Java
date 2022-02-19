@@ -1,5 +1,7 @@
 package com.koala.tools.factory.product;
 
+import com.koala.tools.models.douyin.ItemInfoRespModel;
+import com.koala.tools.utils.GsonUtil;
 import com.koala.tools.utils.HeaderUtil;
 import com.koala.tools.utils.HttpClientUtil;
 import com.koala.tools.utils.PatternUtil;
@@ -20,9 +22,9 @@ public class DouYinApiProduct {
     private static final Logger logger = LoggerFactory.getLogger(DouYinApiProduct.class);
     private String url;
     private String directUrl;
-    private String pageData;
     private String id;
     private String itemId;
+    private ItemInfoRespModel itemInfo;
 
     public void setUrl(String url) {
         this.url = url;
@@ -46,14 +48,27 @@ public class DouYinApiProduct {
         }
     }
 
+    public void getItemInfoData() throws IOException, URISyntaxException {
+        if (!Objects.isNull(itemId)) {
+            String itemInfoPath = "https://www.iesdouyin.com/web/api/v2/aweme/iteminfo/?item_ids=" + itemId;
+            String itemInfoResponse = HttpClientUtil.doGet(itemInfoPath, null, HeaderUtil.getDouYinDownloadHeader());
+            logger.info("[DouYinApiProduct]({}, {}) itemInfoResponse: {}}", id, itemId, itemInfoResponse);
+            try {
+                this.itemInfo = GsonUtil.toBean(itemInfoResponse, ItemInfoRespModel.class);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public ItemInfoRespModel getItemInfo() {
+        return itemInfo;
+    }
+
     /**
      * 下面是打印log区域
      */
     public void printParams() {
         logger.info("[DouYinApiProduct]({}, {}) params: {url={}, directPath={}}", id, itemId, url, directUrl);
-    }
-
-    public void printPageData() {
-        logger.info("[DouYinApiProduct]({}, {}) pageData: {}}", id, itemId, pageData);
     }
 }

@@ -20,7 +20,7 @@ public class DouYinApiManager {
     }
 
     public DouYinApiProduct construct(String url) throws IOException, URISyntaxException {
-        builder.url(url).getIdByUrl().getRedirectUrl().getItemIdByDirectUrl();
+        builder.url(url).getIdByUrl().getRedirectUrl().getItemIdByDirectUrl().getItemInfo();
         builder.printParams();
         return builder.getProduct();
     }
