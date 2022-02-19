@@ -4,6 +4,7 @@ import com.google.gson.annotations.SerializedName;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 /**
  * @author koala
@@ -16,4 +17,5 @@ public class ItemInfoDataModel implements Serializable {
     @SerializedName("aweme_type")
     private Integer awemeType;
     private VideoItemInfoDataModel video;
+    private ArrayList<ImageItemInfoDataModel> images;
 }
