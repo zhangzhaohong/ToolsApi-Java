@@ -16,7 +16,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.*;
 
-import static com.koala.tools.enums.ResponseEnums.GET_FILE_SUCCESS;
+import static com.koala.tools.enums.LanZouResponseEnums.GET_FILE_SUCCESS;
 import static com.koala.tools.utils.HeaderUtil.*;
 
 /**

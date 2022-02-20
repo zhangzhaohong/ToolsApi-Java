@@ -242,6 +242,47 @@ public class HttpClientUtil {
         return doGetRedirectLocation(url, null, null);
     }
 
+    public static int doGetResponseCode(String url, Map<String, String> headers, Map<String, String> params) throws IOException, URISyntaxException {
+        // 创建httpClient对象
+        int responseCode = 0;
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            // 创建访问地址
+            URIBuilder uriBuilder = new URIBuilder(url);
+            if (!ObjectUtils.isEmpty(params)) {
+                params.forEach(uriBuilder::setParameter);
+            }
+            // 创建http对象
+            HttpGet httpGet = new HttpGet(uriBuilder.build());
+            // 设置请求超时时间及响应超时时间
+            RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(CONNECT_TIMEOUT).setSocketTimeout(SOCKET_TIMEOUT).setRedirectsEnabled(false).build();
+            httpGet.setConfig(requestConfig);
+            // 设置请求头
+            packageHeader(headers, httpGet);
+            // 执行请求获取响应体并释放资源
+            // 执行请求
+            CloseableHttpResponse httpResponse = null;
+            try {
+                // 获取响应体
+                httpResponse = httpClient.execute(httpGet);
+                responseCode = httpResponse.getStatusLine().getStatusCode();
+                return responseCode;
+            } finally {
+                // 释放资源
+                if (!ObjectUtils.isEmpty(httpResponse)) {
+                    httpResponse.close();
+                }
+            }
+        }
+    }
+
+    public static int doGetResponseCode(String url, Map<String, String> params) throws IOException, URISyntaxException {
+        return doGetResponseCode(url, null, params);
+    }
+
+    public static int doGetResponseCode(String url) throws IOException, URISyntaxException {
+        return doGetResponseCode(url, null, null);
+    }
+
     /**
      * 设置请求头
      */

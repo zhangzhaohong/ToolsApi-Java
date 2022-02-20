@@ -1,5 +1,7 @@
-# LanZouApi-Java
+# Tools-Java
+支持蓝奏云&抖音解析
 
+## LanZou
 ## 说明
 1. 支持检测文件是否被取消
 
