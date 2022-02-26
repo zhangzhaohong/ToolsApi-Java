@@ -51,7 +51,7 @@ public class DouYinToolsController {
         this.basicConfigProperties = basicConfigProperties;
     }
 
-    @GetMapping("getVideo")
+    @GetMapping("player/video")
     public Object getVideo(@RequestParam(value = "vid", required = false) String vid, @RequestParam(value = "ratio", required = false, defaultValue = "540p") String ratio, @RequestParam(value = "isDownload", required = false, defaultValue = "0") String isDownload, HttpServletRequest request, HttpServletResponse response) throws IOException, URISyntaxException {
         if (StringUtils.isEmpty(vid)) {
             return formatRespData(FAILURE, null);
@@ -65,19 +65,19 @@ public class DouYinToolsController {
         if (StringUtils.isEmpty(redirectUrl)) {
             return formatRespData(FAILURE, null);
         }
-        redirectStrategy.sendRedirect(request, response, "/tools/DouYin/liveVideo?livePath=" + Base64Utils.encodeToUrlSafeString(redirectUrl.getBytes(StandardCharsets.UTF_8)));
+        redirectStrategy.sendRedirect(request, response, "/tools/DouYin/previewVideo?livePath=" + Base64Utils.encodeToUrlSafeString(redirectUrl.getBytes(StandardCharsets.UTF_8)));
         return formatRespData(FAILURE, null);
     }
 
-    @GetMapping("liveVideo")
-    public void liveVideo(@RequestParam String livePath, HttpServletRequest request, HttpServletResponse response) throws IOException, URISyntaxException {
+    @GetMapping("previewVideo")
+    public void previewVideo(@RequestParam String livePath, HttpServletRequest request, HttpServletResponse response) throws IOException, URISyntaxException {
         String url = new String(Base64Utils.decodeFromUrlSafeString(livePath));
-        logger.info("[liveVideo] inputUrl: {}, Sec-Fetch-Dest: {}", url, request.getHeader("Sec-Fetch-Dest"));
+        logger.info("[previewVideo] inputUrl: {}, Sec-Fetch-Dest: {}", url, request.getHeader("Sec-Fetch-Dest"));
         HttpClientUtil.doRelay(url, HeaderUtil.getDouYinDownloadHeader(), null, 206, HeaderUtil.getMockVideoHeader(false), response);
     }
 
     @GetMapping("api")
-    public Object getDouYinInfos(@RequestParam(value = "link", required = false) String link, HttpServletResponse response) throws IOException, URISyntaxException {
+    public Object getDouYinInfos(@RequestParam(value = "link", required = false) String link) throws IOException, URISyntaxException {
         if (StringUtils.isEmpty(link)) {
             return formatRespData(INVALID_LINK, null);
         }

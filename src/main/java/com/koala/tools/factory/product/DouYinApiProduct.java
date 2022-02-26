@@ -93,8 +93,8 @@ public class DouYinApiProduct {
                         if (!StringUtils.isEmpty(vid)) {
                             String link = "https://aweme.snssdk.com/aweme/v1/play/?video_id=" + vid + "&line=0&ratio=" + ratio + "&media_type=4&vr_type=0&improve_bitrate=0&is_play_url=1&is_support_h265=0&source=PackSourceEnum_PUBLISH";
                             item.getVideo().setRealPath(link);
-                            item.getVideo().setMockLiveVidPath(host + "/tools/DouYin/getVideo?vid=" + vid + "&ratio=" + ratio + "&isDownload=0");
-                            item.getVideo().setMockDownloadVidPath(host + "/tools/DouYin/getVideo?vid=" + vid + "&ratio=" + ratio + "&isDownload=1");
+                            item.getVideo().setMockLiveVidPath(host + "/tools/DouYin/player/video?vid=" + vid + "&ratio=" + ratio + "&isDownload=0");
+                            item.getVideo().setMockDownloadVidPath(host + "/tools/DouYin/player/video?vid=" + vid + "&ratio=" + ratio + "&isDownload=1");
                             // logger.info("[DouYinApiProduct]({}, {}) realFile: {}", id, itemId,HttpClientUtil.doGetRedirectLocation(link, HeaderUtil.getDouYinDownloadHeader(), null));
                         }
                         break;
