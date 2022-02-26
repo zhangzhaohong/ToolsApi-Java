@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.web.DefaultRedirectStrategy;
 import org.springframework.security.web.RedirectStrategy;
+import org.springframework.util.Base64Utils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,7 +22,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -58,11 +61,19 @@ public class DouYinToolsController {
         }
         String link = "https://aweme.snssdk.com/aweme/v1/play/?video_id=" + vid + "&line=0&ratio=" + ratio + "&media_type=4&vr_type=0&improve_bitrate=0&is_play_url=1&is_support_h265=0&source=PackSourceEnum_PUBLISH";
         String redirectUrl = HttpClientUtil.doGetRedirectLocation(link, HeaderUtil.getDouYinDownloadHeader(), null);
+        logger.info("[getVideo] inputUrl: {}, redirectUrl: {}", link, redirectUrl);
         if (StringUtils.isEmpty(redirectUrl)) {
             return formatRespData(FAILURE, null);
         }
-        HttpClientUtil.doRelay(redirectUrl, HeaderUtil.getDouYinDownloadHeader(), null, 206, HeaderUtil.getMockVideoHeader(!Objects.equals(isDownload, "0")), response);
+        redirectStrategy.sendRedirect(request, response, "/tools/DouYin/liveVideo?livePath=" + Base64Utils.encodeToUrlSafeString(redirectUrl.getBytes(StandardCharsets.UTF_8)) + "&isDownload=" + isDownload);
         return formatRespData(FAILURE, null);
+    }
+
+    @GetMapping("liveVideo")
+    public void liveVideo(@RequestParam String livePath, @RequestParam(value = "isDownload", required = false, defaultValue = "0") String isDownload, HttpServletRequest request, HttpServletResponse response) throws IOException, URISyntaxException {
+        String url = new String(Base64Utils.decodeFromUrlSafeString(livePath));
+        logger.info("[liveVideo] inputUrl: {}", url);
+        HttpClientUtil.doRelay(url, HeaderUtil.getDouYinDownloadHeader(), null, 206, HeaderUtil.getMockVideoHeader(!Objects.equals(isDownload, "0")), response);
     }
 
     @GetMapping("api")
