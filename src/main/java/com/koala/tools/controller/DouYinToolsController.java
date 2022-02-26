@@ -72,7 +72,7 @@ public class DouYinToolsController {
     @GetMapping("liveVideo")
     public void liveVideo(@RequestParam String livePath, HttpServletRequest request, HttpServletResponse response) throws IOException, URISyntaxException {
         String url = new String(Base64Utils.decodeFromUrlSafeString(livePath));
-        logger.info("[liveVideo] inputUrl: {}", url);
+        logger.info("[liveVideo] inputUrl: {}, Sec-Fetch-Dest: {}", url, request.getHeader("Sec-Fetch-Dest"));
         HttpClientUtil.doRelay(url, HeaderUtil.getDouYinDownloadHeader(), null, 206, HeaderUtil.getMockVideoHeader(false), response);
     }
 
