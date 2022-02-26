@@ -66,6 +66,14 @@ public class HeaderUtil {
         header.put("X-FORWARDED-FOR", getRandomIpAddress());
         header.put("CLIENT-IP", getRandomIpAddress());
         return header;
+    }
 
+    public static Map<String, String> getMockVideoHeader() {
+        HashMap<String, String> header = new HashMap<>(0);
+        header.put("Content-Type", "video/mp4");
+        header.put("User-Agent", "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1");
+        header.put("X-FORWARDED-FOR", getRandomIpAddress());
+        header.put("CLIENT-IP", getRandomIpAddress());
+        return header;
     }
 }

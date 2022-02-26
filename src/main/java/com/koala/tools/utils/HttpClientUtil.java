@@ -1,6 +1,7 @@
 package com.koala.tools.utils;
 
 import org.apache.http.Header;
+import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -14,8 +15,9 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.springframework.util.ObjectUtils;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
@@ -281,6 +283,56 @@ public class HttpClientUtil {
 
     public static int doGetResponseCode(String url) throws IOException, URISyntaxException {
         return doGetResponseCode(url, null, null);
+    }
+
+    public static void doRelay(String url, Map<String, String> headers, Map<String, String> params, Integer successCode, Map<String, String> responseHeader, HttpServletResponse response) throws IOException, URISyntaxException {
+        // 创建httpClient对象
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            // 创建访问地址
+            URIBuilder uriBuilder = new URIBuilder(url);
+            if (!ObjectUtils.isEmpty(params)) {
+                params.forEach(uriBuilder::setParameter);
+            }
+            // 创建http对象
+            HttpGet httpGet = new HttpGet(uriBuilder.build());
+            // 设置请求超时时间及响应超时时间
+            RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(CONNECT_TIMEOUT).setSocketTimeout(SOCKET_TIMEOUT).build();
+            httpGet.setConfig(requestConfig);
+            // 设置请求头
+            packageHeader(headers, httpGet);
+            // 执行请求获取响应体并释放资源
+            // 执行请求
+            CloseableHttpResponse httpResponse = null;
+            try {
+                // 获取响应体
+                httpResponse = httpClient.execute(httpGet);
+                HttpEntity entity = httpResponse.getEntity();
+                if (Objects.equals(httpResponse.getStatusLine().getStatusCode(), successCode) && !Objects.isNull(entity)) {
+                    responseHeader.forEach(response::addHeader);
+                    try (
+                            InputStream inputStream = entity.getContent();
+                            ServletOutputStream targetStream = response.getOutputStream();
+                    ) {
+                        inputStream.transferTo(targetStream);
+                        response.setContentLengthLong(entity.getContentLength());
+                        targetStream.flush();
+                    }
+                }
+            } finally {
+                // 释放资源
+                if (!ObjectUtils.isEmpty(httpResponse)) {
+                    httpResponse.close();
+                }
+            }
+        }
+    }
+
+    public static void doRelay(String url, Map<String, String> params, Integer successCode, Map<String, String> responseHeader, HttpServletResponse response) throws IOException, URISyntaxException {
+        doRelay(url, null, params, successCode, responseHeader, response);
+    }
+
+    public static void doRelay(String url, Integer successCode, Map<String, String> responseHeader, HttpServletResponse response) throws IOException, URISyntaxException {
+        doRelay(url, null, null, successCode, responseHeader, response);
     }
 
     /**

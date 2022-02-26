@@ -6,6 +6,7 @@ import com.koala.tools.factory.builder.DouYinApiBuilder;
 import com.koala.tools.factory.director.DouYinApiManager;
 import com.koala.tools.factory.product.DouYinApiProduct;
 import com.koala.tools.utils.HeaderUtil;
+import com.koala.tools.utils.HttpClientUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.web.DefaultRedirectStrategy;
@@ -48,7 +49,7 @@ public class DouYinToolsController {
     }
 
     @GetMapping("getVideo")
-    public Object getVideo(@RequestParam(value = "vid", required = false) String vid, @RequestParam(value = "ratio", required = false, defaultValue = "540p") String ratio, HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public Object getVideo(@RequestParam(value = "vid", required = false) String vid, @RequestParam(value = "ratio", required = false, defaultValue = "540p") String ratio, HttpServletRequest request, HttpServletResponse response) throws IOException, URISyntaxException {
         if (StringUtils.isEmpty(vid)) {
             return formatRespData(FAILURE, null);
         }
@@ -56,8 +57,8 @@ public class DouYinToolsController {
             ratio = "540p";
         }
         String link = "https://aweme.snssdk.com/aweme/v1/play/?video_id=" + vid + "&line=0&ratio=" + ratio + "&media_type=4&vr_type=0&improve_bitrate=0&is_play_url=1&is_support_h265=0&source=PackSourceEnum_PUBLISH";
-        HeaderUtil.getDouYinDownloadHeader().forEach(response::addHeader);
-        redirectStrategy.sendRedirect(request, response, link);
+        String redirectUrl = HttpClientUtil.doGetRedirectLocation(link, HeaderUtil.getDouYinDownloadHeader(), null);
+        HttpClientUtil.doRelay(redirectUrl, HeaderUtil.getDouYinDownloadHeader(), null, 206, HeaderUtil.getMockVideoHeader(), response);
         return formatRespData(FAILURE, null);
     }
 
