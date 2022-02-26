@@ -1,10 +1,12 @@
 package com.koala.tools.controller;
 
 import com.koala.tools.config.BasicConfigProperties;
+import com.koala.tools.enums.DouYinRequestTypeEnums;
 import com.koala.tools.factory.builder.ConcreteDouYinApiBuilder;
 import com.koala.tools.factory.builder.DouYinApiBuilder;
 import com.koala.tools.factory.director.DouYinApiManager;
 import com.koala.tools.factory.product.DouYinApiProduct;
+import com.koala.tools.models.douyin.ItemInfoRespModel;
 import com.koala.tools.utils.HeaderUtil;
 import com.koala.tools.utils.HttpClientUtil;
 import org.slf4j.Logger;
@@ -24,11 +26,11 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.Objects;
 import java.util.Optional;
 
 import static com.koala.tools.enums.DouYinResponseEnums.*;
+import static com.koala.tools.enums.DouYinResponseEnums.INVALID_TYPE;
 import static com.koala.tools.utils.RespUtil.formatRespData;
 
 /**
@@ -65,7 +67,11 @@ public class DouYinToolsController {
         if (StringUtils.isEmpty(redirectUrl)) {
             return formatRespData(FAILURE, null);
         }
-        redirectStrategy.sendRedirect(request, response, "/tools/DouYin/previewVideo?livePath=" + Base64Utils.encodeToUrlSafeString(redirectUrl.getBytes(StandardCharsets.UTF_8)));
+        if (isDownload.equals("0")) {
+            redirectStrategy.sendRedirect(request, response, "/tools/DouYin/previewVideo?livePath=" + Base64Utils.encodeToUrlSafeString(redirectUrl.getBytes(StandardCharsets.UTF_8)));
+        } else {
+            HttpClientUtil.doRelay(redirectUrl, HeaderUtil.getDouYinDownloadHeader(), null, 206, HeaderUtil.getMockVideoHeader(true), response);
+        }
         return formatRespData(FAILURE, null);
     }
 
@@ -77,9 +83,13 @@ public class DouYinToolsController {
     }
 
     @GetMapping("api")
-    public Object getDouYinInfos(@RequestParam(value = "link", required = false) String link) throws IOException, URISyntaxException {
+    public Object getDouYinInfos(@RequestParam(value = "link", required = false) String link, @RequestParam(value = "type", required = false, defaultValue = "info") String type, HttpServletRequest request, HttpServletResponse response) throws IOException, URISyntaxException {
         if (StringUtils.isEmpty(link)) {
             return formatRespData(INVALID_LINK, null);
+        }
+        int typeId = DouYinRequestTypeEnums.getTypeIdByType(type);
+        if (Objects.equals(typeId, DouYinRequestTypeEnums.INVALID_TYPE.getTypeId())) {
+            return formatRespData(INVALID_TYPE, null);
         }
         String url;
         Optional<String> optional = Arrays.stream(link.split(" ")).filter(item -> item.contains("douyin.com/")).findFirst();
@@ -92,19 +102,36 @@ public class DouYinToolsController {
         DouYinApiBuilder builder = new ConcreteDouYinApiBuilder();
         DouYinApiManager manager = new DouYinApiManager(builder);
         DouYinApiProduct product = manager.construct(basicConfigProperties.getHost(), url);
-        try {
-            if (!Objects.isNull(product.getItemInfo())) {
-                if (!Objects.equals(product.getItemInfo().getStatusCode(), 0)) {
-                    return formatRespData(GET_INFO_ERROR, null);
-                } else {
-                    return formatRespData(GET_DATA_SUCCESS, product.generateData());
-                }
-            } else {
+        if (!Objects.isNull(product.getItemInfo())) {
+            if (!Objects.equals(product.getItemInfo().getStatusCode(), 0)) {
                 return formatRespData(GET_INFO_ERROR, null);
+            } else {
+                try {
+                    ItemInfoRespModel productData = product.generateData();
+                    switch (Objects.requireNonNull(DouYinRequestTypeEnums.getEnumsByType(type))) {
+                        case DOWNLOAD:
+                            if (!Objects.isNull(productData) && !Objects.isNull(productData.getItemList()) && !productData.getItemList().isEmpty() && !Objects.isNull(productData.getItemList().get(0).getVideo()) && !StringUtils.isEmpty(productData.getItemList().get(0).getVideo().getMockDownloadVidPath())) {
+                                redirectStrategy.sendRedirect(request, response, productData.getItemList().get(0).getVideo().getMockDownloadVidPath());
+                            }
+                            break;
+                        case PREVIEW:
+                            if (!Objects.isNull(productData) && !Objects.isNull(productData.getItemList()) && !productData.getItemList().isEmpty() && !Objects.isNull(productData.getItemList().get(0).getVideo()) && !StringUtils.isEmpty(productData.getItemList().get(0).getVideo().getMockPreviewVidPath())) {
+                                redirectStrategy.sendRedirect(request, response, productData.getItemList().get(0).getVideo().getMockPreviewVidPath());
+                            }
+                            break;
+                        case INFO:
+                        case INVALID_TYPE:
+                        default:
+                            break;
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return formatRespData(GET_DATA_SUCCESS, product.generateData());
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } else {
+            return formatRespData(GET_INFO_ERROR, null);
         }
-        return formatRespData(FAILURE, null);
+        // return formatRespData(FAILURE, null);
     }
 }
