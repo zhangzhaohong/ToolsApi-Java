@@ -49,7 +49,7 @@ public class DouYinToolsController {
     }
 
     @GetMapping("getVideo")
-    public Object getVideo(@RequestParam(value = "vid", required = false) String vid, @RequestParam(value = "ratio", required = false, defaultValue = "540p") String ratio, HttpServletRequest request, HttpServletResponse response) throws IOException, URISyntaxException {
+    public Object getVideo(@RequestParam(value = "vid", required = false) String vid, @RequestParam(value = "ratio", required = false, defaultValue = "540p") String ratio, @RequestParam(value = "isDownload", required = false, defaultValue = "0") String isDownload, HttpServletRequest request, HttpServletResponse response) throws IOException, URISyntaxException {
         if (StringUtils.isEmpty(vid)) {
             return formatRespData(FAILURE, null);
         }
@@ -58,7 +58,10 @@ public class DouYinToolsController {
         }
         String link = "https://aweme.snssdk.com/aweme/v1/play/?video_id=" + vid + "&line=0&ratio=" + ratio + "&media_type=4&vr_type=0&improve_bitrate=0&is_play_url=1&is_support_h265=0&source=PackSourceEnum_PUBLISH";
         String redirectUrl = HttpClientUtil.doGetRedirectLocation(link, HeaderUtil.getDouYinDownloadHeader(), null);
-        HttpClientUtil.doRelay(redirectUrl, HeaderUtil.getDouYinDownloadHeader(), null, 206, HeaderUtil.getMockVideoHeader(), response);
+        if (StringUtils.isEmpty(redirectUrl)) {
+            return formatRespData(FAILURE, null);
+        }
+        HttpClientUtil.doRelay(redirectUrl, HeaderUtil.getDouYinDownloadHeader(), null, 206, HeaderUtil.getMockVideoHeader(!Objects.equals(isDownload, "0")), response);
         return formatRespData(FAILURE, null);
     }
 
