@@ -65,15 +65,15 @@ public class DouYinToolsController {
         if (StringUtils.isEmpty(redirectUrl)) {
             return formatRespData(FAILURE, null);
         }
-        redirectStrategy.sendRedirect(request, response, "/tools/DouYin/liveVideo?livePath=" + Base64Utils.encodeToUrlSafeString(redirectUrl.getBytes(StandardCharsets.UTF_8)) + "&isDownload=" + isDownload);
+        redirectStrategy.sendRedirect(request, response, "/tools/DouYin/liveVideo?livePath=" + Base64Utils.encodeToUrlSafeString(redirectUrl.getBytes(StandardCharsets.UTF_8)));
         return formatRespData(FAILURE, null);
     }
 
     @GetMapping("liveVideo")
-    public void liveVideo(@RequestParam String livePath, @RequestParam(value = "isDownload", required = false, defaultValue = "0") String isDownload, HttpServletRequest request, HttpServletResponse response) throws IOException, URISyntaxException {
+    public void liveVideo(@RequestParam String livePath, HttpServletRequest request, HttpServletResponse response) throws IOException, URISyntaxException {
         String url = new String(Base64Utils.decodeFromUrlSafeString(livePath));
         logger.info("[liveVideo] inputUrl: {}", url);
-        HttpClientUtil.doRelay(url, HeaderUtil.getDouYinDownloadHeader(), null, 206, HeaderUtil.getMockVideoHeader(!Objects.equals(isDownload, "0")), response);
+        HttpClientUtil.doRelay(url, HeaderUtil.getDouYinDownloadHeader(), null, 206, HeaderUtil.getMockVideoHeader(false), response);
     }
 
     @GetMapping("api")
