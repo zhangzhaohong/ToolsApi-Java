@@ -70,7 +70,7 @@ public class DouYinToolsController {
         if (isDownload.equals("0")) {
             redirectStrategy.sendRedirect(request, response, "/tools/DouYin/previewVideo?livePath=" + Base64Utils.encodeToUrlSafeString(redirectUrl.getBytes(StandardCharsets.UTF_8)));
         } else {
-            HttpClientUtil.doRelay(redirectUrl, HeaderUtil.getDouYinDownloadHeader(), null, 206, HeaderUtil.getMockVideoHeader(true), response);
+            HttpClientUtil.doRelay(redirectUrl, HeaderUtil.getDouYinDownloadHeader(), null, 206, HeaderUtil.getMockVideoHeader(true), request, response);
         }
         return formatRespData(FAILURE, null);
     }
@@ -79,7 +79,7 @@ public class DouYinToolsController {
     public void previewVideo(@RequestParam String livePath, HttpServletRequest request, HttpServletResponse response) throws IOException, URISyntaxException {
         String url = new String(Base64Utils.decodeFromUrlSafeString(livePath));
         logger.info("[previewVideo] inputUrl: {}, Sec-Fetch-Dest: {}", url, request.getHeader("Sec-Fetch-Dest"));
-        HttpClientUtil.doRelay(url, HeaderUtil.getDouYinDownloadHeader(), null, 206, HeaderUtil.getMockVideoHeader(false), response);
+        HttpClientUtil.doRelay(url, HeaderUtil.getDouYinDownloadHeader(), null, 206, HeaderUtil.getMockVideoHeader(false), request, response);
     }
 
     @GetMapping("api")

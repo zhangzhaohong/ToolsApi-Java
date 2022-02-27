@@ -71,6 +71,8 @@ public class HeaderUtil {
 
     public static Map<String, String> getMockVideoHeader(Boolean isDownload) {
         HashMap<String, String> header = new HashMap<>(0);
+        header.put("Accept-Ranges", "bytes");
+        header.put("Expect", "100-continue");
         header.put("Content-Type", "video/mp4");
         header.put("Content-Disposition", Boolean.TRUE.equals(isDownload) ? "attachment" : "inline" + "; filename = " + UUID.randomUUID().toString().replace("-", "") + ".mp4");
         header.put("User-Agent", "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1");

@@ -14,8 +14,10 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 
 import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.URISyntaxException;
@@ -285,7 +287,7 @@ public class HttpClientUtil {
         return doGetResponseCode(url, null, null);
     }
 
-    public static void doRelay(String url, Map<String, String> headers, Map<String, String> params, Integer successCode, Map<String, String> responseHeader, HttpServletResponse response) throws IOException, URISyntaxException {
+    public static void doRelay(String url, Map<String, String> headers, Map<String, String> params, Integer successCode, Map<String, String> responseHeader, HttpServletRequest request, HttpServletResponse response) throws IOException, URISyntaxException {
         // 创建httpClient对象
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             // 创建访问地址
@@ -309,6 +311,12 @@ public class HttpClientUtil {
                 HttpEntity entity = httpResponse.getEntity();
                 if (Objects.equals(httpResponse.getStatusLine().getStatusCode(), successCode) && !Objects.isNull(entity)) {
                     responseHeader.forEach(response::addHeader);
+                    response.addHeader("Content-Length", String.valueOf(entity.getContentLength()));
+                    String rangeString = request.getHeader("Range");
+                    if (!StringUtils.isEmpty(rangeString)) {
+                        long range = Long.parseLong(rangeString.substring(rangeString.indexOf("=") + 1, rangeString.indexOf("-")));
+                        response.addHeader("Content-Range", String.valueOf(range + (entity.getContentLength()) - 1));
+                    }
                     try (
                             InputStream inputStream = entity.getContent();
                             ServletOutputStream targetStream = response.getOutputStream();
@@ -327,12 +335,12 @@ public class HttpClientUtil {
         }
     }
 
-    public static void doRelay(String url, Map<String, String> params, Integer successCode, Map<String, String> responseHeader, HttpServletResponse response) throws IOException, URISyntaxException {
-        doRelay(url, null, params, successCode, responseHeader, response);
+    public static void doRelay(String url, Map<String, String> params, Integer successCode, Map<String, String> responseHeader, HttpServletRequest request, HttpServletResponse response) throws IOException, URISyntaxException {
+        doRelay(url, null, params, successCode, responseHeader, request, response);
     }
 
-    public static void doRelay(String url, Integer successCode, Map<String, String> responseHeader, HttpServletResponse response) throws IOException, URISyntaxException {
-        doRelay(url, null, null, successCode, responseHeader, response);
+    public static void doRelay(String url, Integer successCode, Map<String, String> responseHeader, HttpServletRequest request, HttpServletResponse response) throws IOException, URISyntaxException {
+        doRelay(url, null, null, successCode, responseHeader, request, response);
     }
 
     /**
