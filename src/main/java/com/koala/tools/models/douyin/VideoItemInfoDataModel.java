@@ -1,5 +1,6 @@
 package com.koala.tools.models.douyin;
 
+import com.google.gson.annotations.SerializedName;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -18,7 +19,10 @@ public class VideoItemInfoDataModel implements Serializable {
     private Integer height;
     private Integer duration;
     private VideoCoverInfoDataModel cover;
+    @SerializedName("real_path")
     private String realPath;
+    @SerializedName("mock_preview_vid_path")
     private String mockPreviewVidPath;
+    @SerializedName("mock_download_vid_path")
     private String mockDownloadVidPath;
 }
