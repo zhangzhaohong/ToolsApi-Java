@@ -19,5 +19,6 @@ public class VideoItemInfoDataModel implements Serializable {
     private Integer duration;
     private VideoCoverInfoDataModel cover;
     private String realPath;
-    private String mockPath;
+    private String mockPreviewVidPath;
+    private String mockDownloadVidPath;
 }
