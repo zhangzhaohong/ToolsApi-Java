@@ -62,7 +62,13 @@ public class LanZouToolsController {
         // 初始化product
         LanZouApiBuilder builder = new ConcreteLanZouApiBuilder();
         LanZouApiManager manager = new LanZouApiManager(builder);
-        LanZouApiProduct product = manager.construct(url, password);
+        LanZouApiProduct product = null;
+        try {
+            product = manager.construct(url, password);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return formatRespData(LanZouResponseEnums.FAILURE, null);
+        }
         if (Objects.isNull(product.getPageData())) {
             return formatRespData(LanZouResponseEnums.GET_DATA_ERROR, null);
         }

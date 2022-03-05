@@ -43,7 +43,6 @@ public class LanZouApiProduct {
         HOST_LIST.add("https://wwi.lanzouj.com");
         INVALID_LIST.put(201, Arrays.asList("文件取消分享了", "文件不存在", "访问地址错误，请核查"));
         INVALID_LIST.put(202, List.of("输入密码"));
-        INVALID_LIST.put(204, List.of("显示更多文件"));
     }
 
     public void setUrl(String url) {
@@ -176,14 +175,12 @@ public class LanZouApiProduct {
                     Object folderFileData = folderData.getText();
                     if (folderFileData instanceof ArrayList) {
                         ((ArrayList<?>) folderFileData).forEach(item -> {
-                            if (item instanceof FolderFileInfoRespModel) {
-                                try {
-                                    String filePageInfo = getPageData(((FolderFileInfoRespModel) item).getId(), 1);
-                                    FileInfoModel fileInfo = getFileInfo(filePageInfo);
-                                    fileInfoList.add(fileInfo);
-                                } catch (IOException | URISyntaxException e) {
-                                    e.printStackTrace();
-                                }
+                            try {
+                                String filePageInfo = getPageData(GsonUtil.toBean(GsonUtil.toString(item), FolderFileInfoRespModel.class).getId(), 1);
+                                FileInfoModel fileInfo = getFileInfo(filePageInfo);
+                                fileInfoList.add(fileInfo);
+                            } catch (IOException | URISyntaxException e) {
+                                e.printStackTrace();
                             }
                         });
                     }
