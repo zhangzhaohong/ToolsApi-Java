@@ -101,7 +101,13 @@ public class DouYinToolsController {
         // 初始化product
         DouYinApiBuilder builder = new ConcreteDouYinApiBuilder();
         DouYinApiManager manager = new DouYinApiManager(builder);
-        DouYinApiProduct product = manager.construct(basicConfigProperties.getHost(), url);
+        DouYinApiProduct product = null;
+        try {
+            product = manager.construct(basicConfigProperties.getHost(), url);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return formatRespData(FAILURE, null);
+        }
         if (!Objects.isNull(product.getItemInfo())) {
             if (!Objects.equals(product.getItemInfo().getStatusCode(), 0)) {
                 return formatRespData(GET_INFO_ERROR, null);
@@ -132,6 +138,5 @@ public class DouYinToolsController {
         } else {
             return formatRespData(GET_INFO_ERROR, null);
         }
-        // return formatRespData(FAILURE, null);
     }
 }
