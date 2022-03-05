@@ -45,7 +45,7 @@ public class DouYinToolsController {
 
     private static final Logger logger = LoggerFactory.getLogger(DouYinToolsController.class);
 
-    private RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
+    private final RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
 
     private final BasicConfigProperties basicConfigProperties;
 
