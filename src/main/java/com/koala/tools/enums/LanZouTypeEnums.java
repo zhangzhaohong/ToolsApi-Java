@@ -27,17 +27,11 @@ public enum LanZouTypeEnums {
 
     public static int getTypeIdByType(String type) {
         Optional<LanZouTypeEnums> optional = Arrays.stream(LanZouTypeEnums.values()).filter(item -> item.getType().equals(type)).findFirst();
-        if (optional.isPresent()) {
-            return optional.get().getTypeId();
-        }
-        return -1;
+        return optional.map(LanZouTypeEnums::getTypeId).orElse(-1);
     }
 
     public static LanZouTypeEnums getEnumsByType(String type) {
         Optional<LanZouTypeEnums> optional = Arrays.stream(LanZouTypeEnums.values()).filter(item -> item.getType().equals(type)).findFirst();
-        if (optional.isPresent()) {
-            return optional.get();
-        }
-        return null;
+        return optional.orElse(null);
     }
 }
