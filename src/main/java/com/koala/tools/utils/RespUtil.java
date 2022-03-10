@@ -2,7 +2,7 @@ package com.koala.tools.utils;
 
 import com.koala.tools.enums.DouYinResponseEnums;
 import com.koala.tools.enums.LanZouResponseEnums;
-import com.koala.tools.models.lanzou.RespModel;
+import com.koala.tools.models.RespModel;
 
 import java.util.Objects;
 
