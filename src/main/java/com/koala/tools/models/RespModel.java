@@ -1,4 +1,4 @@
-package com.koala.tools.models.lanzou;
+package com.koala.tools.models;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
