@@ -33,7 +33,7 @@ public class MixedHttpRequestProcessor implements HandlerMethodArgumentResolver 
         messageConverters.add(messageConverter);
 
         jsonResolver = new RequestResponseBodyMethodProcessor(messageConverters);
-        formResolver = new ServletModelAttributeMethodProcessor(false);
+        formResolver = new ServletModelAttributeMethodProcessor(true);
     }
 
     @Override
@@ -45,8 +45,9 @@ public class MixedHttpRequestProcessor implements HandlerMethodArgumentResolver 
     @Override
     public Object resolveArgument(MethodParameter methodParameter, ModelAndViewContainer modelAndViewContainer, NativeWebRequest nativeWebRequest, WebDataBinderFactory webDataBinderFactory) throws Exception {
         ServletRequest servletRequest = nativeWebRequest.getNativeRequest(ServletRequest.class);
-        if (Objects.isNull(servletRequest))
+        if (Objects.isNull(servletRequest)) {
             throw new IllegalArgumentException("servletRequest不能为null");
+        }
         String contentType = servletRequest.getContentType();
         if (contentType == null) {
             throw new IllegalArgumentException("不支持contentType");

@@ -1,9 +1,9 @@
 package com.koala.tools.controller;
 
 import com.koala.tools.http.annotation.MixedHttpRequest;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.koala.tools.models.demo.TestModel;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @author koala
@@ -19,8 +19,13 @@ public class DefaultController {
         return "Hello";
     }
 
-    @GetMapping("test")
-    public String test(@MixedHttpRequest String p) {
+    @GetMapping("test/get")
+    public String testGet(@MixedHttpRequest String p) {
         return p;
+    }
+
+    @PostMapping("test/post")
+    public Object testPost(@RequestBody TestModel model) {
+        return model.getP();
     }
 }

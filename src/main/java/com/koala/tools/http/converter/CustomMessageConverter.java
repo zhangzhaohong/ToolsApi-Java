@@ -68,7 +68,7 @@ public class CustomMessageConverter extends MappingJackson2HttpMessageConverter 
     }
 
 
-    public class MyBeanSerializerModifier extends BeanSerializerModifier {
+    public static class MyBeanSerializerModifier extends BeanSerializerModifier {
         @Override
         public List<BeanPropertyWriter> changeProperties(SerializationConfig config, BeanDescription beanDesc, List<BeanPropertyWriter> beanProperties) {
             //循环所有的beanPropertyWriter
