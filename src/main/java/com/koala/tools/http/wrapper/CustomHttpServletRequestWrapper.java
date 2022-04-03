@@ -17,7 +17,7 @@ import java.io.StringWriter;
  */
 public class CustomHttpServletRequestWrapper extends HttpServletRequestWrapper {
 
-    private byte[] body;
+    private final byte[] body;
 
     public CustomHttpServletRequestWrapper(HttpServletRequest request) throws IOException {
         super(request);

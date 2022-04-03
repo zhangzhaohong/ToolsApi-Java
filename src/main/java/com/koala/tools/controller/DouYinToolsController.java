@@ -6,6 +6,7 @@ import com.koala.tools.factory.builder.ConcreteDouYinApiBuilder;
 import com.koala.tools.factory.builder.DouYinApiBuilder;
 import com.koala.tools.factory.director.DouYinApiManager;
 import com.koala.tools.factory.product.DouYinApiProduct;
+import com.koala.tools.http.annotation.MixedHttpRequest;
 import com.koala.tools.models.douyin.ItemInfoRespModel;
 import com.koala.tools.utils.HeaderUtil;
 import com.koala.tools.utils.HttpClientUtil;
@@ -51,6 +52,11 @@ public class DouYinToolsController {
 
     public DouYinToolsController(BasicConfigProperties basicConfigProperties) {
         this.basicConfigProperties = basicConfigProperties;
+    }
+
+    @GetMapping("test")
+    public Object test(@MixedHttpRequest String link) {
+        return link;
     }
 
     @GetMapping("player/video")

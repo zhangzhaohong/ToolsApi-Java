@@ -22,15 +22,6 @@ import java.util.List;
 @Configuration
 @EnableWebMvc
 public class FilterConfig {
-    @Bean
-    public FilterRegistrationBean<CharacterEncodingFilter> registrationCharsetEncodingFilter() {
-        FilterRegistrationBean<CharacterEncodingFilter> registrationBean = new FilterRegistrationBean<>();
-        registrationBean.setFilter(new CharacterEncodingFilter());
-        registrationBean.addUrlPatterns("/*");
-        registrationBean.setName("CharacterEncodingFilter");
-        registrationBean.setOrder(Ordered.HIGHEST_PRECEDENCE);
-        return registrationBean;
-    }
 
     @Bean
     public FilterRegistrationBean<RequestLoggingFilter> registrationRequestLoggingFilter() {
@@ -38,7 +29,7 @@ public class FilterConfig {
         registrationBean.setFilter(new RequestLoggingFilter());
         registrationBean.addUrlPatterns("/*");
         registrationBean.setName("RequestLoggingFilter");
-        registrationBean.setOrder(Ordered.HIGHEST_PRECEDENCE + 1);
+        registrationBean.setOrder(Ordered.HIGHEST_PRECEDENCE);
         return registrationBean;
     }
 
