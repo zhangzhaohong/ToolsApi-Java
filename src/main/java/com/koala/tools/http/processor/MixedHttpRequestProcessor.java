@@ -1,9 +1,12 @@
 package com.koala.tools.http.processor;
 
+import com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter;
 import com.koala.tools.http.annotation.MixedHttpRequest;
 import com.koala.tools.http.converter.CustomMessageConverter;
 import org.springframework.core.MethodParameter;
+import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.ResourceHttpMessageConverter;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
@@ -29,7 +32,13 @@ public class MixedHttpRequestProcessor implements HandlerMethodArgumentResolver 
 
     public MixedHttpRequestProcessor() {
         List<HttpMessageConverter<?>> messageConverters = new ArrayList<>();
+        FormHttpMessageConverter formHttpMessageConverter = new FormHttpMessageConverter();
+        FastJsonHttpMessageConverter fastJsonHttpMessageConverter = new FastJsonHttpMessageConverter();
+        ResourceHttpMessageConverter resourceHttpMessageConverter = new ResourceHttpMessageConverter();
         CustomMessageConverter messageConverter = new CustomMessageConverter();
+        messageConverters.add(formHttpMessageConverter);
+        messageConverters.add(fastJsonHttpMessageConverter);
+        messageConverters.add(resourceHttpMessageConverter);
         messageConverters.add(messageConverter);
 
         jsonResolver = new RequestResponseBodyMethodProcessor(messageConverters);
