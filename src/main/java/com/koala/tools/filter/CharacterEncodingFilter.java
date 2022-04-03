@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Locale;
 
 /**
  * @author koala
@@ -15,7 +16,7 @@ import java.nio.charset.StandardCharsets;
  * @date 2022/2/26 20:43
  * @description
  */
-@WebFilter(urlPatterns = "/*",filterName = "CharacterEncodingFilter")
+@WebFilter(urlPatterns = "/*", filterName = "CharacterEncodingFilter")
 public class CharacterEncodingFilter implements Filter {
 
     @Override

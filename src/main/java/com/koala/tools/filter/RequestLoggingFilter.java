@@ -8,7 +8,6 @@ import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -18,7 +17,7 @@ import java.util.*;
  * @description
  */
 @Slf4j
-@WebFilter(urlPatterns = "/*",filterName = "RequestLoggingFilter")
+@WebFilter(urlPatterns = "/*", filterName = "RequestLoggingFilter")
 public class RequestLoggingFilter implements Filter {
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
@@ -51,7 +50,7 @@ public class RequestLoggingFilter implements Filter {
         Map<String, String> parameterMaps = new HashMap<>(0);
         for (Enumeration<String> names = request.getParameterNames(); names.hasMoreElements(); ) {
             String name = names.nextElement();
-            parameterMaps.put(name, new String(request.getParameter(name).getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8));
+            parameterMaps.put(name, request.getParameter(name));
         }
         parameterList.add(parameterMaps);
         map.put("Parameters", parameterList);
