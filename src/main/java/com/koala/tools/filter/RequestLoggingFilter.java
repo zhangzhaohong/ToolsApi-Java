@@ -1,13 +1,17 @@
 package com.koala.tools.filter;
 
+import com.koala.tools.http.wrapper.CustomHttpServletRequestWrapper;
 import com.koala.tools.utils.GsonUtil;
+import com.koala.tools.utils.JsonUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.StringUtils;
 
 import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -26,7 +30,7 @@ public class RequestLoggingFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
-        HttpServletRequest request = (HttpServletRequest) servletRequest;
+        CustomHttpServletRequestWrapper request = new CustomHttpServletRequestWrapper((HttpServletRequest) servletRequest);
         HttpServletResponse response = (HttpServletResponse) servletResponse;
         Map<String, Object> map = new HashMap<>(0);
 
@@ -64,6 +68,27 @@ public class RequestLoggingFilter implements Filter {
         if (line != null) {
             map.put("Context", new String[]{line});
         }
+
+        // 获取body
+        try {
+            String body = new String(request.getBody(), String.valueOf(StandardCharsets.UTF_8));
+            if (!StringUtils.isEmpty(body)) {
+                if (JsonUtils.isJson(body)) {
+                    map.put("Body", GsonUtil.toMaps(body));
+                } else {
+                    Map<String, Object> params = new HashMap<>(0);
+                    String[] tmp = body.split("&");
+                    Arrays.stream(tmp).forEach(item -> {
+                        String[] param = item.split("=");
+                        params.put(param[0], param[1]);
+                    });
+                    map.put("Body", params);
+                }
+            }
+        } catch (Exception e) {
+            log.error("[GetRequestInfoError]", e);
+        }
+
         log.info("[RequestInfo]" + GsonUtil.toString(map));
         filterChain.doFilter(request, response);
     }

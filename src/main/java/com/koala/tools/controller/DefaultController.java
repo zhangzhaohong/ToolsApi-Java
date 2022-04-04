@@ -2,7 +2,6 @@ package com.koala.tools.controller;
 
 import com.koala.tools.http.annotation.MixedHttpRequest;
 import com.koala.tools.models.demo.TestModel;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -25,7 +24,7 @@ public class DefaultController {
     }
 
     @PostMapping("test/post")
-    public Object testPost(@RequestBody TestModel model) {
+    public Object testPost(@MixedHttpRequest TestModel model) {
         return model.getP();
     }
 }
