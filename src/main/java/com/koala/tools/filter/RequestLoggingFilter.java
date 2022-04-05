@@ -4,9 +4,6 @@ import com.koala.tools.http.wrapper.CustomHttpServletRequestWrapper;
 import com.koala.tools.utils.GsonUtil;
 import com.koala.tools.utils.JsonUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import javax.servlet.*;
@@ -23,6 +20,7 @@ import java.util.*;
  * @description
  */
 @Slf4j
+@WebFilter(urlPatterns = "/*",filterName = "requestLoggingFilter")
 public class RequestLoggingFilter implements Filter {
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {

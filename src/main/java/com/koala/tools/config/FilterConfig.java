@@ -22,7 +22,7 @@ public class FilterConfig {
         FilterRegistrationBean<CharacterEncodingFilter> registrationBean = new FilterRegistrationBean<>();
         registrationBean.setFilter(new CharacterEncodingFilter());
         registrationBean.addUrlPatterns("/*");
-        registrationBean.setName("CharacterEncodingFilter");
+        registrationBean.setName("characterEncodingFilter");
         registrationBean.setOrder(Ordered.HIGHEST_PRECEDENCE);
         return registrationBean;
     }
@@ -32,7 +32,7 @@ public class FilterConfig {
         FilterRegistrationBean<RequestLoggingFilter> registrationBean = new FilterRegistrationBean<>();
         registrationBean.setFilter(new RequestLoggingFilter());
         registrationBean.addUrlPatterns("/*");
-        registrationBean.setName("RequestLoggingFilter");
+        registrationBean.setName("requestLoggingFilter");
         registrationBean.setOrder(Ordered.HIGHEST_PRECEDENCE + 1);
         return registrationBean;
     }
