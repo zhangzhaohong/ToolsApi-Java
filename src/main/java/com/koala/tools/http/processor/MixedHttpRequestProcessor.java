@@ -32,6 +32,13 @@ public class MixedHttpRequestProcessor implements HandlerMethodArgumentResolver 
     @Resource
     private RequestMappingHandlerAdapter requestMappingHandlerAdapter;
 
+    private final List<HttpMessageConverter<?>> messageConverters = new ArrayList<>();
+
+    public MixedHttpRequestProcessor() {
+        CustomMessageConverter messageConverter = new CustomMessageConverter();
+        messageConverters.add(messageConverter);
+    }
+
     private final Map<String, HandlerMethodArgumentResolver> argumentResolverCache =
             new ConcurrentHashMap<>(8);
 
@@ -51,6 +58,7 @@ public class MixedHttpRequestProcessor implements HandlerMethodArgumentResolver 
         if (Objects.isNull(contentType)) {
             throw new IllegalArgumentException("无效的contentType");
         }
+        requestMappingHandlerAdapter.setMessageConverters(messageConverters);
         List<HandlerMethodArgumentResolver> argumentResolvers = requestMappingHandlerAdapter.getArgumentResolvers();
         HandlerMethodArgumentResolver handlerMethodArgumentResolver = argumentResolverCache.get(contentType);
         if (!Objects.isNull(handlerMethodArgumentResolver)) {

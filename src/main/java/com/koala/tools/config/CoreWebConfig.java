@@ -49,5 +49,7 @@ public class CoreWebConfig implements WebMvcConfigurer {
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
         resolvers.add(mixedHttpRequestProcessor());
+        resolvers.add(requestResponseBodyMethodProcessor());
+        resolvers.add(servletModelAttributeMethodProcessor());
     }
 }
