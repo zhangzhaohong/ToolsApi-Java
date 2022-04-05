@@ -8,13 +8,17 @@ import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 import org.springframework.web.servlet.mvc.method.annotation.RequestResponseBodyMethodProcessor;
 import org.springframework.web.servlet.mvc.method.annotation.ServletModelAttributeMethodProcessor;
 
+import javax.annotation.Resource;
 import javax.servlet.ServletRequest;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author koala
@@ -24,17 +28,18 @@ import java.util.Objects;
  */
 public class MixedHttpRequestProcessor implements HandlerMethodArgumentResolver {
 
-    private final RequestResponseBodyMethodProcessor jsonResolver;
-    private final ServletModelAttributeMethodProcessor formResolver;
+    @Resource
+    private RequestMappingHandlerAdapter requestMappingHandlerAdapter;
+
+    private final List<HttpMessageConverter<?>> messageConverters = new ArrayList<>();
 
     public MixedHttpRequestProcessor() {
-        List<HttpMessageConverter<?>> messageConverters = new ArrayList<>();
         CustomMessageConverter messageConverter = new CustomMessageConverter();
         messageConverters.add(messageConverter);
-
-        jsonResolver = new RequestResponseBodyMethodProcessor(messageConverters);
-        formResolver = new ServletModelAttributeMethodProcessor(true);
     }
+
+    private final Map<String, HandlerMethodArgumentResolver> argumentResolverCache =
+            new ConcurrentHashMap<>(8);
 
     @Override
     public boolean supportsParameter(MethodParameter methodParameter) {
@@ -49,17 +54,31 @@ public class MixedHttpRequestProcessor implements HandlerMethodArgumentResolver 
             throw new IllegalArgumentException("servletRequest不能为null");
         }
         String contentType = servletRequest.getContentType();
-        if (contentType == null) {
-            throw new IllegalArgumentException("不支持contentType");
+        if (Objects.isNull(contentType)) {
+            throw new IllegalArgumentException("无效的contentType");
         }
-        if (contentType.contains("application/json")) {
-            return jsonResolver.resolveArgument(methodParameter, modelAndViewContainer, nativeWebRequest, webDataBinderFactory);
+        requestMappingHandlerAdapter.setMessageConverters(messageConverters);
+        List<HandlerMethodArgumentResolver> argumentResolvers = requestMappingHandlerAdapter.getArgumentResolvers();
+        HandlerMethodArgumentResolver handlerMethodArgumentResolver = argumentResolverCache.get(contentType);
+        if (!Objects.isNull(handlerMethodArgumentResolver)) {
+            return handlerMethodArgumentResolver.resolveArgument(methodParameter, modelAndViewContainer, nativeWebRequest, webDataBinderFactory);
         }
-        if (contentType.contains("application/x-www-form-urlencoded")) {
-            return formResolver.resolveArgument(methodParameter, modelAndViewContainer, nativeWebRequest, webDataBinderFactory);
+        if (Objects.isNull(argumentResolvers)) {
+            throw new IllegalArgumentException("无效的resolvers");
         }
-        if (contentType.contains("multipart")) {
-            return formResolver.resolveArgument(methodParameter, modelAndViewContainer, nativeWebRequest, webDataBinderFactory);
+        for (HandlerMethodArgumentResolver argumentResolver : argumentResolvers) {
+            if (contentType.contains("application/json") && argumentResolver instanceof RequestResponseBodyMethodProcessor) {
+                argumentResolverCache.put(contentType, argumentResolver);
+                return argumentResolver.resolveArgument(methodParameter, modelAndViewContainer, nativeWebRequest, webDataBinderFactory);
+            }
+            if (contentType.contains("application/x-www-form-urlencoded") && argumentResolver instanceof ServletModelAttributeMethodProcessor) {
+                argumentResolverCache.put(contentType, argumentResolver);
+                return argumentResolver.resolveArgument(methodParameter, modelAndViewContainer, nativeWebRequest, webDataBinderFactory);
+            }
+            if (contentType.contains("multipart") && argumentResolver instanceof ServletModelAttributeMethodProcessor) {
+                argumentResolverCache.put(contentType, argumentResolver);
+                return argumentResolver.resolveArgument(methodParameter, modelAndViewContainer, nativeWebRequest, webDataBinderFactory);
+            }
         }
         throw new IllegalArgumentException("不支持contentType");
     }

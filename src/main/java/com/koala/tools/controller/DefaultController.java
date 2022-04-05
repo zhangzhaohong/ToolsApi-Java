@@ -24,7 +24,7 @@ public class DefaultController {
     }
 
     @PostMapping("test/post")
-    public Object testPost(@MixedHttpRequest TestModel model) {
+    public Object testPost(@RequestBody TestModel model) {
         return model.getP();
     }
 }
