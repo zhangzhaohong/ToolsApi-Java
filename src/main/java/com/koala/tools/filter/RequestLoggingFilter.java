@@ -10,7 +10,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartResolver;
 
 import javax.servlet.*;
-import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -24,7 +23,6 @@ import java.util.*;
  */
 @Slf4j
 @DependsOn(value = {"beanContext", "multipartResolver"})
-@WebFilter(urlPatterns = "/*", filterName = "requestLoggingFilter")
 public class RequestLoggingFilter implements Filter {
 
     private MultipartResolver multipartResolver = null;
