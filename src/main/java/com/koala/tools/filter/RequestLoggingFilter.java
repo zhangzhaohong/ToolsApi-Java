@@ -115,7 +115,7 @@ public class RequestLoggingFilter implements Filter {
 
     private ServletRequest getRequest(ServletRequest request) {
         String contentType = request.getContentType();
-        if (!StringUtils.isEmpty(contentType) && contentType.contains("multipart/form-data")) {
+        if (!StringUtils.isEmpty(contentType) && contentType.contains("multipart")) {
             return multipartResolver.resolveMultipart((HttpServletRequest) request);
         } else {
             return request;
