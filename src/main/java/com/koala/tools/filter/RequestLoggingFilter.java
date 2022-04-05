@@ -23,7 +23,7 @@ import java.util.*;
  * @description
  */
 @Slf4j
-@DependsOn(value = {"beanContext"})
+@DependsOn(value = {"beanContext", "multipartResolver"})
 @WebFilter(urlPatterns = "/*", filterName = "requestLoggingFilter")
 public class RequestLoggingFilter implements Filter {
 
@@ -33,7 +33,7 @@ public class RequestLoggingFilter implements Filter {
     public void init(FilterConfig filterConfig) throws ServletException {
         Filter.super.init(filterConfig);
         log.info("init RequestLoggingFilter");
-        multipartResolver = (MultipartResolver) BeanContext.getBean("customMultipartResolver");
+        multipartResolver = (MultipartResolver) BeanContext.getBean("multipartResolver");
     }
 
     @Override

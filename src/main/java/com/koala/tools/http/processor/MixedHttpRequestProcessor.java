@@ -27,7 +27,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @date 2022/4/3 11:22
  * @description
  */
-@DependsOn({"beanContext", "customMultipartResolver"})
+@DependsOn({"beanContext"})
 public class MixedHttpRequestProcessor implements HandlerMethodArgumentResolver {
 
     @Resource
