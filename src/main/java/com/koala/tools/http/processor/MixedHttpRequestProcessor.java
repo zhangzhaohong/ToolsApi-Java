@@ -4,7 +4,6 @@ import com.koala.tools.http.annotation.MixedHttpRequest;
 import com.koala.tools.http.converter.CustomMessageConverter;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;

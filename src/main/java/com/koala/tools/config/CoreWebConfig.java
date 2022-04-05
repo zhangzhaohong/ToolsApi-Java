@@ -23,33 +23,13 @@ import java.util.List;
 @Configuration
 @Order
 public class CoreWebConfig implements WebMvcConfigurer {
-
-    List<HttpMessageConverter<?>> messageConverters = new ArrayList<>();
-
-    public CoreWebConfig() {
-        CustomMessageConverter messageConverter = new CustomMessageConverter();
-        messageConverters.add(messageConverter);
-    }
-
     @Bean
     public MixedHttpRequestProcessor mixedHttpRequestProcessor() {
         return new MixedHttpRequestProcessor();
     }
 
-    @Bean
-    public RequestResponseBodyMethodProcessor requestResponseBodyMethodProcessor() {
-        return new RequestResponseBodyMethodProcessor(messageConverters);
-    }
-
-    @Bean
-    public ServletModelAttributeMethodProcessor servletModelAttributeMethodProcessor() {
-        return new ServletModelAttributeMethodProcessor(true);
-    }
-
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
         resolvers.add(mixedHttpRequestProcessor());
-        resolvers.add(requestResponseBodyMethodProcessor());
-        resolvers.add(servletModelAttributeMethodProcessor());
     }
 }
