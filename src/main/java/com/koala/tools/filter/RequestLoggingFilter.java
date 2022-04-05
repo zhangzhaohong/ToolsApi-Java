@@ -4,6 +4,9 @@ import com.koala.tools.http.wrapper.CustomHttpServletRequestWrapper;
 import com.koala.tools.utils.GsonUtil;
 import com.koala.tools.utils.JsonUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import javax.servlet.*;
@@ -11,7 +14,6 @@ import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -21,30 +23,37 @@ import java.util.*;
  * @description
  */
 @Slf4j
-@WebFilter(urlPatterns = "/*", filterName = "RequestLoggingFilter")
 public class RequestLoggingFilter implements Filter {
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         Filter.super.init(filterConfig);
+        log.info("init RequestLoggingFilter");
     }
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
-        CustomHttpServletRequestWrapper request = new CustomHttpServletRequestWrapper((HttpServletRequest) servletRequest);
+        CustomHttpServletRequestWrapper requestWrapper = null;
+        if (servletRequest instanceof HttpServletRequest) {
+            requestWrapper = new CustomHttpServletRequestWrapper((HttpServletRequest) servletRequest);
+        }
+        if (Objects.isNull(requestWrapper)) {
+            filterChain.doFilter(servletRequest, servletResponse);
+            return;
+        }
         HttpServletResponse response = (HttpServletResponse) servletResponse;
         Map<String, Object> map = new HashMap<>(0);
 
         // Get request URL.
-        map.put("Url", request.getRequestURL());
-        map.put("Method", request.getMethod());
-        map.put("Protocol", request.getProtocol());
+        map.put("Url", requestWrapper.getRequestURL());
+        map.put("Method", requestWrapper.getMethod());
+        map.put("Protocol", requestWrapper.getProtocol());
 
         // 获取header信息
         List<Map<String, String>> headerList = new ArrayList<>();
         Map<String, String> headerMaps = new HashMap<>();
-        for (Enumeration<String> enu = request.getHeaderNames(); enu.hasMoreElements(); ) {
+        for (Enumeration<String> enu = requestWrapper.getHeaderNames(); enu.hasMoreElements(); ) {
             String name = enu.nextElement();
-            headerMaps.put(name, request.getHeader(name));
+            headerMaps.put(name, requestWrapper.getHeader(name));
         }
         headerList.add(headerMaps);
         map.put("Headers", headerList);
@@ -52,16 +61,16 @@ public class RequestLoggingFilter implements Filter {
         //获取parameters信息
         List<Map<String, String>> parameterList = new ArrayList<>();
         Map<String, String> parameterMaps = new HashMap<>(0);
-        for (Enumeration<String> names = request.getParameterNames(); names.hasMoreElements(); ) {
+        for (Enumeration<String> names = requestWrapper.getParameterNames(); names.hasMoreElements(); ) {
             String name = names.nextElement();
-            parameterMaps.put(name, request.getParameter(name));
+            parameterMaps.put(name, requestWrapper.getParameter(name));
         }
         parameterList.add(parameterMaps);
         map.put("Parameters", parameterList);
         String line = "";
-        int idx = request.getRequestURL().indexOf("?");
+        int idx = requestWrapper.getRequestURL().indexOf("?");
         if (idx != -1) {
-            line = request.getRequestURL().substring(idx + 1);
+            line = requestWrapper.getRequestURL().substring(idx + 1);
         } else {
             line = null;
         }
@@ -71,7 +80,7 @@ public class RequestLoggingFilter implements Filter {
 
         // 获取body
         try {
-            String body = request.getBody();
+            String body = requestWrapper.getBody();
             if (!StringUtils.isEmpty(body)) {
                 if (JsonUtils.isJson(body)) {
                     map.put("Body", GsonUtil.toMaps(body));
@@ -90,7 +99,7 @@ public class RequestLoggingFilter implements Filter {
         }
 
         log.info("[RequestInfo]" + GsonUtil.toString(map));
-        filterChain.doFilter(request, response);
+        filterChain.doFilter(requestWrapper, response);
     }
 
     @Override
