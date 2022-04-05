@@ -1,14 +1,11 @@
 package com.koala.tools.filter;
 
-import com.koala.tools.config.FilterConfig;
-
 import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Locale;
 
 /**
  * @author koala
