@@ -18,21 +18,21 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @EnableWebMvc
 public class FilterConfig {
     @Bean
-    public FilterRegistrationBean<RequestLoggingFilter> registrationRequestLoggingFilter() {
-        FilterRegistrationBean<RequestLoggingFilter> registrationBean = new FilterRegistrationBean<>();
-        registrationBean.setFilter(new RequestLoggingFilter());
-        registrationBean.addUrlPatterns("/*");
-        registrationBean.setName("RequestLoggingFilter");
-        registrationBean.setOrder(Ordered.HIGHEST_PRECEDENCE);
-        return registrationBean;
-    }
-
-    @Bean
     public FilterRegistrationBean<CharacterEncodingFilter> registrationCharsetEncodingFilter() {
         FilterRegistrationBean<CharacterEncodingFilter> registrationBean = new FilterRegistrationBean<>();
         registrationBean.setFilter(new CharacterEncodingFilter());
         registrationBean.addUrlPatterns("/*");
         registrationBean.setName("CharacterEncodingFilter");
+        registrationBean.setOrder(Ordered.HIGHEST_PRECEDENCE);
+        return registrationBean;
+    }
+
+    @Bean
+    public FilterRegistrationBean<RequestLoggingFilter> registrationRequestLoggingFilter() {
+        FilterRegistrationBean<RequestLoggingFilter> registrationBean = new FilterRegistrationBean<>();
+        registrationBean.setFilter(new RequestLoggingFilter());
+        registrationBean.addUrlPatterns("/*");
+        registrationBean.setName("RequestLoggingFilter");
         registrationBean.setOrder(Ordered.HIGHEST_PRECEDENCE + 1);
         return registrationBean;
     }
