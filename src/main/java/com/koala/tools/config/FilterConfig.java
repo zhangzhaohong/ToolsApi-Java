@@ -5,7 +5,9 @@ import com.koala.tools.filter.RequestLoggingFilter;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.Ordered;
+import org.springframework.context.annotation.DependsOn;
+import org.springframework.web.multipart.MultipartResolver;
+import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 /**
@@ -16,14 +18,16 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
  */
 @Configuration
 @EnableWebMvc
+@DependsOn({"beanContext"})
 public class FilterConfig {
+
     @Bean
     public FilterRegistrationBean<CharacterEncodingFilter> registrationCharsetEncodingFilter() {
         FilterRegistrationBean<CharacterEncodingFilter> registrationBean = new FilterRegistrationBean<>();
         registrationBean.setFilter(new CharacterEncodingFilter());
         registrationBean.addUrlPatterns("/*");
         registrationBean.setName("characterEncodingFilter");
-        registrationBean.setOrder(Ordered.HIGHEST_PRECEDENCE);
+        registrationBean.setOrder(0);
         return registrationBean;
     }
 
@@ -33,7 +37,8 @@ public class FilterConfig {
         registrationBean.setFilter(new RequestLoggingFilter());
         registrationBean.addUrlPatterns("/*");
         registrationBean.setName("requestLoggingFilter");
-        registrationBean.setOrder(Ordered.HIGHEST_PRECEDENCE + 1);
+        registrationBean.setOrder(1);
         return registrationBean;
     }
+
 }

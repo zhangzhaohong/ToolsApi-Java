@@ -2,6 +2,7 @@ package com.koala.tools.http.processor;
 
 import com.koala.tools.http.annotation.MixedHttpRequest;
 import com.koala.tools.http.converter.CustomMessageConverter;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.bind.support.WebDataBinderFactory;
@@ -26,6 +27,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @date 2022/4/3 11:22
  * @description
  */
+@DependsOn({"beanContext", "customMultipartResolver"})
 public class MixedHttpRequestProcessor implements HandlerMethodArgumentResolver {
 
     @Resource
