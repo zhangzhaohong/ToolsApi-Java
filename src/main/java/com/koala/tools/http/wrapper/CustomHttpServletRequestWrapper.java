@@ -1,13 +1,12 @@
 package com.koala.tools.http.wrapper;
 
+import org.springframework.util.StreamUtils;
+
 import javax.servlet.ReadListener;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.StringWriter;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 
 /**
@@ -22,20 +21,16 @@ public class CustomHttpServletRequestWrapper extends HttpServletRequestWrapper {
 
     public CustomHttpServletRequestWrapper(HttpServletRequest request) throws IOException {
         super(request);
-
-        BufferedReader reader = request.getReader();
-        try (StringWriter writer = new StringWriter()) {
-            int read;
-            char[] buf = new char[1024 * 8];
-            while ((read = reader.read(buf)) != -1) {
-                writer.write(buf, 0, read);
-            }
-            this.body = writer.getBuffer().toString().getBytes();
-        }
+        this.body = StreamUtils.copyToByteArray(request.getInputStream());
     }
 
     public String getBody() {
         return new String(body, StandardCharsets.UTF_8);
+    }
+
+    @Override
+    public BufferedReader getReader() throws IOException {
+        return new BufferedReader(new InputStreamReader(getInputStream()));
     }
 
     @Override
@@ -54,7 +49,7 @@ public class CustomHttpServletRequestWrapper extends HttpServletRequestWrapper {
 
             @Override
             public boolean isReady() {
-                return true;
+                return false;
             }
 
             @Override
