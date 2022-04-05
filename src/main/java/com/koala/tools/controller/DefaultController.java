@@ -2,6 +2,9 @@ package com.koala.tools.controller;
 
 import com.koala.tools.http.annotation.MixedHttpRequest;
 import com.koala.tools.models.demo.TestModel;
+import com.koala.tools.utils.GsonUtil;
+import org.springframework.http.MediaType;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -26,5 +29,10 @@ public class DefaultController {
     @PostMapping("test/post")
     public Object testPost(@RequestBody TestModel model) {
         return model.getP();
+    }
+
+    @PostMapping(value = "test/post/x-www-form-urlencoded", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    public Object testPostXWWW(@RequestParam(value = "p") String p) {
+        return GsonUtil.toString(p);
     }
 }
