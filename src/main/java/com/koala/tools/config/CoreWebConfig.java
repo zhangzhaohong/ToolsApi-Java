@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.GsonHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.multipart.MultipartResolver;
@@ -33,8 +34,10 @@ public class CoreWebConfig implements WebMvcConfigurer {
         RequestMappingHandlerAdapter adapter = new RequestMappingHandlerAdapter();
         List<HttpMessageConverter<?>> converters = adapter.getMessageConverters();
         CustomMessageConverter customMessageConverter = new CustomMessageConverter();
+        GsonHttpMessageConverter gsonHttpMessageConverter = new GsonHttpMessageConverter();
         MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter = new MappingJackson2HttpMessageConverter();
         converters.add(customMessageConverter);
+        converters.add(gsonHttpMessageConverter);
         converters.add(mappingJackson2HttpMessageConverter);
         adapter.setMessageConverters(converters);
         return adapter;
