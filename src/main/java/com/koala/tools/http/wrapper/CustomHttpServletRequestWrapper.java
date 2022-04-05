@@ -8,6 +8,7 @@ import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 
 /**
  * @author koala
@@ -33,8 +34,8 @@ public class CustomHttpServletRequestWrapper extends HttpServletRequestWrapper {
         }
     }
 
-    public byte[] getBody() {
-        return body;
+    public String getBody() {
+        return new String(body, StandardCharsets.UTF_8);
     }
 
     @Override

@@ -71,7 +71,7 @@ public class RequestLoggingFilter implements Filter {
 
         // 获取body
         try {
-            String body = new String(request.getBody(), String.valueOf(StandardCharsets.UTF_8));
+            String body = request.getBody();
             if (!StringUtils.isEmpty(body)) {
                 if (JsonUtils.isJson(body)) {
                     map.put("Body", GsonUtil.toMaps(body));
