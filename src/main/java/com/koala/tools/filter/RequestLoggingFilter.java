@@ -22,7 +22,7 @@ import java.util.*;
  * @description
  */
 @Slf4j
-@DependsOn(value = {"beanContext", "multipartResolver"})
+@DependsOn(value = {"beanContext", "customMultipartResolver"})
 public class RequestLoggingFilter implements Filter {
 
     private MultipartResolver multipartResolver = null;
@@ -31,7 +31,7 @@ public class RequestLoggingFilter implements Filter {
     public void init(FilterConfig filterConfig) throws ServletException {
         Filter.super.init(filterConfig);
         log.info("init RequestLoggingFilter");
-        multipartResolver = (MultipartResolver) BeanContext.getBean("multipartResolver");
+        multipartResolver = (MultipartResolver) BeanContext.getBean("customMultipartResolver");
     }
 
     @Override

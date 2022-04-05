@@ -1,13 +1,17 @@
 package com.koala.tools.config;
 
+import com.koala.tools.http.converter.CustomMessageConverter;
 import com.koala.tools.http.processor.MixedHttpRequestProcessor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 
 import java.util.List;
 
@@ -21,7 +25,19 @@ import java.util.List;
 @DependsOn({"beanContext"})
 public class CoreWebConfig implements WebMvcConfigurer {
 
-    @Bean(name = "multipartResolver")
+    @Bean(name = "customRequestMappingHandlerAdapter")
+    public RequestMappingHandlerAdapter requestMappingHandlerAdapter() {
+        RequestMappingHandlerAdapter adapter = new RequestMappingHandlerAdapter();
+        List<HttpMessageConverter<?>> converters = adapter.getMessageConverters();
+        CustomMessageConverter customMessageConverter = new CustomMessageConverter();
+        MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter = new MappingJackson2HttpMessageConverter();
+        converters.add(customMessageConverter);
+        converters.add(mappingJackson2HttpMessageConverter);
+        adapter.setMessageConverters(converters);
+        return adapter;
+    }
+
+    @Bean(name = "customMultipartResolver")
     public MultipartResolver multipartResolver() {
         CommonsMultipartResolver resolver = new CommonsMultipartResolver();
         resolver.setDefaultEncoding("UTF-8");

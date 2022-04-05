@@ -32,7 +32,7 @@ public class DefaultController {
     }
 
     @PostMapping(value = "test/post/x-www-form-urlencoded", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    public Object testPostXWWW(@RequestParam(value = "p", required = false) String p) {
-        return GsonUtil.toString(p);
+    public Object testPostXWWW(@RequestBody(required = false) MultiValueMap<String, String> values) {
+        return GsonUtil.toString(values);
     }
 }

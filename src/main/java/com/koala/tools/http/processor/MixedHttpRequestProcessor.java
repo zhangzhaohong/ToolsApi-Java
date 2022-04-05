@@ -1,10 +1,8 @@
 package com.koala.tools.http.processor;
 
 import com.koala.tools.http.annotation.MixedHttpRequest;
-import com.koala.tools.http.converter.CustomMessageConverter;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.core.MethodParameter;
-import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
@@ -15,7 +13,6 @@ import org.springframework.web.servlet.mvc.method.annotation.ServletModelAttribu
 
 import javax.annotation.Resource;
 import javax.servlet.ServletRequest;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -30,15 +27,8 @@ import java.util.concurrent.ConcurrentHashMap;
 @DependsOn({"beanContext"})
 public class MixedHttpRequestProcessor implements HandlerMethodArgumentResolver {
 
-    @Resource
+    @Resource(name = "customRequestMappingHandlerAdapter")
     private RequestMappingHandlerAdapter requestMappingHandlerAdapter;
-
-    private final List<HttpMessageConverter<?>> messageConverters = new ArrayList<>();
-
-    public MixedHttpRequestProcessor() {
-        CustomMessageConverter messageConverter = new CustomMessageConverter();
-        messageConverters.add(messageConverter);
-    }
 
     private final Map<String, HandlerMethodArgumentResolver> argumentResolverCache =
             new ConcurrentHashMap<>(8);
@@ -59,9 +49,6 @@ public class MixedHttpRequestProcessor implements HandlerMethodArgumentResolver 
         if (Objects.isNull(contentType)) {
             throw new IllegalArgumentException("无效的contentType");
         }
-        List<HttpMessageConverter<?>> currentMessageConverters = requestMappingHandlerAdapter.getMessageConverters();
-        currentMessageConverters.addAll(messageConverters);
-        requestMappingHandlerAdapter.setMessageConverters(currentMessageConverters);
         List<HandlerMethodArgumentResolver> argumentResolvers = requestMappingHandlerAdapter.getArgumentResolvers();
         HandlerMethodArgumentResolver handlerMethodArgumentResolver = argumentResolverCache.get(contentType);
         if (!Objects.isNull(handlerMethodArgumentResolver)) {
