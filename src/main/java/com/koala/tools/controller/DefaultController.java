@@ -4,7 +4,6 @@ import com.koala.tools.http.annotation.MixedHttpRequest;
 import com.koala.tools.models.demo.TestModel;
 import com.koala.tools.utils.GsonUtil;
 import org.springframework.http.MediaType;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
