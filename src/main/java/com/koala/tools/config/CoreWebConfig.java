@@ -1,12 +1,15 @@
 package com.koala.tools.config;
 
+import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.alibaba.fastjson.support.config.FastJsonConfig;
+import com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter;
 import com.koala.tools.http.converter.CustomMessageConverter;
 import com.koala.tools.http.processor.MixedHttpRequestProcessor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.json.GsonHttpMessageConverter;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
@@ -15,6 +18,7 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -32,10 +36,27 @@ public class CoreWebConfig implements WebMvcConfigurer {
     public RequestMappingHandlerAdapter requestMappingHandlerAdapter() {
         RequestMappingHandlerAdapter adapter = new RequestMappingHandlerAdapter();
         List<HttpMessageConverter<?>> converters = adapter.getMessageConverters();
+        FastJsonHttpMessageConverter fastJsonHttpMessageConverter = new FastJsonHttpMessageConverter();
+        FastJsonConfig fastJsonConfig = new FastJsonConfig();
+        fastJsonConfig.setSerializerFeatures(
+                SerializerFeature.QuoteFieldNames,
+                //保留空的字段
+                SerializerFeature.WriteMapNullValue,
+                //List null-> []
+                SerializerFeature.WriteNullListAsEmpty,
+                // 日期格式化
+                SerializerFeature.WriteDateUseDateFormat,
+                //String null -> ""
+                SerializerFeature.WriteNullStringAsEmpty);
+        List<MediaType> mediaTypeList = new ArrayList<>();
+        mediaTypeList.add(MediaType.TEXT_HTML);
+        mediaTypeList.add(MediaType.APPLICATION_JSON);
+        mediaTypeList.add(MediaType.APPLICATION_FORM_URLENCODED);
+        fastJsonHttpMessageConverter.setSupportedMediaTypes(mediaTypeList);
+        fastJsonHttpMessageConverter.setFastJsonConfig(fastJsonConfig);
         CustomMessageConverter customMessageConverter = new CustomMessageConverter();
-        GsonHttpMessageConverter gsonHttpMessageConverter = new GsonHttpMessageConverter();
+        converters.add(fastJsonHttpMessageConverter);
         converters.add(customMessageConverter);
-        converters.add(gsonHttpMessageConverter);
         adapter.setMessageConverters(converters);
         return adapter;
     }
