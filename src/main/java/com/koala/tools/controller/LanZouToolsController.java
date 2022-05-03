@@ -49,7 +49,7 @@ public class LanZouToolsController {
      * @throws IOException
      * @throws URISyntaxException
      */
-    @GetMapping("api")
+    @GetMapping(value = "api", produces = {"application/json;charset=utf-8"})
     public Object getLanZouInfos(@RequestParam(value = "url", required = false) String url, @RequestParam(value = "password", required = false) String password, @RequestParam(value = "type", required = false, defaultValue = "info") String type, HttpServletResponse response) throws IOException, URISyntaxException {
         logger.info("LanZouApi: params: {url={}, password={}, type={}}", url, password, type);
         if (Boolean.FALSE.equals(checkLanZouUrl(url))) {

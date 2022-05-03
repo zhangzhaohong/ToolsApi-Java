@@ -6,6 +6,7 @@ import com.koala.tools.factory.builder.ConcreteDouYinApiBuilder;
 import com.koala.tools.factory.builder.DouYinApiBuilder;
 import com.koala.tools.factory.director.DouYinApiManager;
 import com.koala.tools.factory.product.DouYinApiProduct;
+import com.koala.tools.http.annotation.MixedHttpRequest;
 import com.koala.tools.models.douyin.ItemInfoRespModel;
 import com.koala.tools.utils.HeaderUtil;
 import com.koala.tools.utils.HttpClientUtil;
@@ -82,8 +83,8 @@ public class DouYinToolsController {
         HttpClientUtil.doRelay(url, HeaderUtil.getDouYinDownloadHeader(), null, 206, HeaderUtil.getMockVideoHeader(false), request, response);
     }
 
-    @GetMapping("api")
-    public Object getDouYinInfos(@RequestParam(value = "link", required = false) String link, @RequestParam(value = "type", required = false, defaultValue = "info") String type, HttpServletRequest request, HttpServletResponse response) throws IOException, URISyntaxException {
+    @GetMapping(value = "api", produces = {"application/json;charset=utf-8"})
+    public Object getDouYinInfos(@MixedHttpRequest(required = false) String link, @RequestParam(value = "type", required = false, defaultValue = "info") String type, HttpServletRequest request, HttpServletResponse response) throws IOException, URISyntaxException {
         if (StringUtils.isEmpty(link)) {
             return formatRespData(INVALID_LINK, null);
         }
