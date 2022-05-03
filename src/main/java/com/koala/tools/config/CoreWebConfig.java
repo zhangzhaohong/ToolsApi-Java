@@ -1,10 +1,15 @@
 package com.koala.tools.config;
 
+import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.alibaba.fastjson2.JSONWriter;
+import com.alibaba.fastjson2.support.config.FastJsonConfig;
+import com.alibaba.fastjson2.support.spring.http.converter.FastJsonHttpMessageConverter;
 import com.koala.tools.http.converter.CustomMessageConverter;
 import com.koala.tools.http.processor.MixedHttpRequestProcessor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.multipart.MultipartResolver;
@@ -14,6 +19,7 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -31,7 +37,36 @@ public class CoreWebConfig implements WebMvcConfigurer {
     public RequestMappingHandlerAdapter requestMappingHandlerAdapter() {
         RequestMappingHandlerAdapter adapter = new RequestMappingHandlerAdapter();
         List<HttpMessageConverter<?>> converters = adapter.getMessageConverters();
+        FastJsonHttpMessageConverter fastJsonHttpMessageConverter = new FastJsonHttpMessageConverter();
+        List<MediaType> supportedMediaTypes = new ArrayList<>();
+        supportedMediaTypes.add(MediaType.APPLICATION_JSON);
+        supportedMediaTypes.add(MediaType.APPLICATION_JSON_UTF8);
+        supportedMediaTypes.add(MediaType.APPLICATION_ATOM_XML);
+        supportedMediaTypes.add(MediaType.APPLICATION_FORM_URLENCODED);
+        supportedMediaTypes.add(MediaType.APPLICATION_OCTET_STREAM);
+        supportedMediaTypes.add(MediaType.APPLICATION_PDF);
+        supportedMediaTypes.add(MediaType.APPLICATION_RSS_XML);
+        supportedMediaTypes.add(MediaType.APPLICATION_XHTML_XML);
+        supportedMediaTypes.add(MediaType.APPLICATION_XML);
+        supportedMediaTypes.add(MediaType.IMAGE_GIF);
+        supportedMediaTypes.add(MediaType.IMAGE_JPEG);
+        supportedMediaTypes.add(MediaType.IMAGE_PNG);
+        supportedMediaTypes.add(MediaType.TEXT_EVENT_STREAM);
+        supportedMediaTypes.add(MediaType.TEXT_HTML);
+        supportedMediaTypes.add(MediaType.TEXT_MARKDOWN);
+        supportedMediaTypes.add(MediaType.TEXT_PLAIN);
+        supportedMediaTypes.add(MediaType.TEXT_XML);
+        fastJsonHttpMessageConverter.setSupportedMediaTypes(supportedMediaTypes);
+
+        //创建配置类
+        FastJsonConfig fastJsonConfig = new FastJsonConfig();
+        fastJsonConfig.setWriterFeatures(
+                JSONWriter.Feature.WriteNulls,
+                JSONWriter.Feature.WriteNonStringValueAsString
+        );
+        fastJsonHttpMessageConverter.setFastJsonConfig(fastJsonConfig);
         CustomMessageConverter customMessageConverter = new CustomMessageConverter();
+        converters.add(fastJsonHttpMessageConverter);
         converters.add(customMessageConverter);
         adapter.setMessageConverters(converters);
         return adapter;
