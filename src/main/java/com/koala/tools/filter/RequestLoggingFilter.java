@@ -6,6 +6,8 @@ import com.koala.tools.utils.GsonUtil;
 import com.koala.tools.utils.JsonUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.http.MediaType;
+import org.springframework.security.core.parameters.P;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartResolver;
 
@@ -38,6 +40,10 @@ public class RequestLoggingFilter implements Filter {
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         CustomHttpServletRequestWrapper requestWrapper = null;
         if (servletRequest instanceof HttpServletRequest) {
+            if (servletRequest.getContentType().contains(MediaType.APPLICATION_FORM_URLENCODED_VALUE)) {
+                filterChain.doFilter(servletRequest, servletResponse);
+                return;
+            }
             requestWrapper = new CustomHttpServletRequestWrapper((HttpServletRequest) servletRequest);
         }
         if (Objects.isNull(requestWrapper)) {
