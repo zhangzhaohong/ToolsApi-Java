@@ -76,9 +76,9 @@
     <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpclient:4.5.13" level="project" />
     <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpcore:4.4.14" level="project" />
     <orderEntry type="library" name="Maven: commons-codec:commons-codec:1.14" level="project" />
-    <orderEntry type="library" name="Maven: com.alibaba:fastjson:2.0.2.graal" level="project" />
-    <orderEntry type="library" name="Maven: com.alibaba.fastjson2:fastjson2-extension:2.0.2.graal" level="project" />
-    <orderEntry type="library" name="Maven: com.alibaba.fastjson2:fastjson2:2.0.2.graal" level="project" />
+    <orderEntry type="library" name="Maven: com.alibaba:fastjson:2.0.2" level="project" />
+    <orderEntry type="library" name="Maven: com.alibaba.fastjson2:fastjson2-extension:2.0.2" level="project" />
+    <orderEntry type="library" name="Maven: com.alibaba.fastjson2:fastjson2:2.0.2" level="project" />
     <orderEntry type="library" name="Maven: org.json:json:20220320" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: org.springframework.boot:spring-boot-devtools:2.3.7.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot:2.3.7.RELEASE" level="project" />
