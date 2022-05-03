@@ -38,13 +38,13 @@ public class RequestLoggingFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
-        CustomHttpServletRequestWrapper requestWrapper = null;
+        Object requestWrapper = null;
         if (servletRequest instanceof HttpServletRequest) {
             if (servletRequest.getContentType().contains(MediaType.APPLICATION_FORM_URLENCODED_VALUE)) {
-                filterChain.doFilter(servletRequest, servletResponse);
-                return;
+                requestWrapper = servletRequest;
+            } else {
+                requestWrapper = new CustomHttpServletRequestWrapper((HttpServletRequest) servletRequest);
             }
-            requestWrapper = new CustomHttpServletRequestWrapper((HttpServletRequest) servletRequest);
         }
         if (Objects.isNull(requestWrapper)) {
             filterChain.doFilter(servletRequest, servletResponse);
@@ -52,18 +52,18 @@ public class RequestLoggingFilter implements Filter {
         }
         HttpServletResponse response = (HttpServletResponse) servletResponse;
         Map<String, Object> map = new HashMap<>(0);
-
+        // 写入info
+        HttpServletRequest wrapper = (HttpServletRequest) requestWrapper;
         // Get request URL.
-        map.put("Url", requestWrapper.getRequestURL());
-        map.put("Method", requestWrapper.getMethod());
-        map.put("Protocol", requestWrapper.getProtocol());
-
+        map.put("Url", wrapper.getRequestURL());
+        map.put("Method", wrapper.getMethod());
+        map.put("Protocol", wrapper.getProtocol());
         // 获取header信息
         List<Map<String, String>> headerList = new ArrayList<>();
         Map<String, String> headerMaps = new HashMap<>();
-        for (Enumeration<String> enu = requestWrapper.getHeaderNames(); enu.hasMoreElements(); ) {
+        for (Enumeration<String> enu = wrapper.getHeaderNames(); enu.hasMoreElements(); ) {
             String name = enu.nextElement();
-            headerMaps.put(name, requestWrapper.getHeader(name));
+            headerMaps.put(name, wrapper.getHeader(name));
         }
         headerList.add(headerMaps);
         map.put("Headers", headerList);
@@ -71,45 +71,50 @@ public class RequestLoggingFilter implements Filter {
         //获取parameters信息
         List<Map<String, String>> parameterList = new ArrayList<>();
         Map<String, String> parameterMaps = new HashMap<>(0);
-        for (Enumeration<String> names = requestWrapper.getParameterNames(); names.hasMoreElements(); ) {
+        for (Enumeration<String> names = wrapper.getParameterNames(); names.hasMoreElements(); ) {
             String name = names.nextElement();
-            parameterMaps.put(name, requestWrapper.getParameter(name));
+            parameterMaps.put(name, wrapper.getParameter(name));
         }
         parameterList.add(parameterMaps);
         map.put("Parameters", parameterList);
         String line = "";
-        int idx = requestWrapper.getRequestURL().indexOf("?");
+        int idx = wrapper.getRequestURL().indexOf("?");
         if (idx != -1) {
-            line = requestWrapper.getRequestURL().substring(idx + 1);
+            line = wrapper.getRequestURL().substring(idx + 1);
         } else {
             line = null;
         }
         if (line != null) {
             map.put("Context", new String[]{line});
         }
-
-        // 获取body
-        try {
-            String body = requestWrapper.getBody();
-            if (!StringUtils.isEmpty(body)) {
-                if (JsonUtils.isJson(body)) {
-                    map.put("Body", GsonUtil.toMaps(body));
-                } else {
-                    Map<String, Object> params = new HashMap<>(0);
-                    String[] tmp = body.split("&");
-                    Arrays.stream(tmp).forEach(item -> {
-                        String[] param = item.split("=");
-                        params.put(param[0], param[1]);
-                    });
-                    map.put("Body", params);
+        if (requestWrapper instanceof CustomHttpServletRequestWrapper) {
+            CustomHttpServletRequestWrapper customWrapper = (CustomHttpServletRequestWrapper) requestWrapper;
+            // 获取body
+            try {
+                String body = customWrapper.getBody();
+                if (!StringUtils.isEmpty(body)) {
+                    if (JsonUtils.isJson(body)) {
+                        map.put("Body", GsonUtil.toMaps(body));
+                    } else {
+                        Map<String, Object> params = new HashMap<>(0);
+                        String[] tmp = body.split("&");
+                        Arrays.stream(tmp).forEach(item -> {
+                            String[] param = item.split("=");
+                            params.put(param[0], param[1]);
+                        });
+                        map.put("Body", params);
+                    }
                 }
+            } catch (Exception e) {
+                log.error("[GetRequestInfoError]", e);
             }
-        } catch (Exception e) {
-            log.error("[GetRequestInfoError]", e);
         }
-
         log.info("[RequestInfo]" + GsonUtil.toString(map));
-        filterChain.doFilter(getRequest(requestWrapper), response);
+        if (requestWrapper instanceof CustomHttpServletRequestWrapper) {
+            filterChain.doFilter(getRequest((CustomHttpServletRequestWrapper) requestWrapper), response);
+        } else {
+            filterChain.doFilter(getRequest((HttpServletRequest) requestWrapper), response);
+        }
     }
 
     @Override
