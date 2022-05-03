@@ -34,7 +34,7 @@ public class DefaultController {
 
     @PostMapping(value = "test/post/x-www-form-urlencoded", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     @ResponseBody
-    public Object testPostXWWW(@RequestParam Map<String, String> params) {
-        return GsonUtil.toString(params);
+    public Object testPostXWWW(@RequestParam String p) {
+        return GsonUtil.toString(p);
     }
 }
