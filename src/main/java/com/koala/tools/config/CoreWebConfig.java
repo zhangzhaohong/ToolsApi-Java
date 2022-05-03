@@ -59,10 +59,7 @@ public class CoreWebConfig implements WebMvcConfigurer {
 
         //创建配置类
         FastJsonConfig fastJsonConfig = new FastJsonConfig();
-        fastJsonConfig.setWriterFeatures(
-                JSONWriter.Feature.WriteNulls,
-                JSONWriter.Feature.WriteNonStringValueAsString
-        );
+        fastJsonConfig.setWriterFeatures(JSONWriter.Feature.WriteNulls, JSONWriter.Feature.WriteNonStringValueAsString);
         fastJsonHttpMessageConverter.setFastJsonConfig(fastJsonConfig);
         CustomMessageConverter customMessageConverter = new CustomMessageConverter();
         converters.add(fastJsonHttpMessageConverter);
@@ -95,9 +92,7 @@ public class CoreWebConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/**")
-                .addResourceLocations("classpath:/static/")
-                .addResourceLocations("classpath:/META-INF/resources/");
+        registry.addResourceHandler("/**").addResourceLocations("classpath:/static/").addResourceLocations("classpath:/META-INF/resources/");
     }
 
 }
