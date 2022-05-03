@@ -1,6 +1,5 @@
 package com.koala.tools.config;
 
-import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.alibaba.fastjson2.JSONWriter;
 import com.alibaba.fastjson2.support.config.FastJsonConfig;
 import com.alibaba.fastjson2.support.spring.http.converter.FastJsonHttpMessageConverter;
@@ -60,10 +59,7 @@ public class CoreWebConfig implements WebMvcConfigurer {
 
         //创建配置类
         FastJsonConfig fastJsonConfig = new FastJsonConfig();
-        fastJsonConfig.setWriterFeatures(
-                JSONWriter.Feature.WriteNulls,
-                JSONWriter.Feature.WriteNonStringValueAsString
-        );
+        fastJsonConfig.setWriterFeatures(JSONWriter.Feature.WriteNulls, JSONWriter.Feature.WriteNonStringValueAsString);
         fastJsonHttpMessageConverter.setFastJsonConfig(fastJsonConfig);
         CustomMessageConverter customMessageConverter = new CustomMessageConverter();
         converters.add(fastJsonHttpMessageConverter);
@@ -96,9 +92,7 @@ public class CoreWebConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/**")
-                .addResourceLocations("classpath:/static/")
-                .addResourceLocations("classpath:/META-INF/resources/");
+        registry.addResourceHandler("/**").addResourceLocations("classpath:/static/").addResourceLocations("classpath:/META-INF/resources/");
     }
 
 }
