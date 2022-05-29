@@ -1,21 +1,21 @@
 package com.koala.tools.controller;
 
-import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.EasyExcelFactory;
-import com.koala.tools.http.annotation.MixedHttpRequest;
 import com.koala.tools.models.purchase.PurchaseInfoModel;
 import com.koala.tools.models.purchase.PurchaseModel;
 import com.koala.tools.utils.GsonUtil;
 import com.koala.tools.utils.PatternUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * @author koala
@@ -54,7 +54,7 @@ public class PurchaseController {
                     itemData = itemData.replaceFirst(roomData, "");
                     String mobile = PatternUtil.getPhoneNum(itemData);
                     itemData = itemData.replaceFirst(mobile, "");
-                    itemData = itemData.replace(",", "").replace("，", "").replace("。", "");
+                    itemData = itemData.replace(",", " ").replace("，", " ").replace("。", " ");
                     PurchaseInfoModel info = new PurchaseInfoModel(
                             Integer.parseInt(department),
                             room,
