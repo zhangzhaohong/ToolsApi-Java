@@ -96,7 +96,12 @@ public class CoreWebConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/**").addResourceLocations("classpath:/static/").addResourceLocations("classpath:/META-INF/resources/").setCacheControl(CacheControl.maxAge(1, TimeUnit.HOURS).cachePublic());
+        registry
+                .addResourceHandler("/**")
+                .addResourceLocations("classpath:/static/")
+                .addResourceLocations("classpath:/static/assets/")
+                .addResourceLocations("classpath:/META-INF/resources/")
+                .setCacheControl(CacheControl.maxAge(1, TimeUnit.HOURS).cachePublic());
     }
 
     @Bean
