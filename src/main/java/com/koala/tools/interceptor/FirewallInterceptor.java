@@ -31,7 +31,7 @@ public class FirewallInterceptor implements HandlerInterceptor {
 
     private static final long LIMIT_TIMES = 5;
 
-    private static final int IP_LOCK_TIME = 60;
+    private static final int IP_LOCK_TIME = 60 * 60;
 
     private RedisLockUtil getRedisLockUtil() {
         return BeanContext.getBean(RedisLockUtil.class);
