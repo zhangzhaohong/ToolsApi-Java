@@ -5,21 +5,25 @@ import com.alibaba.fastjson2.support.config.FastJsonConfig;
 import com.alibaba.fastjson2.support.spring.http.converter.FastJsonHttpMessageConverter;
 import com.koala.tools.http.converter.CustomMessageConverter;
 import com.koala.tools.http.processor.MixedHttpRequestProcessor;
+import com.koala.tools.interceptor.FirewallInterceptor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.http.CacheControl;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author koala
@@ -92,7 +96,22 @@ public class CoreWebConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/**").addResourceLocations("classpath:/static/").addResourceLocations("classpath:/META-INF/resources/");
+        registry
+                .addResourceHandler("/**")
+                .addResourceLocations("classpath:/static/")
+                .addResourceLocations("classpath:/static/assets/")
+                .addResourceLocations("classpath:/META-INF/resources/")
+                .setCacheControl(CacheControl.maxAge(1, TimeUnit.HOURS).cachePublic());
     }
 
+    @Bean
+    FirewallInterceptor getFirewallInterceptor() {
+        return new FirewallInterceptor();
+    }
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(getFirewallInterceptor()).addPathPatterns("/**");
+        WebMvcConfigurer.super.addInterceptors(registry);
+    }
 }

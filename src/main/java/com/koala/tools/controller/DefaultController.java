@@ -3,10 +3,12 @@ package com.koala.tools.controller;
 import com.koala.tools.http.annotation.MixedHttpRequest;
 import com.koala.tools.models.demo.TestModel;
 import com.koala.tools.utils.GsonUtil;
+import lombok.NonNull;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
+import javax.annotation.Resource;
 
 /**
  * @author koala
@@ -17,6 +19,10 @@ import java.util.Map;
 @RestController
 @RequestMapping("demo")
 public class DefaultController {
+
+    @Resource
+    private RedisTemplate<String, String> redisTemplate;
+
     @GetMapping("hello")
     public String hello() {
         return "Hello";
@@ -36,5 +42,16 @@ public class DefaultController {
     @ResponseBody
     public Object testPostXWWW(@RequestParam String p) {
         return GsonUtil.toString(p);
+    }
+
+    @GetMapping("redis/set")
+    public String setRedis(@NonNull @MixedHttpRequest String key, @NonNull @MixedHttpRequest String value) {
+        redisTemplate.opsForValue().set(key, value);
+        return "ok";
+    }
+
+    @GetMapping("redis/get")
+    public String getRedis(@NonNull @MixedHttpRequest String key) {
+        return redisTemplate.opsForValue().get(key);
     }
 }
