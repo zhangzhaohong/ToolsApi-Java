@@ -6,9 +6,11 @@ import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.data.redis.core.script.RedisScript;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.util.Collections;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author koala
@@ -24,6 +26,25 @@ public class RedisLockUtil {
 
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
+
+    private Boolean redisStatus = false;
+
+    @PostConstruct
+    private void init() {
+        try {
+            String key = "checkRedisAlive";
+            redisTemplate.opsForValue().set(key, "0", 1, TimeUnit.MINUTES);
+            if ("0".equals(redisTemplate.opsForValue().get(key))) {
+                redisStatus = true;
+            }
+        } catch (Exception e) {
+            log.error("onConnectError", e);
+        }
+    }
+
+    public boolean getRedisStatus() {
+        return redisStatus;
+    }
 
     public boolean getLock(String lockKey, Object value, int expireTime) {
         try {
