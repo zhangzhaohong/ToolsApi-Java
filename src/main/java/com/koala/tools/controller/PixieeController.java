@@ -1,9 +1,12 @@
 package com.koala.tools.controller;
 
 import com.koala.tools.http.annotation.MixedHttpRequest;
+import com.koala.tools.mail.EmailSenderService;
 import com.koala.tools.mail.EmailService;
+import com.koala.tools.mail.MailDataContext;
 import com.koala.tools.models.pixiee.ProductInfoModel;
 import com.koala.tools.utils.GsonUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,7 +27,7 @@ import java.io.UnsupportedEncodingException;
 public class PixieeController {
 
     @Resource
-    private EmailService emailService;
+    private EmailSenderService emailSenderService;
 
     @PostMapping(value = "getInfo", produces = {"application/json;charset=utf-8"})
     public String getInfo(@MixedHttpRequest String description, @MixedHttpRequest String material, @MixedHttpRequest String packageInfo, @MixedHttpRequest String pockets, @MixedHttpRequest String type, @MixedHttpRequest String caring) {
@@ -38,7 +41,7 @@ public class PixieeController {
             @MixedHttpRequest String text,
             @MixedHttpRequest(required = false) MultipartFile file
     ) throws MessagingException, UnsupportedEncodingException {
-        emailService.sendMailWithAttachment(to, subject, text, file);
+        emailSenderService.addTask(new MailDataContext(to, subject, text, null));
         return "ok";
     }
 
