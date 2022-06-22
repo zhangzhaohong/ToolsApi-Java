@@ -1,9 +1,11 @@
 package com.koala.tools.controller;
 
+import com.google.gson.Gson;
 import com.koala.tools.http.annotation.MixedHttpRequest;
 import com.koala.tools.mail.EmailSenderService;
 import com.koala.tools.mail.EmailService;
 import com.koala.tools.mail.MailDataContext;
+import com.koala.tools.models.RespModel;
 import com.koala.tools.models.pixiee.ProductInfoModel;
 import com.koala.tools.utils.GsonUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +17,8 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.Resource;
 import javax.mail.MessagingException;
 import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
+import java.util.UUID;
 
 /**
  * @author koala
@@ -40,9 +44,13 @@ public class PixieeController {
             @MixedHttpRequest String subject,
             @MixedHttpRequest String text,
             @MixedHttpRequest(required = false) MultipartFile file
-    ) throws MessagingException, UnsupportedEncodingException {
-        emailSenderService.addTask(new MailDataContext(to, subject, text, null));
-        return "ok";
+    ) {
+        String uuid = UUID.randomUUID().toString();
+        emailSenderService.addTask(new MailDataContext(uuid, 0L, to, subject, text, null));
+        HashMap<String, Object> result = new HashMap<>(0);
+        result.put("taskId", uuid);
+        result.put("taskLength", 0);
+        return GsonUtil.toString(new RespModel(200, "add task success", result));
     }
 
 }

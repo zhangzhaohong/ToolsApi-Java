@@ -17,6 +17,8 @@ import java.util.ArrayList;
 @AllArgsConstructor
 @Slf4j
 public class MailDataContext {
+    private String taskId;
+    private Long taskIndex;
     private String to;
     private String subject;
     private String text;
