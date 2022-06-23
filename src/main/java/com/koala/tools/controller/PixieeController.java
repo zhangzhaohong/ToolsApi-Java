@@ -67,6 +67,8 @@ public class PixieeController {
             fileList = save2TmpFile(uuid, multipartFile, fileList);
         }
         emailExecutorService.addTask(new MailDataContext(tmpPath, uuid, 0, type, to, replyTo, subject, text, fileList));
+        redisTemplate.opsForValue().set(String.format("task:length:%s", uuid), 1);
+        redisTemplate.expire(String.format("task:length:%s", uuid), 12L * 60 * 60, TimeUnit.SECONDS);
         HashMap<String, Object> result = new HashMap<>(0);
         result.put("taskId", uuid);
         result.put("taskLength", 1);
