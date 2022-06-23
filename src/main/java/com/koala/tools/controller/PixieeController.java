@@ -100,7 +100,8 @@ public class PixieeController {
                 }
             })).sheet("Sheet1").doRead();
         }
-        redisTemplate.opsForValue().set(String.format("task:length:%s", uuid), taskLength.get(), 12L * 60 * 60, TimeUnit.SECONDS);
+        redisTemplate.opsForValue().set(String.format("task:length:%s", uuid), taskLength.get());
+        redisTemplate.expire(String.format("task:length:%s", uuid), 12L * 60 * 60, TimeUnit.SECONDS);
         HashMap<String, Object> result = new HashMap<>(0);
         result.put("taskId", uuid);
         result.put("taskLength", taskLength.get());
