@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.FileSystemUtils;
+import org.springframework.util.StringUtils;
 
 import javax.mail.MessagingException;
 import java.io.File;
@@ -34,23 +35,30 @@ public class MailDataContext {
     private String text;
     private ArrayList<String> fileList;
 
+    public String getReplyTo() {
+        if (Objects.isNull(this.replyTo) || StringUtils.isEmpty(this.replyTo)) {
+            return null;
+        }
+        return replyTo;
+    }
+
     public void startExec(EmailSenderService emailService, RedisTemplate<String, Object> redisTemplate) throws MessagingException, UnsupportedEncodingException, Exception {
         Long start = System.currentTimeMillis();
         switch (this.type) {
             case 0:
-                emailService.sendMail(this.to, this.replyTo, this.subject, this.text);
+                emailService.sendMail(this.to, this.getReplyTo(), this.subject, this.text);
                 break;
             case 1:
-                emailService.sendMailWithAttachment(this.to, this.replyTo, this.subject, this.text, this.fileList);
+                emailService.sendMailWithAttachment(this.to, this.getReplyTo(), this.subject, this.text, this.fileList);
                 break;
             case 2:
-                emailService.sendRichMail(this.to, this.replyTo, this.subject, this.text, this.fileList);
+                emailService.sendRichMail(this.to, this.getReplyTo(), this.subject, this.text, this.fileList);
                 break;
             default:
                 break;
         }
         redisTemplate.opsForValue().increment(String.format("task:%s:finished", taskId), 1L);
-        redisTemplate.expire(String.format("task:%s:finished", taskId), 12, TimeUnit.HOURS);
+        redisTemplate.expire(String.format("task:%s:finished", taskId), 12L * 60 * 60, TimeUnit.SECONDS);
         Long end = System.currentTimeMillis();
         log.info("OnSendFinish: {}, {}", GsonUtil.toString(this), (end - start) + "ms");
         Thread.sleep(3L * 1000);
