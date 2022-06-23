@@ -61,7 +61,7 @@ public class PixieeController {
             @MixedHttpRequest Integer type,
             @MixedHttpRequest(required = false) List<MultipartFile> file
     ) {
-        String uuid = UUID.randomUUID().toString();
+        String uuid = UUID.randomUUID().toString().replace("-", "");
         ArrayList<String> fileList = new ArrayList<>(0);
         for (MultipartFile multipartFile : file) {
             fileList = save2TmpFile(uuid, multipartFile, fileList);
@@ -83,7 +83,7 @@ public class PixieeController {
             @MixedHttpRequest(required = false) List<MultipartFile> file
     ) {
         AtomicReference<Integer> taskLength = new AtomicReference<>(0);
-        String uuid = UUID.randomUUID().toString();
+        String uuid = UUID.randomUUID().toString().replace("-", "");
         ArrayList<String> userDataList = new ArrayList<>(1);
         userDataList = save2TmpFile(uuid, userDataFile, userDataList);
         ArrayList<String> fileList = new ArrayList<>(0);
