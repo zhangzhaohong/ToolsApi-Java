@@ -59,15 +59,11 @@ public class PixieeController {
             @MixedHttpRequest String subject,
             @MixedHttpRequest String text,
             @MixedHttpRequest Integer type,
-            @MixedHttpRequest(required = false) MultipartFile file1,
-            @MixedHttpRequest(required = false) MultipartFile file2,
-            @MixedHttpRequest(required = false) MultipartFile file3,
-            @MixedHttpRequest(required = false) MultipartFile file4,
-            @MixedHttpRequest(required = false) MultipartFile file5
+            @MixedHttpRequest(required = false) List<MultipartFile> file
     ) {
         String uuid = UUID.randomUUID().toString();
         ArrayList<String> fileList = new ArrayList<>(0);
-        for (MultipartFile multipartFile : Arrays.asList(file1, file2, file3, file4, file5)) {
+        for (MultipartFile multipartFile : file) {
             fileList = save2TmpFile(uuid, multipartFile, fileList);
         }
         emailExecutorService.addTask(new MailDataContext(tmpPath, uuid, 0, type, to, replyTo, subject, text, fileList));
@@ -84,18 +80,14 @@ public class PixieeController {
             @MixedHttpRequest String subject,
             @MixedHttpRequest String text,
             @MixedHttpRequest Integer type,
-            @MixedHttpRequest(required = false) MultipartFile file1,
-            @MixedHttpRequest(required = false) MultipartFile file2,
-            @MixedHttpRequest(required = false) MultipartFile file3,
-            @MixedHttpRequest(required = false) MultipartFile file4,
-            @MixedHttpRequest(required = false) MultipartFile file5
+            @MixedHttpRequest(required = false) List<MultipartFile> file
     ) {
         AtomicReference<Integer> taskLength = new AtomicReference<>(0);
         String uuid = UUID.randomUUID().toString();
         ArrayList<String> userDataList = new ArrayList<>(1);
         userDataList = save2TmpFile(uuid, userDataFile, userDataList);
         ArrayList<String> fileList = new ArrayList<>(0);
-        for (MultipartFile multipartFile : Arrays.asList(file1, file2, file3, file4, file5)) {
+        for (MultipartFile multipartFile : file) {
             fileList = save2TmpFile(uuid, multipartFile, fileList);
         }
         if (!userDataList.isEmpty()) {
@@ -108,7 +100,7 @@ public class PixieeController {
                 }
             })).sheet("Sheet1").doRead();
         }
-        redisTemplate.opsForValue().set(String.format("task:length:%s", uuid), taskLength.get(), 12L, TimeUnit.HOURS);
+        redisTemplate.opsForValue().set(String.format("task:length:%s", uuid), taskLength.get(), 12L * 60 * 60, TimeUnit.SECONDS);
         HashMap<String, Object> result = new HashMap<>(0);
         result.put("taskId", uuid);
         result.put("taskLength", taskLength.get());
@@ -117,7 +109,7 @@ public class PixieeController {
 
     @GetMapping(value = "getStatus", produces = {"application/json;charset=utf-8"})
     public String getStatus(
-            @MixedHttpRequest(required = true) String taskId
+            @MixedHttpRequest String taskId
     ) {
         HashMap<String, Object> result = new HashMap<>(0);
         result.put("taskId", taskId);
