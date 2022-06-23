@@ -9,9 +9,11 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
+import org.springframework.util.FileSystemUtils;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
+import java.io.File;
 import java.util.Objects;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -38,7 +40,7 @@ public class EmailExecutorService implements InitializingBean {
     private volatile Boolean runLoopFlag = true;
 
     private final ListeningExecutorService executorService =
-            executorService("mail-sender-service", 5, 10);
+            executorService("mail-sender-service", 10, 16);
 
     public static ListeningExecutorService executorService(String namePrefix, Integer corePoolSize, Integer maxPoolSize) {
         log.info("perf exec executor info = corePoolSize: {}, maxPoolSize: {}", corePoolSize, maxPoolSize);
@@ -78,10 +80,26 @@ public class EmailExecutorService implements InitializingBean {
                         sendMail(mailDataContext);
                     } catch (Exception e) {
                         log.error("发送失败", e);
+                        redisTemplate.opsForValue().increment(String.format("task:%s:finished", mailDataContext.getTaskId()), 1L);
+                        redisTemplate.expire(String.format("task:%s:finished", mailDataContext.getTaskId()), 12, TimeUnit.HOURS);
+                        Object taskLength = redisTemplate.opsForValue().get(String.format("task:length:%s", mailDataContext.getTaskId()));
+                        if (Objects.equals(mailDataContext.getTaskIndex(), taskLength)) {
+                            try {
+                                Thread.sleep(5L * 1000);
+                            } catch (InterruptedException ex) {
+                                throw new RuntimeException(ex);
+                            }
+                            log.info("OnSendAllMailFinished: {}", mailDataContext.getTaskId());
+                            try {
+                                FileSystemUtils.deleteRecursively(new File(String.format("%s/%s", mailDataContext.getTmpPath(), mailDataContext.getTaskId())));
+                            } catch (Exception exception) {
+                                log.error("结束操作执行失败，请手动清理", exception);
+                            }
+                        }
                     }
                 });
-            } catch (Exception e) {
-                log.error("服务异常", e);
+            } catch (Exception exception) {
+                log.error("服务异常", exception);
             }
         }
     }
