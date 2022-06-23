@@ -83,14 +83,12 @@ public class EmailExecutorService implements InitializingBean {
                         redisTemplate.opsForValue().increment(String.format("task:%s:finished", mailDataContext.getTaskId()), 1L);
                         redisTemplate.expire(String.format("task:%s:finished", mailDataContext.getTaskId()), 12, TimeUnit.HOURS);
                         Object taskLength = redisTemplate.opsForValue().get(String.format("task:length:%s", mailDataContext.getTaskId()));
-                        if (!Objects.isNull(taskLength) && Objects.equals(mailDataContext.getTaskIndex(), (Integer) taskLength - 1)) {
+                        if (Objects.equals(mailDataContext.getTaskIndex(), taskLength)) {
                             try {
                                 Thread.sleep(5L * 1000);
                             } catch (InterruptedException ex) {
                                 throw new RuntimeException(ex);
                             }
-                        }
-                        if (Objects.equals(mailDataContext.getTaskIndex(), taskLength)) {
                             log.info("OnSendAllMailFinished: {}", mailDataContext.getTaskId());
                             try {
                                 FileSystemUtils.deleteRecursively(new File(String.format("%s/%s", mailDataContext.getTmpPath(), mailDataContext.getTaskId())));

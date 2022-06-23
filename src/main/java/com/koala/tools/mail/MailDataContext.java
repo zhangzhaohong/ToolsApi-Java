@@ -53,11 +53,10 @@ public class MailDataContext {
         redisTemplate.expire(String.format("task:%s:finished", taskId), 12, TimeUnit.HOURS);
         Long end = System.currentTimeMillis();
         log.info("OnSendFinish: {}, {}", GsonUtil.toString(this), (end - start) + "ms");
+        Thread.sleep(3L * 1000);
         Object taskLength = redisTemplate.opsForValue().get(String.format("task:length:%s", taskId));
-        if (!Objects.isNull(taskLength) && Objects.equals(this.taskIndex, (Integer) taskLength - 1)) {
+        if (!Objects.isNull(taskLength) && Objects.equals(this.taskIndex, taskLength)) {
             Thread.sleep(5L * 1000);
-        }
-        if (Objects.equals(this.taskIndex, taskLength)) {
             log.info("OnSendAllMailFinished: {}", this.taskId);
             try {
                 FileSystemUtils.deleteRecursively(new File(String.format("%s/%s", tmpPath, taskId)));
