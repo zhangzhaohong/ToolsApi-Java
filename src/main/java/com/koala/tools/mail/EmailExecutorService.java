@@ -40,7 +40,7 @@ public class EmailExecutorService implements InitializingBean {
     private volatile Boolean runLoopFlag = true;
 
     private final ListeningExecutorService executorService =
-            executorService("mail-sender-service", 5, 10);
+            executorService("mail-sender-service", 10, 16);
 
     public static ListeningExecutorService executorService(String namePrefix, Integer corePoolSize, Integer maxPoolSize) {
         log.info("perf exec executor info = corePoolSize: {}, maxPoolSize: {}", corePoolSize, maxPoolSize);
