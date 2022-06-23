@@ -16,7 +16,6 @@ import java.io.Serializable;
  * @description
  */
 @Configuration
-
 public class LettuceRedisConfig {
 
     @Bean
