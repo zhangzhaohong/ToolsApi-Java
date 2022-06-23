@@ -123,7 +123,7 @@ public class PixieeController {
         result.put("taskId", taskId);
         result.put("finished", redisTemplate.opsForValue().get(String.format("task:%s:finished", taskId)));
         result.put("taskLength", redisTemplate.opsForValue().get(String.format("task:length:%s", taskId)));
-        return GsonUtil.toString(new RespModel(200, "current task success", result));
+        return GsonUtil.toString(new RespModel(200, "current task status", result));
     }
 
     private ArrayList<String> save2TmpFile(String taskId, MultipartFile file, ArrayList<String> fileList) {
