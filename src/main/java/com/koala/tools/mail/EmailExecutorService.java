@@ -81,7 +81,7 @@ public class EmailExecutorService implements InitializingBean {
                     } catch (Exception e) {
                         log.error("发送失败", e);
                         redisTemplate.opsForValue().increment(String.format("task:%s:finished", mailDataContext.getTaskId()), 1L);
-                        redisTemplate.expire(String.format("task:%s:finished", mailDataContext.getTaskId()), 12, TimeUnit.HOURS);
+                        redisTemplate.expire(String.format("task:%s:finished", mailDataContext.getTaskId()), 12L * 60 * 60, TimeUnit.SECONDS);
                         Object taskLength = redisTemplate.opsForValue().get(String.format("task:length:%s", mailDataContext.getTaskId()));
                         if (Objects.equals(mailDataContext.getTaskIndex(), taskLength)) {
                             try {

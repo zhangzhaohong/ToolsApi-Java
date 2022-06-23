@@ -50,7 +50,7 @@ public class MailDataContext {
                 break;
         }
         redisTemplate.opsForValue().increment(String.format("task:%s:finished", taskId), 1L);
-        redisTemplate.expire(String.format("task:%s:finished", taskId), 12, TimeUnit.HOURS);
+        redisTemplate.expire(String.format("task:%s:finished", taskId), 12L * 60 * 60, TimeUnit.SECONDS);
         Long end = System.currentTimeMillis();
         log.info("OnSendFinish: {}, {}", GsonUtil.toString(this), (end - start) + "ms");
         Thread.sleep(3L * 1000);
