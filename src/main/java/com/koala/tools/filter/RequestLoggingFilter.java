@@ -98,8 +98,10 @@ public class RequestLoggingFilter implements Filter {
                         Map<String, Object> params = new HashMap<>(0);
                         String[] tmp = body.split("&");
                         Arrays.stream(tmp).forEach(item -> {
-                            String[] param = item.split("=");
-                            params.put(param[0], param[1]);
+                            if (item.contains("=")) {
+                                String[] param = item.split("=");
+                                params.put(param[0], param[1]);
+                            }
                         });
                         map.put("Body", params);
                     }
