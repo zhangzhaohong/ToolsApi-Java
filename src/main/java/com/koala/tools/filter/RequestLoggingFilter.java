@@ -91,20 +91,8 @@ public class RequestLoggingFilter implements Filter {
             // 获取body
             try {
                 String body = customWrapper.getBody();
-                if (!StringUtils.isEmpty(body)) {
-                    if (JsonUtils.isJson(body)) {
-                        map.put("Body", GsonUtil.toMaps(body));
-                    } else {
-                        Map<String, Object> params = new HashMap<>(0);
-                        String[] tmp = body.split("&");
-                        Arrays.stream(tmp).forEach(item -> {
-                            String[] param = item.split("=");
-                            if (param.length > 1) {
-                                params.put(param[0], param[1]);
-                            }
-                        });
-                        map.put("Body", params);
-                    }
+                if (!StringUtils.isEmpty(body) && JsonUtils.isJson(body)) {
+                    map.put("Body", GsonUtil.toMaps(body));
                 }
             } catch (Exception e) {
                 log.error("[GetRequestInfoError]", e);
