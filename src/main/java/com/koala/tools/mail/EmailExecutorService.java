@@ -84,7 +84,7 @@ public class EmailExecutorService implements InitializingBean {
                         sendMail(mailDataContext);
                     } catch (Exception e) {
                         log.error("发送失败", e);
-                        redisTemplate.opsForList().leftPush(String.format("task:%s:failed", mailDataContext.getTaskId()), new SendFailedDataModel(mailDataContext.getTaskIndex(), mailDataContext.getTo()));
+                        redisTemplate.opsForList().leftPush(String.format("task:%s:failed", mailDataContext.getTaskId()), GsonUtil.toString(new SendFailedDataModel(mailDataContext.getTaskIndex(), mailDataContext.getTo())));
                         redisTemplate.expire(String.format("task:%s:failed", mailDataContext.getTaskId()), 12L * 60 * 60, TimeUnit.SECONDS);
                         redisTemplate.opsForValue().increment(String.format("task:%s:finished", mailDataContext.getTaskId()), 1L);
                         redisTemplate.expire(String.format("task:%s:finished", mailDataContext.getTaskId()), 12L * 60 * 60, TimeUnit.SECONDS);
