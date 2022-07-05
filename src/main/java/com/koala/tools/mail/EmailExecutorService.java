@@ -108,6 +108,7 @@ public class EmailExecutorService implements InitializingBean {
                 log.error("服务异常", exception);
                 retryTime += 1;
                 if (retryTime == 3) {
+                    this.runLoopFlag = false;
                     log.info("Email Executor is stopped!");
                 }
             }
