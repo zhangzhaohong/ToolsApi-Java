@@ -40,8 +40,10 @@ public class EmailExecutorService implements InitializingBean {
 
     private volatile Boolean runLoopFlag = true;
 
+    private int retryTime = 0;
+
     private final ListeningExecutorService executorService =
-            executorService("mail-sender-service", 10, 16);
+            executorService("mail-sender-service", 2, 4);
 
     public static ListeningExecutorService executorService(String namePrefix, Integer corePoolSize, Integer maxPoolSize) {
         log.info("perf exec executor info = corePoolSize: {}, maxPoolSize: {}", corePoolSize, maxPoolSize);
@@ -68,9 +70,10 @@ public class EmailExecutorService implements InitializingBean {
     }
 
     public void scanRedis() {
-        while (Boolean.TRUE.equals(runLoopFlag) || executorService.isTerminated()) {
+        while ((Boolean.TRUE.equals(runLoopFlag) || executorService.isTerminated()) && retryTime <= 3) {
             try {
                 String result = String.valueOf(redisTemplate.opsForList().rightPop(mailSenderRedisKey));
+                retryTime = 0;
                 if (Objects.isNull(result) || StringUtils.isEmpty(result) || result.equals("null")) {
                     TimeUnit.SECONDS.sleep(RandomUtils.nextInt(1, 3));
                     continue;
@@ -103,6 +106,10 @@ public class EmailExecutorService implements InitializingBean {
                 });
             } catch (Exception exception) {
                 log.error("服务异常", exception);
+                retryTime += 1;
+                if (retryTime == 3) {
+                    log.info("Email Executor is stopped!");
+                }
             }
         }
     }
