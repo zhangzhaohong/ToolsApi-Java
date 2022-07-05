@@ -2,6 +2,7 @@ package com.koala.tools.mail;
 
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
+import com.koala.tools.models.mail.SendFailedDataModel;
 import com.koala.tools.utils.GsonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomUtils;
@@ -80,6 +81,8 @@ public class EmailExecutorService implements InitializingBean {
                         sendMail(mailDataContext);
                     } catch (Exception e) {
                         log.error("发送失败", e);
+                        redisTemplate.opsForList().leftPush(String.format("task:%s:failed", mailDataContext.getTaskId()), new SendFailedDataModel(mailDataContext.getTaskIndex(), mailDataContext.getTo()));
+                        redisTemplate.expire(String.format("task:%s:failed", mailDataContext.getTaskId()), 12L * 60 * 60, TimeUnit.SECONDS);
                         redisTemplate.opsForValue().increment(String.format("task:%s:finished", mailDataContext.getTaskId()), 1L);
                         redisTemplate.expire(String.format("task:%s:finished", mailDataContext.getTaskId()), 12L * 60 * 60, TimeUnit.SECONDS);
                         Object taskLength = redisTemplate.opsForValue().get(String.format("task:length:%s", mailDataContext.getTaskId()));

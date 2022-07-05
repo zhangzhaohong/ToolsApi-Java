@@ -115,6 +115,7 @@ public class PixieeController {
     ) {
         HashMap<String, Object> result = new HashMap<>(0);
         result.put("taskId", taskId);
+        result.put("failed", redisTemplate.opsForList().range(String.format("task:%s:failed", taskId), 0, -1));
         result.put("finished", redisTemplate.opsForValue().get(String.format("task:%s:finished", taskId)));
         result.put("taskLength", redisTemplate.opsForValue().get(String.format("task:length:%s", taskId)));
         return GsonUtil.toString(new RespModel(200, "current task status", result));
@@ -125,7 +126,7 @@ public class PixieeController {
             return fileList;
         }
         File folder = new File(String.format("%s/%s", tmpPath, taskId));
-        if  (!folder.exists()  && !folder.isDirectory()){
+        if (!folder.exists() && !folder.isDirectory()) {
             folder.mkdirs();
         }
         String filePath = String.format("%s/%s/%s", tmpPath, taskId, file.getOriginalFilename());

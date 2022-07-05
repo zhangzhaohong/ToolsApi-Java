@@ -9,6 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * @author koala
@@ -54,4 +55,16 @@ public class DefaultController {
     public String getRedis(@NonNull @MixedHttpRequest String key) {
         return redisTemplate.opsForValue().get(key);
     }
+
+    @GetMapping("redis/setList")
+    public String setListRedis(@NonNull @MixedHttpRequest String key, @NonNull @MixedHttpRequest String value) {
+        redisTemplate.opsForList().leftPush(key, value);
+        return "ok";
+    }
+
+    @GetMapping("redis/getList")
+    public List<String> getListRedis(@NonNull @MixedHttpRequest String key) {
+        return redisTemplate.opsForList().range(key, 0 , -1);
+    }
+
 }
