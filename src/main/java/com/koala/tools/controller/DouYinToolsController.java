@@ -1,6 +1,5 @@
 package com.koala.tools.controller;
 
-import com.koala.tools.config.BasicConfigProperties;
 import com.koala.tools.enums.DouYinRequestTypeEnums;
 import com.koala.tools.factory.builder.ConcreteDouYinApiBuilder;
 import com.koala.tools.factory.builder.DouYinApiBuilder;
@@ -21,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -48,11 +48,8 @@ public class DouYinToolsController {
 
     private final RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
 
-    private final BasicConfigProperties basicConfigProperties;
-
-    public DouYinToolsController(BasicConfigProperties basicConfigProperties) {
-        this.basicConfigProperties = basicConfigProperties;
-    }
+    @Resource(name = "getHost")
+    private String host;
 
     @GetMapping("player/video")
     public Object getVideo(@RequestParam(value = "vid", required = false) String vid, @RequestParam(value = "ratio", required = false, defaultValue = "540p") String ratio, @RequestParam(value = "isDownload", required = false, defaultValue = "0") String isDownload, HttpServletRequest request, HttpServletResponse response) throws IOException, URISyntaxException {
@@ -104,7 +101,7 @@ public class DouYinToolsController {
         DouYinApiManager manager = new DouYinApiManager(builder);
         DouYinApiProduct product = null;
         try {
-            product = manager.construct(basicConfigProperties.getHost(), url);
+            product = manager.construct(host, url);
         } catch (Exception e) {
             e.printStackTrace();
             return formatRespData(FAILURE, null);

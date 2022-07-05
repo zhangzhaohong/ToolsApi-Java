@@ -37,7 +37,7 @@ import java.util.concurrent.atomic.AtomicReference;
 @RequestMapping("tools/pixiee")
 public class PixieeController {
 
-    @Value("${spring.mail.properties.tmpPath}")
+    @Resource(name = "getTmpPath")
     private String tmpPath;
 
     @Resource
