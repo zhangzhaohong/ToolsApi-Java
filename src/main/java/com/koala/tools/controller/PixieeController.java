@@ -47,8 +47,8 @@ public class PixieeController {
     private RedisTemplate<String, Object> redisTemplate;
 
     @PostMapping(value = "getInfo", produces = {"application/json;charset=utf-8"})
-    public String getInfo(@MixedHttpRequest String description, @MixedHttpRequest String material, @MixedHttpRequest String packageInfo, @MixedHttpRequest String pockets, @MixedHttpRequest String type, @MixedHttpRequest String caring) {
-        return GsonUtil.toString(new ProductInfoModel(description, material, packageInfo, pockets, type, caring));
+    public String getInfo(@MixedHttpRequest String description, @MixedHttpRequest String modelInfo, @MixedHttpRequest String material, @MixedHttpRequest String packageInfo, @MixedHttpRequest String pockets, @MixedHttpRequest String type, @MixedHttpRequest String caring) {
+        return GsonUtil.toString(new ProductInfoModel(description, modelInfo, material, packageInfo, pockets, type, caring));
     }
 
     @PostMapping(value = "sendMail", produces = {"application/json;charset=utf-8"})
