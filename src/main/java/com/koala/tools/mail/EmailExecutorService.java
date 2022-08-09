@@ -32,6 +32,8 @@ public class EmailExecutorService implements InitializingBean {
 
     private final String mailSenderRedisKey = "mail:sender:exec:list";
 
+    private final String mailSenderCancelRedisKey = "mail:sender:exec:list:cancel";
+
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
 
@@ -131,5 +133,9 @@ public class EmailExecutorService implements InitializingBean {
         threadPoolExecutor.submit(this::scanRedis, "EmailSenderService");
         threadPoolExecutor.shutdown();
         Runtime.getRuntime().addShutdownHook(new Thread(this::stopLoop));
+    }
+
+    public void cancelTask(String taskId) {
+        redisTemplate.opsForList().leftPush(mailSenderCancelRedisKey, taskId);
     }
 }

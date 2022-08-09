@@ -121,6 +121,16 @@ public class PixieeController {
         return GsonUtil.toString(new RespModel(200, "current task status", result));
     }
 
+    @GetMapping(value = "cancelTask", produces = {"application/json;charset=utf-8"})
+    public String cancelTask(
+            @MixedHttpRequest String taskId
+    ) {
+        emailExecutorService.cancelTask(taskId);
+        HashMap<String, Object> result = new HashMap<>(0);
+        result.put("taskId", taskId);
+        return GsonUtil.toString(new RespModel(200, "on cancel task success", result));
+    }
+
     private ArrayList<String> save2TmpFile(String taskId, MultipartFile file, ArrayList<String> fileList) {
         if (Objects.isNull(file) || file.isEmpty()) {
             return fileList;
