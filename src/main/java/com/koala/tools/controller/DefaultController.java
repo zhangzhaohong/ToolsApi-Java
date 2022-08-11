@@ -67,4 +67,15 @@ public class DefaultController {
         return redisTemplate.opsForList().range(key, 0 , -1);
     }
 
+    @GetMapping("redis/set/input")
+    public String setInput(@MixedHttpRequest String key, @MixedHttpRequest String value) {
+        redisTemplate.opsForSet().add(key, value);
+        return "ok";
+    }
+
+    @GetMapping("redis/set/checkMember")
+    public Boolean setCheckMember(@MixedHttpRequest String key, @MixedHttpRequest String value) {
+        return redisTemplate.opsForSet().isMember(key, value);
+    }
+
 }

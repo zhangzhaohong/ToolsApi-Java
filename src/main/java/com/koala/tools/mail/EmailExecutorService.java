@@ -71,6 +71,10 @@ public class EmailExecutorService implements InitializingBean {
         redisTemplate.opsForList().leftPush(mailSenderRedisKey, GsonUtil.toString(mailDataContext));
     }
 
+    public void cancelTask(String taskId) {
+        redisTemplate.opsForSet().add(mailSenderCancelRedisKey, taskId);
+    }
+
     public void scanRedis() {
         while ((Boolean.TRUE.equals(runLoopFlag) || executorService.isTerminated()) && retryTime <= 3) {
             try {
@@ -81,6 +85,12 @@ public class EmailExecutorService implements InitializingBean {
                     continue;
                 }
                 MailDataContext mailDataContext = GsonUtil.toBean(result, MailDataContext.class);
+                if (Boolean.TRUE.equals(redisTemplate.opsForSet().isMember(mailSenderCancelRedisKey, mailDataContext.getTaskId()))) {
+                    log.info("OnSendCancel: {}", GsonUtil.toString(mailDataContext));
+                    redisTemplate.opsForValue().increment(String.format("task:%s:canceled", mailDataContext.getTaskId()), 1L);
+                    redisTemplate.expire(String.format("task:%s:canceled", mailDataContext.getTaskId()), 12L * 60 * 60, TimeUnit.SECONDS);
+                    finalOperation(mailDataContext);
+                }
                 executorService.execute(() -> {
                     try {
                         sendMail(mailDataContext);
@@ -88,22 +98,7 @@ public class EmailExecutorService implements InitializingBean {
                         log.error("发送失败", e);
                         redisTemplate.opsForList().leftPush(String.format("task:%s:failed", mailDataContext.getTaskId()), GsonUtil.toString(new SendFailedDataModel(mailDataContext.getTaskIndex(), mailDataContext.getTo())));
                         redisTemplate.expire(String.format("task:%s:failed", mailDataContext.getTaskId()), 12L * 60 * 60, TimeUnit.SECONDS);
-                        redisTemplate.opsForValue().increment(String.format("task:%s:finished", mailDataContext.getTaskId()), 1L);
-                        redisTemplate.expire(String.format("task:%s:finished", mailDataContext.getTaskId()), 12L * 60 * 60, TimeUnit.SECONDS);
-                        Object taskLength = redisTemplate.opsForValue().get(String.format("task:length:%s", mailDataContext.getTaskId()));
-                        if (Objects.equals(mailDataContext.getTaskIndex(), taskLength)) {
-                            try {
-                                Thread.sleep(5L * 1000);
-                            } catch (InterruptedException ex) {
-                                throw new RuntimeException(ex);
-                            }
-                            log.info("OnSendAllMailFinished: {}", mailDataContext.getTaskId());
-                            try {
-                                FileSystemUtils.deleteRecursively(new File(String.format("%s/%s", mailDataContext.getTmpPath(), mailDataContext.getTaskId())));
-                            } catch (Exception exception) {
-                                log.error("结束操作执行失败，请手动清理", exception);
-                            }
-                        }
+                        finalOperation(mailDataContext);
                     }
                 });
             } catch (Exception exception) {
@@ -113,6 +108,29 @@ public class EmailExecutorService implements InitializingBean {
                     this.runLoopFlag = false;
                     log.info("EmailSenderService is stopped!");
                 }
+            }
+        }
+    }
+
+    /**
+     * finished + 1
+     * clean folder
+     * */
+    private void finalOperation(MailDataContext mailDataContext) {
+        redisTemplate.opsForValue().increment(String.format("task:%s:finished", mailDataContext.getTaskId()), 1L);
+        redisTemplate.expire(String.format("task:%s:finished", mailDataContext.getTaskId()), 12L * 60 * 60, TimeUnit.SECONDS);
+        Object taskLength = redisTemplate.opsForValue().get(String.format("task:length:%s", mailDataContext.getTaskId()));
+        if (Objects.equals(mailDataContext.getTaskIndex(), taskLength)) {
+            try {
+                Thread.sleep(5L * 1000);
+            } catch (InterruptedException ex) {
+                throw new RuntimeException(ex);
+            }
+            log.info("OnSendAllMailFinished: {}", mailDataContext.getTaskId());
+            try {
+                FileSystemUtils.deleteRecursively(new File(String.format("%s/%s", mailDataContext.getTmpPath(), mailDataContext.getTaskId())));
+            } catch (Exception exception) {
+                log.error("结束操作执行失败，请手动清理", exception);
             }
         }
     }
@@ -133,9 +151,5 @@ public class EmailExecutorService implements InitializingBean {
         threadPoolExecutor.submit(this::scanRedis, "EmailSenderService");
         threadPoolExecutor.shutdown();
         Runtime.getRuntime().addShutdownHook(new Thread(this::stopLoop));
-    }
-
-    public void cancelTask(String taskId) {
-        redisTemplate.opsForList().leftPush(mailSenderCancelRedisKey, taskId);
     }
 }
