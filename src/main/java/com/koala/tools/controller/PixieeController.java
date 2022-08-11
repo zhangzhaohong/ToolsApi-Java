@@ -129,6 +129,9 @@ public class PixieeController {
         emailExecutorService.cancelTask(taskId);
         HashMap<String, Object> result = new HashMap<>(0);
         result.put("taskId", taskId);
+        result.put("failed", redisTemplate.opsForList().range(String.format("task:%s:failed", taskId), 0, -1));
+        result.put("finished", redisTemplate.opsForValue().get(String.format("task:%s:finished", taskId)));
+        result.put("taskLength", redisTemplate.opsForValue().get(String.format("task:length:%s", taskId)));
         return GsonUtil.toString(new RespModel(200, "on cancel task success", result));
     }
 

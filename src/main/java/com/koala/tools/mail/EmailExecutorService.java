@@ -85,13 +85,13 @@ public class EmailExecutorService implements InitializingBean {
                     continue;
                 }
                 MailDataContext mailDataContext = GsonUtil.toBean(result, MailDataContext.class);
-                if (Boolean.TRUE.equals(redisTemplate.opsForSet().isMember(mailSenderCancelRedisKey, mailDataContext.getTaskId()))) {
-                    log.info("OnSendCancel: {}", GsonUtil.toString(mailDataContext));
-                    redisTemplate.opsForValue().increment(String.format("task:%s:canceled", mailDataContext.getTaskId()), 1L);
-                    redisTemplate.expire(String.format("task:%s:canceled", mailDataContext.getTaskId()), 12L * 60 * 60, TimeUnit.SECONDS);
-                    finalOperation(mailDataContext);
-                } else {
-                    executorService.execute(() -> {
+                executorService.execute(() -> {
+                    if (Boolean.TRUE.equals(redisTemplate.opsForSet().isMember(mailSenderCancelRedisKey, mailDataContext.getTaskId()))) {
+                        log.info("OnSendCancel: {}", GsonUtil.toString(mailDataContext));
+                        redisTemplate.opsForValue().increment(String.format("task:%s:canceled", mailDataContext.getTaskId()), 1L);
+                        redisTemplate.expire(String.format("task:%s:canceled", mailDataContext.getTaskId()), 12L * 60 * 60, TimeUnit.SECONDS);
+                        finalOperation(mailDataContext);
+                    } else {
                         try {
                             sendMail(mailDataContext);
                         } catch (Exception e) {
@@ -100,8 +100,8 @@ public class EmailExecutorService implements InitializingBean {
                             redisTemplate.expire(String.format("task:%s:failed", mailDataContext.getTaskId()), 12L * 60 * 60, TimeUnit.SECONDS);
                             finalOperation(mailDataContext);
                         }
-                    });
-                }
+                    }
+                });
             } catch (Exception exception) {
                 log.error("服务异常", exception);
                 retryTime += 1;
