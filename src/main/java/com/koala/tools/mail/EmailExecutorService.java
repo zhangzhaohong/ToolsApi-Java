@@ -90,17 +90,18 @@ public class EmailExecutorService implements InitializingBean {
                     redisTemplate.opsForValue().increment(String.format("task:%s:canceled", mailDataContext.getTaskId()), 1L);
                     redisTemplate.expire(String.format("task:%s:canceled", mailDataContext.getTaskId()), 12L * 60 * 60, TimeUnit.SECONDS);
                     finalOperation(mailDataContext);
+                } else {
+                    executorService.execute(() -> {
+                        try {
+                            sendMail(mailDataContext);
+                        } catch (Exception e) {
+                            log.error("发送失败", e);
+                            redisTemplate.opsForList().leftPush(String.format("task:%s:failed", mailDataContext.getTaskId()), GsonUtil.toString(new SendFailedDataModel(mailDataContext.getTaskIndex(), mailDataContext.getTo())));
+                            redisTemplate.expire(String.format("task:%s:failed", mailDataContext.getTaskId()), 12L * 60 * 60, TimeUnit.SECONDS);
+                            finalOperation(mailDataContext);
+                        }
+                    });
                 }
-                executorService.execute(() -> {
-                    try {
-                        sendMail(mailDataContext);
-                    } catch (Exception e) {
-                        log.error("发送失败", e);
-                        redisTemplate.opsForList().leftPush(String.format("task:%s:failed", mailDataContext.getTaskId()), GsonUtil.toString(new SendFailedDataModel(mailDataContext.getTaskIndex(), mailDataContext.getTo())));
-                        redisTemplate.expire(String.format("task:%s:failed", mailDataContext.getTaskId()), 12L * 60 * 60, TimeUnit.SECONDS);
-                        finalOperation(mailDataContext);
-                    }
-                });
             } catch (Exception exception) {
                 log.error("服务异常", exception);
                 retryTime += 1;
@@ -115,7 +116,7 @@ public class EmailExecutorService implements InitializingBean {
     /**
      * finished + 1
      * clean folder
-     * */
+     */
     private void finalOperation(MailDataContext mailDataContext) {
         redisTemplate.opsForValue().increment(String.format("task:%s:finished", mailDataContext.getTaskId()), 1L);
         redisTemplate.expire(String.format("task:%s:finished", mailDataContext.getTaskId()), 12L * 60 * 60, TimeUnit.SECONDS);
