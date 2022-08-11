@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author koala
@@ -76,6 +77,11 @@ public class DefaultController {
     @GetMapping("redis/set/checkMember")
     public Boolean setCheckMember(@MixedHttpRequest String key, @MixedHttpRequest String value) {
         return redisTemplate.opsForSet().isMember(key, value);
+    }
+
+    @GetMapping("redis/set/get")
+    public Set<String> setGet(@MixedHttpRequest String key) {
+        return redisTemplate.opsForSet().members(key);
     }
 
 }
