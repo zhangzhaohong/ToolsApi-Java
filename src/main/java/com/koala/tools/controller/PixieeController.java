@@ -12,7 +12,6 @@ import com.koala.tools.utils.GsonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.util.FileSystemUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -38,7 +37,7 @@ import java.util.concurrent.atomic.AtomicReference;
 @RequestMapping("tools/pixiee")
 public class PixieeController {
 
-    @Value("${spring.mail.properties.tmpPath}")
+    @Resource(name = "getTmpPath")
     private String tmpPath;
 
     @Resource
@@ -48,8 +47,8 @@ public class PixieeController {
     private RedisTemplate<String, Object> redisTemplate;
 
     @PostMapping(value = "getInfo", produces = {"application/json;charset=utf-8"})
-    public String getInfo(@MixedHttpRequest String description, @MixedHttpRequest String material, @MixedHttpRequest String packageInfo, @MixedHttpRequest String pockets, @MixedHttpRequest String type, @MixedHttpRequest String caring) {
-        return GsonUtil.toString(new ProductInfoModel(description, material, packageInfo, pockets, type, caring));
+    public String getInfo(@MixedHttpRequest String description, @MixedHttpRequest String modelInfo, @MixedHttpRequest String material, @MixedHttpRequest String packageInfo, @MixedHttpRequest String pockets, @MixedHttpRequest String type, @MixedHttpRequest String caring) {
+        return GsonUtil.toString(new ProductInfoModel(description, modelInfo, material, packageInfo, pockets, type, caring));
     }
 
     @PostMapping(value = "sendMail", produces = {"application/json;charset=utf-8"})
@@ -116,9 +115,24 @@ public class PixieeController {
     ) {
         HashMap<String, Object> result = new HashMap<>(0);
         result.put("taskId", taskId);
+        result.put("failed", redisTemplate.opsForList().range(String.format("task:%s:failed", taskId), 0, -1));
+        result.put("canceled", redisTemplate.opsForValue().get(String.format("task:%s:canceled", taskId)));
         result.put("finished", redisTemplate.opsForValue().get(String.format("task:%s:finished", taskId)));
         result.put("taskLength", redisTemplate.opsForValue().get(String.format("task:length:%s", taskId)));
         return GsonUtil.toString(new RespModel(200, "current task status", result));
+    }
+
+    @GetMapping(value = "cancelTask", produces = {"application/json;charset=utf-8"})
+    public String cancelTask(
+            @MixedHttpRequest String taskId
+    ) {
+        emailExecutorService.cancelTask(taskId);
+        HashMap<String, Object> result = new HashMap<>(0);
+        result.put("taskId", taskId);
+        result.put("failed", redisTemplate.opsForList().range(String.format("task:%s:failed", taskId), 0, -1));
+        result.put("finished", redisTemplate.opsForValue().get(String.format("task:%s:finished", taskId)));
+        result.put("taskLength", redisTemplate.opsForValue().get(String.format("task:length:%s", taskId)));
+        return GsonUtil.toString(new RespModel(200, "on cancel task success", result));
     }
 
     private ArrayList<String> save2TmpFile(String taskId, MultipartFile file, ArrayList<String> fileList) {
@@ -126,7 +140,7 @@ public class PixieeController {
             return fileList;
         }
         File folder = new File(String.format("%s/%s", tmpPath, taskId));
-        if  (!folder.exists()  && !folder.isDirectory()){
+        if (!folder.exists() && !folder.isDirectory()) {
             folder.mkdirs();
         }
         String filePath = String.format("%s/%s/%s", tmpPath, taskId, file.getOriginalFilename());

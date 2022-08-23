@@ -6,9 +6,11 @@ import com.alibaba.fastjson2.support.spring.http.converter.FastJsonHttpMessageCo
 import com.koala.tools.http.converter.CustomMessageConverter;
 import com.koala.tools.http.processor.MixedHttpRequestProcessor;
 import com.koala.tools.interceptor.FirewallInterceptor;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.core.env.Environment;
 import org.springframework.http.CacheControl;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -21,6 +23,10 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 
+import javax.annotation.Resource;
+import java.io.File;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -35,6 +41,9 @@ import java.util.concurrent.TimeUnit;
 @EnableWebMvc
 @DependsOn({"beanContext"})
 public class CoreWebConfig implements WebMvcConfigurer {
+
+    @Resource
+    private ApplicationContext applicationContext;
 
     @Bean(name = "customRequestMappingHandlerAdapter")
     public RequestMappingHandlerAdapter requestMappingHandlerAdapter() {
@@ -113,5 +122,26 @@ public class CoreWebConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(getFirewallInterceptor()).addPathPatterns("/**");
         WebMvcConfigurer.super.addInterceptors(registry);
+    }
+
+    @Bean
+    public static String getTmpPath() {
+        String dir = System.getProperty("user.dir");
+        String folderDir = String.format("%s/ToolsTmp", dir);
+        File folder = new File(folderDir);
+        if (!folder.exists() && !folder.isDirectory()) {
+            folder.mkdirs();
+        }
+        return folderDir;
+    }
+
+    @Bean
+    public String getHost() throws UnknownHostException {
+        Environment env = applicationContext.getEnvironment();
+        String ip = InetAddress.getLocalHost().getHostAddress();
+        String port = env.getProperty("server.port");
+        String property = env.getProperty("server.servlet.context-path");
+        String path = property == null ? "" : property;
+        return "http://" + ip + ":" + port + path + "/";
     }
 }

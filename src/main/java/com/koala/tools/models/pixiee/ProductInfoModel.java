@@ -16,6 +16,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class ProductInfoModel implements Serializable {
     private String description;
+    private String modelInfo;
     private String material;
     @SerializedName("package")
     private String packageInfo;

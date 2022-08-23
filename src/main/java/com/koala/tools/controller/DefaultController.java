@@ -9,6 +9,8 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author koala
@@ -54,4 +56,32 @@ public class DefaultController {
     public String getRedis(@NonNull @MixedHttpRequest String key) {
         return redisTemplate.opsForValue().get(key);
     }
+
+    @GetMapping("redis/setList")
+    public String setListRedis(@NonNull @MixedHttpRequest String key, @NonNull @MixedHttpRequest String value) {
+        redisTemplate.opsForList().leftPush(key, value);
+        return "ok";
+    }
+
+    @GetMapping("redis/getList")
+    public List<String> getListRedis(@NonNull @MixedHttpRequest String key) {
+        return redisTemplate.opsForList().range(key, 0 , -1);
+    }
+
+    @GetMapping("redis/set/input")
+    public String setInput(@MixedHttpRequest String key, @MixedHttpRequest String value) {
+        redisTemplate.opsForSet().add(key, value);
+        return "ok";
+    }
+
+    @GetMapping("redis/set/checkMember")
+    public Boolean setCheckMember(@MixedHttpRequest String key, @MixedHttpRequest String value) {
+        return redisTemplate.opsForSet().isMember(key, value);
+    }
+
+    @GetMapping("redis/set/get")
+    public Set<String> setGet(@MixedHttpRequest String key) {
+        return redisTemplate.opsForSet().members(key);
+    }
+
 }
