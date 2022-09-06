@@ -18,6 +18,9 @@ public class ProductInfoModel implements Serializable {
     private String description;
     private String modelInfo;
     private String material;
+    private String closure;
+    private String neckline;
+    private String sleeve;
     @SerializedName("package")
     private String packageInfo;
     private  String pockets;
