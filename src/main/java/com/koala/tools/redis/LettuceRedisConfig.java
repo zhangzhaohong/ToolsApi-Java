@@ -21,8 +21,11 @@ public class LettuceRedisConfig {
     @Bean
     public RedisTemplate<String, Serializable> redisTemplate(LettuceConnectionFactory connectionFactory) {
         RedisTemplate<String, Serializable> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setDefaultSerializer(new KryoRedisSerializer<>());
         redisTemplate.setKeySerializer(new StringRedisSerializer());
-        redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer());
+        redisTemplate.setValueSerializer(new KryoRedisSerializer<>());
+        redisTemplate.setHashKeySerializer(new StringRedisSerializer());
+        redisTemplate.setHashValueSerializer(new KryoRedisSerializer<>());
         redisTemplate.setConnectionFactory(connectionFactory);
         return redisTemplate;
     }
