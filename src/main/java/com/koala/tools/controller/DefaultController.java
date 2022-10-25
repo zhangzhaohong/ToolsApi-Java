@@ -2,6 +2,7 @@ package com.koala.tools.controller;
 
 import com.koala.tools.http.annotation.MixedHttpRequest;
 import com.koala.tools.models.demo.TestModel;
+import com.koala.tools.redis.service.RedisService;
 import com.koala.tools.utils.GsonUtil;
 import lombok.NonNull;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -24,6 +25,9 @@ public class DefaultController {
 
     @Resource
     private RedisTemplate<String, String> redisTemplate;
+
+    @Resource(name = "RedisService")
+    private RedisService redisService;
 
     @GetMapping("hello")
     public String hello() {
@@ -48,13 +52,13 @@ public class DefaultController {
 
     @GetMapping("redis/set")
     public String setRedis(@NonNull @MixedHttpRequest String key, @NonNull @MixedHttpRequest String value) {
-        redisTemplate.opsForValue().set(key, value);
+        redisService.set(key, value);
         return "ok";
     }
 
     @GetMapping("redis/get")
     public String getRedis(@NonNull @MixedHttpRequest String key) {
-        return redisTemplate.opsForValue().get(key);
+        return redisService.get(key);
     }
 
     @GetMapping("redis/setList")
