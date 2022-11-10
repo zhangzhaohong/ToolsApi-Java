@@ -45,7 +45,7 @@ public class EmailExecutorService implements InitializingBean {
     private int retryTime = 0;
 
     private final ListeningExecutorService executorService =
-            executorService("mail-sender-service", 4, 4);
+            executorService("mail-sender-service", 2, 4);
 
     public static ListeningExecutorService executorService(String namePrefix, Integer corePoolSize, Integer maxPoolSize) {
         log.info("perf exec executor info = corePoolSize: {}, maxPoolSize: {}", corePoolSize, maxPoolSize);
