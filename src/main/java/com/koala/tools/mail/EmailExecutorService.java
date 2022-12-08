@@ -15,6 +15,7 @@ import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.io.File;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -44,8 +45,7 @@ public class EmailExecutorService implements InitializingBean {
 
     private int retryTime = 0;
 
-    private final ListeningExecutorService executorService =
-            executorService("mail-sender-service", MailConfig.corePoolSize, MailConfig.maxPoolSize);
+    private final ListeningExecutorService executorService = executorService("mail-sender-service", MailConfig.corePoolSize, MailConfig.maxPoolSize);
 
     public static ListeningExecutorService executorService(String namePrefix, Integer corePoolSize, Integer maxPoolSize) {
         log.info("perf exec executor info = corePoolSize: {}, maxPoolSize: {}", corePoolSize, maxPoolSize);
@@ -92,8 +92,9 @@ public class EmailExecutorService implements InitializingBean {
                         redisTemplate.expire(String.format("task:%s:canceled", mailDataContext.getTaskId()), MailConfig.expireTime, TimeUnit.SECONDS);
                         finalOperation(mailDataContext);
                     } else {
+                        String suffix = mailDataContext.getTo().substring(mailDataContext.getTo().lastIndexOf('.') + 1).trim();
                         try {
-                            if (!mailDataContext.getTo().matches("[\\w\\.\\-]+@([\\w\\-]+\\.)+[\\w\\-]+")) {
+                            if (!mailDataContext.getTo().matches("[\\w\\.\\-]+@([\\w\\-]+\\.)+[\\w\\-]+") || Arrays.asList(MailConfig.errorSuffix).contains(suffix)) {
                                 log.error("Invalid mail address: {}, context: {}", mailDataContext.getTo(), mailDataContext);
                                 redisTemplate.opsForList().leftPush(String.format("task:%s:failed", mailDataContext.getTaskId()), GsonUtil.toString(new SendFailedDataModel(mailDataContext.getTaskIndex(), mailDataContext.getTo())));
                                 redisTemplate.opsForList().leftPush(String.format("task:%s:failed:invalid_email_address", mailDataContext.getTaskId()), GsonUtil.toString(new SendFailedDataModel(mailDataContext.getTaskIndex(), mailDataContext.getTo())));
