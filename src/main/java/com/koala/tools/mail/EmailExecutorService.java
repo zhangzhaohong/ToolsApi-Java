@@ -15,6 +15,7 @@ import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.io.File;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -44,8 +45,7 @@ public class EmailExecutorService implements InitializingBean {
 
     private int retryTime = 0;
 
-    private final ListeningExecutorService executorService =
-            executorService("mail-sender-service", 2, 4);
+    private final ListeningExecutorService executorService = executorService("mail-sender-service", MailConfig.corePoolSize, MailConfig.maxPoolSize);
 
     public static ListeningExecutorService executorService(String namePrefix, Integer corePoolSize, Integer maxPoolSize) {
         log.info("perf exec executor info = corePoolSize: {}, maxPoolSize: {}", corePoolSize, maxPoolSize);
@@ -89,15 +89,25 @@ public class EmailExecutorService implements InitializingBean {
                     if (Boolean.TRUE.equals(redisTemplate.opsForSet().isMember(mailSenderCancelRedisKey, mailDataContext.getTaskId()))) {
                         log.info("OnSendCancel: {}", GsonUtil.toString(mailDataContext));
                         redisTemplate.opsForValue().increment(String.format("task:%s:canceled", mailDataContext.getTaskId()), 1L);
-                        redisTemplate.expire(String.format("task:%s:canceled", mailDataContext.getTaskId()), 12L * 60 * 60, TimeUnit.SECONDS);
+                        redisTemplate.expire(String.format("task:%s:canceled", mailDataContext.getTaskId()), MailConfig.expireTime, TimeUnit.SECONDS);
                         finalOperation(mailDataContext);
                     } else {
+                        String suffix = mailDataContext.getTo().substring(mailDataContext.getTo().lastIndexOf('.') + 1).trim();
                         try {
-                            sendMail(mailDataContext);
+                            if (!mailDataContext.getTo().matches("[\\w\\.\\-]+@([\\w\\-]+\\.)+[\\w\\-]+") || Arrays.asList(MailConfig.errorSuffix).contains(suffix)) {
+                                log.error("Invalid mail address: {}, context: {}", mailDataContext.getTo(), mailDataContext);
+                                redisTemplate.opsForList().leftPush(String.format("task:%s:failed", mailDataContext.getTaskId()), GsonUtil.toString(new SendFailedDataModel(mailDataContext.getTaskIndex(), mailDataContext.getTo())));
+                                redisTemplate.opsForList().leftPush(String.format("task:%s:failed:invalid_email_address", mailDataContext.getTaskId()), GsonUtil.toString(new SendFailedDataModel(mailDataContext.getTaskIndex(), mailDataContext.getTo())));
+                                redisTemplate.expire(String.format("task:%s:failed", mailDataContext.getTaskId()), MailConfig.expireTime, TimeUnit.SECONDS);
+                                redisTemplate.expire(String.format("task:%s:failed:invalid_email_address", mailDataContext.getTaskId()), MailConfig.expireTime, TimeUnit.SECONDS);
+                                finalOperation(mailDataContext);
+                            } else {
+                                sendMail(mailDataContext);
+                            }
                         } catch (Exception e) {
                             log.error("发送失败", e);
                             redisTemplate.opsForList().leftPush(String.format("task:%s:failed", mailDataContext.getTaskId()), GsonUtil.toString(new SendFailedDataModel(mailDataContext.getTaskIndex(), mailDataContext.getTo())));
-                            redisTemplate.expire(String.format("task:%s:failed", mailDataContext.getTaskId()), 12L * 60 * 60, TimeUnit.SECONDS);
+                            redisTemplate.expire(String.format("task:%s:failed", mailDataContext.getTaskId()), MailConfig.expireTime, TimeUnit.SECONDS);
                             finalOperation(mailDataContext);
                         }
                     }
@@ -119,7 +129,7 @@ public class EmailExecutorService implements InitializingBean {
      */
     private void finalOperation(MailDataContext mailDataContext) {
         redisTemplate.opsForValue().increment(String.format("task:%s:finished", mailDataContext.getTaskId()), 1L);
-        redisTemplate.expire(String.format("task:%s:finished", mailDataContext.getTaskId()), 12L * 60 * 60, TimeUnit.SECONDS);
+        redisTemplate.expire(String.format("task:%s:finished", mailDataContext.getTaskId()), MailConfig.expireTime, TimeUnit.SECONDS);
         Object taskLength = redisTemplate.opsForValue().get(String.format("task:length:%s", mailDataContext.getTaskId()));
         if (Objects.equals(mailDataContext.getTaskIndex(), taskLength)) {
             try {

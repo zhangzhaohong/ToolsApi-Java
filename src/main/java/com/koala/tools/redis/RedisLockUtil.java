@@ -81,6 +81,12 @@ public class RedisLockUtil {
     }
 
     public Long increment(String key, Long value) {
-        return redisTemplate.opsForValue().increment(key, value);
+        try {
+            return redisTemplate.opsForValue().increment(key, value);
+        } catch (Exception e) {
+            log.error("Increment Record Error", e);
+            redisTemplate.opsForValue().set(key, SUCCESS);
+            return SUCCESS;
+        }
     }
 }

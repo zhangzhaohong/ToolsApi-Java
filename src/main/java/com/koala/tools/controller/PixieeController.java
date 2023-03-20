@@ -4,6 +4,7 @@ import com.alibaba.excel.EasyExcelFactory;
 import com.alibaba.excel.read.listener.PageReadListener;
 import com.koala.tools.http.annotation.MixedHttpRequest;
 import com.koala.tools.mail.EmailExecutorService;
+import com.koala.tools.mail.MailConfig;
 import com.koala.tools.mail.MailDataContext;
 import com.koala.tools.models.RespModel;
 import com.koala.tools.models.mail.UserListModel;
@@ -67,7 +68,7 @@ public class PixieeController {
         }
         emailExecutorService.addTask(new MailDataContext(tmpPath, uuid, 0, type, to, replyTo, subject, text, fileList));
         redisTemplate.opsForValue().set(String.format("task:length:%s", uuid), 1);
-        redisTemplate.expire(String.format("task:length:%s", uuid), 12L * 60 * 60, TimeUnit.SECONDS);
+        redisTemplate.expire(String.format("task:length:%s", uuid), MailConfig.expireTime, TimeUnit.SECONDS);
         HashMap<String, Object> result = new HashMap<>(0);
         result.put("taskId", uuid);
         result.put("taskLength", 1);
@@ -102,7 +103,7 @@ public class PixieeController {
             })).sheet("Sheet1").doRead();
         }
         redisTemplate.opsForValue().set(String.format("task:length:%s", uuid), taskLength.get());
-        redisTemplate.expire(String.format("task:length:%s", uuid), 12L * 60 * 60, TimeUnit.SECONDS);
+        redisTemplate.expire(String.format("task:length:%s", uuid), MailConfig.expireTime, TimeUnit.SECONDS);
         HashMap<String, Object> result = new HashMap<>(0);
         result.put("taskId", uuid);
         result.put("taskLength", taskLength.get());
@@ -116,6 +117,7 @@ public class PixieeController {
         HashMap<String, Object> result = new HashMap<>(0);
         result.put("taskId", taskId);
         result.put("failed", redisTemplate.opsForList().range(String.format("task:%s:failed", taskId), 0, -1));
+        result.put("invalidEmailAddress", redisTemplate.opsForList().range(String.format("task:%s:failed:invalid_email_address", taskId), 0, -1));
         result.put("canceled", redisTemplate.opsForValue().get(String.format("task:%s:canceled", taskId)));
         result.put("finished", redisTemplate.opsForValue().get(String.format("task:%s:finished", taskId)));
         result.put("taskLength", redisTemplate.opsForValue().get(String.format("task:length:%s", taskId)));
