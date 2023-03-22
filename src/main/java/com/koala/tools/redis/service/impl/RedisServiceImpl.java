@@ -29,7 +29,9 @@ public class RedisServiceImpl implements RedisService {
     public String get(String key, String defaultValue) {
         try {
             byte[] result = redisTemplate.execute((RedisConnection redisConnection) -> redisConnection.get(key.getBytes(StandardCharsets.UTF_8)));
-            if (Objects.isNull(result)) return defaultValue;
+            if (Objects.isNull(result)) {
+                return defaultValue;
+            }
             return (String) SerializeUtil.unserialize(result);
         } catch (Exception e) {
             log.error("getRedisDataError", e);
