@@ -2,6 +2,7 @@ package com.koala.tools.http.processor;
 
 import com.koala.tools.http.annotation.MixedHttpRequest;
 import jakarta.servlet.ServletRequest;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.core.MethodParameter;
 import org.springframework.web.bind.support.WebDataBinderFactory;
@@ -40,7 +41,7 @@ public class MixedHttpRequestProcessor implements HandlerMethodArgumentResolver 
     }
 
     @Override
-    public Object resolveArgument(MethodParameter methodParameter, ModelAndViewContainer modelAndViewContainer, NativeWebRequest nativeWebRequest, WebDataBinderFactory webDataBinderFactory) throws Exception {
+    public Object resolveArgument(@NotNull MethodParameter methodParameter, ModelAndViewContainer modelAndViewContainer, NativeWebRequest nativeWebRequest, WebDataBinderFactory webDataBinderFactory) throws Exception {
         ServletRequest servletRequest = nativeWebRequest.getNativeRequest(ServletRequest.class);
         if (Objects.isNull(servletRequest)) {
             throw new IllegalArgumentException("servletRequest不能为null");
