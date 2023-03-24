@@ -6,6 +6,7 @@ import com.alibaba.fastjson2.support.spring6.http.converter.FastJsonHttpMessageC
 import com.koala.tools.http.converter.CustomMessageConverter;
 import com.koala.tools.http.processor.MixedHttpRequestProcessor;
 import com.koala.tools.interceptor.FirewallInterceptor;
+import jakarta.annotation.Resource;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -41,11 +42,8 @@ import java.util.concurrent.TimeUnit;
 @DependsOn({"beanContext"})
 public class CoreWebConfig implements WebMvcConfigurer {
 
-    private final ApplicationContext applicationContext;
-
-    public CoreWebConfig(ApplicationContext applicationContext) {
-        this.applicationContext = applicationContext;
-    }
+    @Resource
+    private ApplicationContext applicationContext;
 
     @Bean(name = "customRequestMappingHandlerAdapter")
     public RequestMappingHandlerAdapter requestMappingHandlerAdapter() {
