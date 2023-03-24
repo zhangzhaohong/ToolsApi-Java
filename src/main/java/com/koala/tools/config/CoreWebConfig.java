@@ -100,12 +100,7 @@ public class CoreWebConfig implements WebMvcConfigurer {
     @Bean(name = "customMultipartResolver")
     public MultipartResolver multipartResolver() {
         StandardServletMultipartResolver resolver = new StandardServletMultipartResolver();
-        // resolver.setDefaultEncoding("UTF-8");
-        // resolveLazily属性启用是为了推迟文件解析，以在在UploadAction中捕获文件大小异常
         resolver.setResolveLazily(true);
-        // resolver.setMaxInMemorySize(40960);
-        //上传文件大小(单位为字节) 1024M     50*1024*1024
-        // resolver.setMaxUploadSize(1024 * 1024 * 1024L);
         return resolver;
     }
 
