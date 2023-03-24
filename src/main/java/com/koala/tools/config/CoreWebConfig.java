@@ -2,7 +2,7 @@ package com.koala.tools.config;
 
 import com.alibaba.fastjson2.JSONWriter;
 import com.alibaba.fastjson2.support.config.FastJsonConfig;
-import com.alibaba.fastjson2.support.spring.http.converter.FastJsonHttpMessageConverter;
+import com.alibaba.fastjson2.support.spring6.http.converter.FastJsonHttpMessageConverter;
 import com.koala.tools.http.converter.CustomMessageConverter;
 import com.koala.tools.http.processor.MixedHttpRequestProcessor;
 import com.koala.tools.interceptor.FirewallInterceptor;
@@ -16,14 +16,13 @@ import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.multipart.MultipartResolver;
-import org.springframework.web.multipart.commons.CommonsMultipartResolver;
+import org.springframework.web.multipart.support.StandardServletMultipartResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 
-import javax.annotation.Resource;
 import java.io.File;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -42,8 +41,11 @@ import java.util.concurrent.TimeUnit;
 @DependsOn({"beanContext"})
 public class CoreWebConfig implements WebMvcConfigurer {
 
-    @Resource
-    private ApplicationContext applicationContext;
+    private final ApplicationContext applicationContext;
+
+    public CoreWebConfig(ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
+    }
 
     @Bean(name = "customRequestMappingHandlerAdapter")
     public RequestMappingHandlerAdapter requestMappingHandlerAdapter() {
@@ -51,8 +53,8 @@ public class CoreWebConfig implements WebMvcConfigurer {
         List<HttpMessageConverter<?>> converters = adapter.getMessageConverters();
         FastJsonHttpMessageConverter fastJsonHttpMessageConverter = new FastJsonHttpMessageConverter();
         List<MediaType> supportedMediaTypes = new ArrayList<>();
+        // 添加支持的媒体类型
         supportedMediaTypes.add(MediaType.APPLICATION_JSON);
-        supportedMediaTypes.add(MediaType.APPLICATION_JSON_UTF8);
         supportedMediaTypes.add(MediaType.APPLICATION_ATOM_XML);
         supportedMediaTypes.add(MediaType.APPLICATION_FORM_URLENCODED);
         supportedMediaTypes.add(MediaType.APPLICATION_OCTET_STREAM);
@@ -72,7 +74,23 @@ public class CoreWebConfig implements WebMvcConfigurer {
 
         //创建配置类
         FastJsonConfig fastJsonConfig = new FastJsonConfig();
-        fastJsonConfig.setWriterFeatures(JSONWriter.Feature.WriteNulls, JSONWriter.Feature.WriteNonStringValueAsString);
+        fastJsonConfig.setWriterFeatures(
+                JSONWriter.Feature.WriteNullListAsEmpty,
+                //json格式化
+                JSONWriter.Feature.PrettyFormat,
+                //输出map中value为null的数据
+                JSONWriter.Feature.WriteMapNullValue,
+                //输出boolean 为 false
+                JSONWriter.Feature.WriteNullBooleanAsFalse,
+                //输出list 为 []
+                JSONWriter.Feature.WriteNullListAsEmpty,
+                //输出number 为 0
+                JSONWriter.Feature.WriteNullNumberAsZero,
+                //输出字符串 为 ""
+                JSONWriter.Feature.WriteNullStringAsEmpty,
+                //对map进行排序
+                JSONWriter.Feature.MapSortField
+        );
         fastJsonHttpMessageConverter.setFastJsonConfig(fastJsonConfig);
         CustomMessageConverter customMessageConverter = new CustomMessageConverter();
         converters.add(fastJsonHttpMessageConverter);
@@ -83,13 +101,13 @@ public class CoreWebConfig implements WebMvcConfigurer {
 
     @Bean(name = "customMultipartResolver")
     public MultipartResolver multipartResolver() {
-        CommonsMultipartResolver resolver = new CommonsMultipartResolver();
-        resolver.setDefaultEncoding("UTF-8");
-        //resolveLazily属性启用是为了推迟文件解析，以在在UploadAction中捕获文件大小异常
+        StandardServletMultipartResolver resolver = new StandardServletMultipartResolver();
+        // resolver.setDefaultEncoding("UTF-8");
+        // resolveLazily属性启用是为了推迟文件解析，以在在UploadAction中捕获文件大小异常
         resolver.setResolveLazily(true);
-        resolver.setMaxInMemorySize(40960);
+        // resolver.setMaxInMemorySize(40960);
         //上传文件大小(单位为字节) 1024M     50*1024*1024
-        resolver.setMaxUploadSize(1024 * 1024 * 1024L);
+        // resolver.setMaxUploadSize(1024 * 1024 * 1024L);
         return resolver;
     }
 
@@ -105,12 +123,7 @@ public class CoreWebConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry
-                .addResourceHandler("/**")
-                .addResourceLocations("classpath:/static/")
-                .addResourceLocations("classpath:/static/assets/")
-                .addResourceLocations("classpath:/META-INF/resources/")
-                .setCacheControl(CacheControl.maxAge(1, TimeUnit.HOURS).cachePublic());
+        registry.addResourceHandler("/**").addResourceLocations("classpath:/static/").addResourceLocations("classpath:/static/assets/").addResourceLocations("classpath:/META-INF/resources/").setCacheControl(CacheControl.maxAge(1, TimeUnit.HOURS).cachePublic());
     }
 
     @Bean

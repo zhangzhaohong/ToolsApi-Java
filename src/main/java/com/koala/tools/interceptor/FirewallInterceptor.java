@@ -3,12 +3,12 @@ package com.koala.tools.interceptor;
 import com.koala.tools.BeanContext;
 import com.koala.tools.redis.RedisLockUtil;
 import com.koala.tools.utils.RemoteIpUtils;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.web.servlet.HandlerInterceptor;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.io.PrintWriter;
 

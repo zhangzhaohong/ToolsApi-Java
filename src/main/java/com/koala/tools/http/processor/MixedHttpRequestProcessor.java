@@ -1,6 +1,7 @@
 package com.koala.tools.http.processor;
 
 import com.koala.tools.http.annotation.MixedHttpRequest;
+import jakarta.servlet.ServletRequest;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.core.MethodParameter;
 import org.springframework.web.bind.support.WebDataBinderFactory;
@@ -12,7 +13,6 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestResponseBody
 import org.springframework.web.servlet.mvc.method.annotation.ServletModelAttributeMethodProcessor;
 
 import javax.annotation.Resource;
-import javax.servlet.ServletRequest;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
