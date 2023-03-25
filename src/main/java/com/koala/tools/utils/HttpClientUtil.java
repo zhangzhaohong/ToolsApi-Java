@@ -3,14 +3,19 @@ package com.koala.tools.utils;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
+import org.apache.http.client.CookieStore;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.*;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.cookie.Cookie;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
@@ -141,6 +146,33 @@ public class HttpClientUtil {
      */
     public static String doPostJson(String url, String json) throws IOException {
         return doPostJson(url, null, json);
+    }
+
+    /*
+     * 自定义的post
+     * 返回Cookie
+     * */
+    public static List<Cookie> doPostJsonAndReturnCookie(String url, Map<String, String> headers, String json) throws IOException {
+        // cookie
+        CookieStore cookieStore = new BasicCookieStore();
+        try (CloseableHttpClient httpClient = HttpClientBuilder.create().setDefaultCookieStore(cookieStore).build()) {
+            // 创建http对象
+            HttpPost httpPost = new HttpPost(url);
+            // 设置请求超时时间及响应超时时间
+            RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(CONNECT_TIMEOUT).setSocketTimeout(SOCKET_TIMEOUT).setCookieSpec(CookieSpecs.STANDARD).build();
+            httpPost.setConfig(requestConfig);
+            // 设置请求头
+            packageHeader(headers, httpPost);
+            // 封装请求参数为json格式
+            packageJson(json, httpPost);
+            // 执行请求获取响应体并释放资源
+            getHttpClientResult(httpClient, httpPost);
+            return cookieStore.getCookies();
+        }
+    }
+
+    public static List<Cookie> doPostJsonAndReturnCookie(String url, String json) throws IOException {
+        return doPostJsonAndReturnCookie(url, null, json);
     }
 
     /**

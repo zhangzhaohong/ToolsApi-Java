@@ -14,6 +14,8 @@ import java.net.URISyntaxException;
 public abstract class DouYinApiBuilder {
     protected DouYinApiProduct product = new DouYinApiProduct();
 
+    public abstract DouYinApiBuilder init() throws IOException;
+
     /**
      * @param url 地址
      * @return
