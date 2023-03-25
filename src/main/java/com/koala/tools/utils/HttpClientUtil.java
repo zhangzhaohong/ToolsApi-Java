@@ -3,6 +3,7 @@ package com.koala.tools.utils;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
+import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.*;
@@ -19,6 +20,7 @@ import org.springframework.util.StringUtils;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import java.io.*;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -57,7 +59,7 @@ public class HttpClientUtil {
             // 创建http对象
             HttpGet httpGet = new HttpGet(uriBuilder.build());
             // 设置请求超时时间及响应超时时间
-            RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(CONNECT_TIMEOUT).setSocketTimeout(SOCKET_TIMEOUT).build();
+            RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(CONNECT_TIMEOUT).setSocketTimeout(SOCKET_TIMEOUT).setCookieSpec(CookieSpecs.STANDARD).build();
             httpGet.setConfig(requestConfig);
             // 设置请求头
             packageHeader(headers, httpGet);
@@ -89,7 +91,7 @@ public class HttpClientUtil {
             // 创建http对象
             HttpPost httpPost = new HttpPost(url);
             // 设置请求超时时间及响应超时时间
-            RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(CONNECT_TIMEOUT).setSocketTimeout(SOCKET_TIMEOUT).build();
+            RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(CONNECT_TIMEOUT).setSocketTimeout(SOCKET_TIMEOUT).setCookieSpec(CookieSpecs.STANDARD).build();
             httpPost.setConfig(requestConfig);
             // 设置请求头
             packageHeader(headers, httpPost);
@@ -123,7 +125,7 @@ public class HttpClientUtil {
             // 创建http对象
             HttpPost httpPost = new HttpPost(url);
             // 设置请求超时时间及响应超时时间
-            RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(CONNECT_TIMEOUT).setSocketTimeout(SOCKET_TIMEOUT).build();
+            RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(CONNECT_TIMEOUT).setSocketTimeout(SOCKET_TIMEOUT).setCookieSpec(CookieSpecs.STANDARD).build();
             httpPost.setConfig(requestConfig);
             // 设置请求头
             packageHeader(headers, httpPost);
@@ -147,7 +149,7 @@ public class HttpClientUtil {
     public static String doPut(String url, Map<String, String> headers, Map<String, String> params) throws IOException {
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             HttpPut httpPut = new HttpPut(url);
-            RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(CONNECT_TIMEOUT).setSocketTimeout(SOCKET_TIMEOUT).build();
+            RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(CONNECT_TIMEOUT).setSocketTimeout(SOCKET_TIMEOUT).setCookieSpec(CookieSpecs.STANDARD).build();
             httpPut.setConfig(requestConfig);
             packageHeader(headers, httpPut);
             packageParam(params, httpPut);
@@ -179,7 +181,7 @@ public class HttpClientUtil {
                 params.forEach(uriBuilder::setParameter);
             }
             HttpDelete httpDelete = new HttpDelete(uriBuilder.build());
-            RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(CONNECT_TIMEOUT).setSocketTimeout(SOCKET_TIMEOUT).build();
+            RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(CONNECT_TIMEOUT).setSocketTimeout(SOCKET_TIMEOUT).setCookieSpec(CookieSpecs.STANDARD).build();
             httpDelete.setConfig(requestConfig);
             packageHeader(headers, httpDelete);
             return getHttpClientResult(httpClient, httpDelete);
@@ -213,7 +215,7 @@ public class HttpClientUtil {
             // 创建http对象
             HttpGet httpGet = new HttpGet(uriBuilder.build());
             // 设置请求超时时间及响应超时时间
-            RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(CONNECT_TIMEOUT).setSocketTimeout(SOCKET_TIMEOUT).setRedirectsEnabled(false).build();
+            RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(CONNECT_TIMEOUT).setSocketTimeout(SOCKET_TIMEOUT).setCookieSpec(CookieSpecs.STANDARD).setRedirectsEnabled(false).build();
             httpGet.setConfig(requestConfig);
             // 设置请求头
             packageHeader(headers, httpGet);
@@ -258,7 +260,7 @@ public class HttpClientUtil {
             // 创建http对象
             HttpGet httpGet = new HttpGet(uriBuilder.build());
             // 设置请求超时时间及响应超时时间
-            RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(CONNECT_TIMEOUT).setSocketTimeout(SOCKET_TIMEOUT).setRedirectsEnabled(false).build();
+            RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(CONNECT_TIMEOUT).setSocketTimeout(SOCKET_TIMEOUT).setCookieSpec(CookieSpecs.STANDARD).setRedirectsEnabled(false).build();
             httpGet.setConfig(requestConfig);
             // 设置请求头
             packageHeader(headers, httpGet);
@@ -298,7 +300,7 @@ public class HttpClientUtil {
             // 创建http对象
             HttpGet httpGet = new HttpGet(uriBuilder.build());
             // 设置请求超时时间及响应超时时间
-            RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(CONNECT_TIMEOUT).setSocketTimeout(SOCKET_TIMEOUT).build();
+            RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(CONNECT_TIMEOUT).setSocketTimeout(SOCKET_TIMEOUT).setCookieSpec(CookieSpecs.STANDARD).build();
             httpGet.setConfig(requestConfig);
             // 设置请求头
             packageHeader(headers, httpGet);
@@ -317,10 +319,7 @@ public class HttpClientUtil {
                         long range = Long.parseLong(rangeString.substring(rangeString.indexOf("=") + 1, rangeString.indexOf("-")));
                         response.addHeader("Content-Range", String.valueOf(range + (entity.getContentLength()) - 1));
                     }
-                    try (
-                            InputStream inputStream = entity.getContent();
-                            ServletOutputStream targetStream = response.getOutputStream();
-                    ) {
+                    try (InputStream inputStream = entity.getContent(); ServletOutputStream targetStream = response.getOutputStream();) {
                         inputStream.transferTo(targetStream);
                         response.setContentLengthLong(entity.getContentLength());
                         targetStream.flush();
