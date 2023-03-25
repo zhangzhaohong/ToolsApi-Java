@@ -59,7 +59,7 @@ public class DouYinApiProduct {
         if (!Objects.isNull(itemId)) {
             String itemInfoPath = "https://www.iesdouyin.com/web/api/v2/aweme/iteminfo/?item_ids=" + itemId;
             logger.info("[DouYinApiProduct]({}, {}) itemInfoPath: {}", id, itemId, itemInfoPath);
-            String itemInfoResponse = HttpClientUtil.doGet(itemInfoPath, null, HeaderUtil.getDouYinDownloadHeader());
+            String itemInfoResponse = HttpClientUtil.doGet(itemInfoPath, HeaderUtil.getDouYinDownloadHeader(), null);
             logger.info("[DouYinApiProduct]({}, {}) itemInfoResponse: {}", id, itemId, itemInfoResponse);
             try {
                 this.itemInfo = GsonUtil.toBean(itemInfoResponse, ItemInfoRespModel.class);
