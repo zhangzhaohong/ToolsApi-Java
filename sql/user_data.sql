@@ -5,6 +5,8 @@ CREATE TABLE IF NOT EXISTS `user_data`
     `nick_name`        VARCHAR(255) NOT NULL DEFAULT 'USERNAME',
     `password`         VARCHAR(255) NOT NULL,
     `user_token`       VARCHAR(255)          DEFAULT NULL,
+    `role_type`        INT                   DEFAULT -1,
+    `special_roles`    VARCHAR(255)          DEFAULT '[]',
     `update_timestamp` TIMESTAMP             DEFAULT NULL,
     PRIMARY KEY (`unique_id`)
 ) ENGINE = InnoDB
