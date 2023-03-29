@@ -10,4 +10,5 @@ import com.koala.tools.data.dataModel.userData.UserDataTable;
  * @description
  */
 public interface UserDataMapper extends BaseMapper<UserDataTable> {
+
 }

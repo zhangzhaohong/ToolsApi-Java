@@ -1,6 +1,7 @@
 package com.koala.tools.data.dataModel.userData;
 
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -12,14 +13,17 @@ import java.io.Serializable;
  * @description
  */
 @Data
+@AllArgsConstructor
 @TableName("user_data")
 public class UserDataTable implements Serializable {
+    @TableId(type = IdType.AUTO)
     private Long uniqueId;
     private Long userId;
     private String nickName;
     private String password;
-    private String userToken;
     private Integer roleType;
-    private String[] specialRoles;
-    private Long updateTimestamp;
+    private String specialRoles;
+    private String userToken;
+    private Long created;
+    private Long updated;
 }
