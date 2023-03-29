@@ -26,7 +26,7 @@ public class UserDataController {
 
     @GetMapping("/user/test")
     public Integer test() {
-        UserDataTable userData = new UserDataTable(null, 1L, "test", "123456", -1, "[]", null, null, null);
+        UserDataTable userData = new UserDataTable(1L, "test", "123456", -1, "[]", null);
         return userDataService.insert(userData);
     }
 

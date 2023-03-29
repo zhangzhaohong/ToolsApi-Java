@@ -7,8 +7,8 @@ CREATE TABLE IF NOT EXISTS `user_data`
     `role_type`        INT                   DEFAULT -1,
     `special_roles`    VARCHAR(255)          DEFAULT '[]',
     `user_token`       VARCHAR(255)          DEFAULT NULL,
-    `created` TIMESTAMP             DEFAULT NULL,
-    `updated` TIMESTAMP             DEFAULT NULL,
+    `created` BIGINT             DEFAULT 0,
+    `updated` BIGINT             DEFAULT 0,
     PRIMARY KEY (`unique_id`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8;

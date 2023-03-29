@@ -13,17 +13,27 @@ import java.io.Serializable;
  * @description
  */
 @Data
-@AllArgsConstructor
 @TableName("user_data")
 public class UserDataTable implements Serializable {
     @TableId(type = IdType.AUTO)
-    private Long uniqueId;
+    private Long uniqueId = null;
     private Long userId;
     private String nickName;
     private String password;
     private Integer roleType;
     private String specialRoles;
     private String userToken;
-    private Long created;
-    private Long updated;
+    @TableField(fill = FieldFill.INSERT)
+    private Long created = null;
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+    private Long updated = null;
+
+    public UserDataTable(Long userId, String nickName, String password, Integer roleType, String specialRoles, String userToken) {
+        this.userId = userId;
+        this.nickName = nickName;
+        this.password = password;
+        this.roleType = roleType;
+        this.specialRoles = specialRoles;
+        this.userToken = userToken;
+    }
 }

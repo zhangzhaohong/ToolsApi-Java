@@ -17,22 +17,21 @@ import java.util.function.Supplier;
 public class CustomMetaObjectHandler implements MetaObjectHandler {
     @Override
     public void insertFill(MetaObject metaObject) {
-        this.strictInsertFill(metaObject, "created", Long.class, System.currentTimeMillis());
-        this.strictInsertFill(metaObject, "updated", Long.class, -1L);
+        Object created = getFieldValByName("created", metaObject);
+        if (null == created) {
+            //字段为空，可以进行填充
+            setFieldValByName("created", System.currentTimeMillis(), metaObject);
+        }
+        Object updated = getFieldValByName("updated", metaObject);
+        if (null == updated) {
+            //字段为空，可以进行填充
+            setFieldValByName("updated", 0L, metaObject);
+        }
     }
 
     @Override
     public void updateFill(MetaObject metaObject) {
         //更新数据时，直接更新字段
-        this.strictUpdateFill(metaObject, "updated", Long.class, System.currentTimeMillis());
-    }
-
-    @Override
-    public MetaObjectHandler strictFillStrategy(MetaObject metaObject, String fieldName, Supplier<?> fieldVal) {
-        Object obj = fieldVal.get();
-        if (Objects.nonNull(obj)) {
-            metaObject.setValue(fieldName, obj);
-        }
-        return this;
+        setFieldValByName("updated", System.currentTimeMillis(), metaObject);
     }
 }
