@@ -22,18 +22,18 @@ public class UserDataTable implements Serializable {
     private String password;
     private Integer roleType;
     private String specialRoles;
-    private String userToken;
+    @TableField(fill = FieldFill.INSERT)
+    private String userToken = null;
     @TableField(fill = FieldFill.INSERT)
     private Long created = null;
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private Long updated = null;
 
-    public UserDataTable(Long userId, String nickName, String password, Integer roleType, String specialRoles, String userToken) {
+    public UserDataTable(Long userId, String nickName, String password, Integer roleType, String specialRoles) {
         this.userId = userId;
         this.nickName = nickName;
         this.password = password;
         this.roleType = roleType;
         this.specialRoles = specialRoles;
-        this.userToken = userToken;
     }
 }

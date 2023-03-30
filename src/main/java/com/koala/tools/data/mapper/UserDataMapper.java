@@ -2,6 +2,8 @@ package com.koala.tools.data.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.koala.tools.data.dataModel.userData.UserDataTable;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Update;
 
 /**
  * @author koala
@@ -10,5 +12,6 @@ import com.koala.tools.data.dataModel.userData.UserDataTable;
  * @description
  */
 public interface UserDataMapper extends BaseMapper<UserDataTable> {
-
+    @Update("update `user_data` set user_id = #{userId} where unique_id = #{uniqueId} limit 1")
+    void updateUserId(@Param("userId") Long userId, @Param("uniqueId") Long uniqueId);
 }

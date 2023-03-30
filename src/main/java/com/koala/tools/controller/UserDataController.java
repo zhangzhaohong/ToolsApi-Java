@@ -1,14 +1,15 @@
 package com.koala.tools.controller;
 
-import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import com.koala.tools.data.dataModel.userData.UserDataTable;
 import com.koala.tools.data.service.UserDataService;
-import com.koala.tools.handler.CustomMetaObjectHandler;
 import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * @author koala
@@ -24,10 +25,12 @@ public class UserDataController {
     @Qualifier("UserDataService")
     private UserDataService userDataService;
 
-    @GetMapping("/user/test")
-    public Integer test() {
-        UserDataTable userData = new UserDataTable(1L, "test", "123456", -1, "[]", null);
-        return userDataService.insert(userData);
+    @GetMapping("/user/register")
+    public Long register() {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
+        Date date = new Date();
+        UserDataTable userData = new UserDataTable(Long.parseLong(simpleDateFormat.format(date)), "test", "123456", -1, "[]");
+        return userDataService.registerUser(userData);
     }
 
 }

@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import org.apache.ibatis.reflection.MetaObject;
 import org.springframework.stereotype.Component;
 
+import java.util.Objects;
+
 /**
  * @author koala
  * @version 1.0
@@ -14,13 +16,18 @@ import org.springframework.stereotype.Component;
 public class CustomMetaObjectHandler implements MetaObjectHandler {
     @Override
     public void insertFill(MetaObject metaObject) {
+        Object userToken = getFieldValByName("userToken", metaObject);
+        if (Objects.isNull(userToken)) {
+            //字段为空，可以进行填充
+            setFieldValByName("userToken", null, metaObject);
+        }
         Object created = getFieldValByName("created", metaObject);
-        if (null == created) {
+        if (Objects.isNull(created)) {
             //字段为空，可以进行填充
             setFieldValByName("created", System.currentTimeMillis(), metaObject);
         }
         Object updated = getFieldValByName("updated", metaObject);
-        if (null == updated) {
+        if (Objects.isNull(updated)) {
             //字段为空，可以进行填充
             setFieldValByName("updated", 0L, metaObject);
         }

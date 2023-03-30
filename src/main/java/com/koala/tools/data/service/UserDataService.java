@@ -1,6 +1,7 @@
 package com.koala.tools.data.service;
 
 import com.koala.tools.data.dataModel.userData.UserDataTable;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * @author koala
@@ -9,5 +10,8 @@ import com.koala.tools.data.dataModel.userData.UserDataTable;
  * @description
  */
 public interface UserDataService {
+    Long registerUser(UserDataTable entity);
     int insert(UserDataTable entity);
+
+    void updateUserId(Long userId, Long uniqueId);
 }
