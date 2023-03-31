@@ -91,6 +91,63 @@
     <orderEntry type="library" name="Maven: org.jetbrains:annotations:13.0" level="project" />
     <orderEntry type="library" name="Maven: org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.7.22" level="project" />
     <orderEntry type="library" name="Maven: org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.7.22" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.rocketmq:rocketmq-spring-boot-starter:2.2.3" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.rocketmq:rocketmq-spring-boot:2.2.3" level="project" />
+    <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:2.0.6" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.rocketmq:rocketmq-client:5.0.0" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.rocketmq:rocketmq-common:5.0.0" level="project" />
+    <orderEntry type="library" name="Maven: com.github.luben:zstd-jni:1.5.2-2" level="project" />
+    <orderEntry type="library" name="Maven: org.lz4:lz4-java:1.8.0" level="project" />
+    <orderEntry type="library" name="Maven: org.awaitility:awaitility:4.2.0" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.rocketmq:rocketmq-acl:5.0.0" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.rocketmq:rocketmq-proto:2.0.0" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.tomcat:annotations-api:6.0.53" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.rocketmq:rocketmq-remoting:5.0.0" level="project" />
+    <orderEntry type="library" name="Maven: com.alibaba:fastjson:1.2.69_noneautotype" level="project" />
+    <orderEntry type="library" name="Maven: io.netty:netty-all:4.1.89.Final" level="project" />
+    <orderEntry type="library" name="Maven: io.netty:netty-codec-dns:4.1.89.Final" level="project" />
+    <orderEntry type="library" name="Maven: io.netty:netty-codec-haproxy:4.1.89.Final" level="project" />
+    <orderEntry type="library" name="Maven: io.netty:netty-codec-http:4.1.89.Final" level="project" />
+    <orderEntry type="library" name="Maven: io.netty:netty-codec-http2:4.1.89.Final" level="project" />
+    <orderEntry type="library" name="Maven: io.netty:netty-codec-memcache:4.1.89.Final" level="project" />
+    <orderEntry type="library" name="Maven: io.netty:netty-codec-mqtt:4.1.89.Final" level="project" />
+    <orderEntry type="library" name="Maven: io.netty:netty-codec-redis:4.1.89.Final" level="project" />
+    <orderEntry type="library" name="Maven: io.netty:netty-codec-smtp:4.1.89.Final" level="project" />
+    <orderEntry type="library" name="Maven: io.netty:netty-codec-socks:4.1.89.Final" level="project" />
+    <orderEntry type="library" name="Maven: io.netty:netty-codec-stomp:4.1.89.Final" level="project" />
+    <orderEntry type="library" name="Maven: io.netty:netty-codec-xml:4.1.89.Final" level="project" />
+    <orderEntry type="library" name="Maven: io.netty:netty-handler-proxy:4.1.89.Final" level="project" />
+    <orderEntry type="library" name="Maven: io.netty:netty-handler-ssl-ocsp:4.1.89.Final" level="project" />
+    <orderEntry type="library" name="Maven: io.netty:netty-resolver-dns:4.1.89.Final" level="project" />
+    <orderEntry type="library" name="Maven: io.netty:netty-transport-rxtx:4.1.89.Final" level="project" />
+    <orderEntry type="library" name="Maven: io.netty:netty-transport-sctp:4.1.89.Final" level="project" />
+    <orderEntry type="library" name="Maven: io.netty:netty-transport-udt:4.1.89.Final" level="project" />
+    <orderEntry type="library" name="Maven: io.netty:netty-transport-classes-epoll:4.1.89.Final" level="project" />
+    <orderEntry type="library" name="Maven: io.netty:netty-transport-classes-kqueue:4.1.89.Final" level="project" />
+    <orderEntry type="library" name="Maven: io.netty:netty-resolver-dns-classes-macos:4.1.89.Final" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: io.netty:netty-transport-native-epoll:linux-x86_64:4.1.89.Final" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: io.netty:netty-transport-native-epoll:linux-aarch_64:4.1.89.Final" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: io.netty:netty-transport-native-kqueue:osx-x86_64:4.1.89.Final" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: io.netty:netty-transport-native-kqueue:osx-aarch_64:4.1.89.Final" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: io.netty:netty-resolver-dns-native-macos:osx-x86_64:4.1.89.Final" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: io.netty:netty-resolver-dns-native-macos:osx-aarch_64:4.1.89.Final" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.rocketmq:rocketmq-logging:5.0.0" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.rocketmq:rocketmq-srvutil:5.0.0" level="project" />
+    <orderEntry type="library" name="Maven: commons-cli:commons-cli:1.4" level="project" />
+    <orderEntry type="library" name="Maven: com.googlecode.concurrentlinkedhashmap:concurrentlinkedhashmap-lru:1.4.2" level="project" />
+    <orderEntry type="library" name="Maven: commons-validator:commons-validator:1.7" level="project" />
+    <orderEntry type="library" name="Maven: commons-beanutils:commons-beanutils:1.9.4" level="project" />
+    <orderEntry type="library" name="Maven: commons-digester:commons-digester:2.1" level="project" />
+    <orderEntry type="library" name="Maven: commons-logging:commons-logging:1.2" level="project" />
+    <orderEntry type="library" name="Maven: commons-collections:commons-collections:3.2.2" level="project" />
+    <orderEntry type="library" name="Maven: com.google.protobuf:protobuf-java-util:3.20.1" level="project" />
+    <orderEntry type="library" name="Maven: com.google.protobuf:protobuf-java:3.20.1" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-messaging:6.0.6" level="project" />
+    <orderEntry type="library" name="Maven: com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.14.2" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-starter-validation:3.0.4" level="project" />
+    <orderEntry type="library" name="Maven: org.hibernate.validator:hibernate-validator:8.0.0.Final" level="project" />
+    <orderEntry type="library" name="Maven: jakarta.validation:jakarta.validation-api:3.0.2" level="project" />
+    <orderEntry type="library" name="Maven: com.fasterxml:classmate:1.5.1" level="project" />
     <orderEntry type="library" name="Maven: com.baomidou:mybatis-plus-boot-starter:3.5.3.1" level="project" />
     <orderEntry type="library" name="Maven: com.baomidou:mybatis-plus:3.5.3.1" level="project" />
     <orderEntry type="library" name="Maven: com.baomidou:mybatis-plus-extension:3.5.3.1" level="project" />
@@ -126,7 +183,6 @@
     <orderEntry type="library" name="Maven: org.springframework:spring-tx:6.0.6" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-oxm:6.0.6" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-context-support:6.0.6" level="project" />
-    <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:2.0.6" level="project" />
     <orderEntry type="library" name="Maven: io.lettuce:lettuce-core:6.2.3.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: io.netty:netty-common:4.1.89.Final" level="project" />
     <orderEntry type="library" name="Maven: io.netty:netty-handler:4.1.89.Final" level="project" />
@@ -162,7 +218,7 @@
     <orderEntry type="library" scope="TEST" name="Maven: jakarta.activation:jakarta.activation-api:2.1.1" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.assertj:assertj-core:3.23.1" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: net.bytebuddy:byte-buddy:1.12.23" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.hamcrest:hamcrest:2.2" level="project" />
+    <orderEntry type="library" name="Maven: org.hamcrest:hamcrest:2.2" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.junit.jupiter:junit-jupiter:5.9.2" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.junit.jupiter:junit-jupiter-api:5.9.2" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.opentest4j:opentest4j:1.2.0" level="project" />
