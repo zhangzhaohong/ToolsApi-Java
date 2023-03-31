@@ -1,15 +1,15 @@
 version: '3'
 services:
   #Service for nameserver
-  namesrv:
+  192.168.2.250:
     image: apache/rocketmq:5.1.0
-    container_name: rocketmq-namesrv
+    container_name: rocketmq-192.168.2.250
     ports:
       - 55002:9876
     environment:
       - JAVA_OPT_EXT=-server -Xms256m -Xmx256m -Xmn256m
     volumes:
-      - /Users/koala/rocketmq/data/namesrv/logs:/root/logs
+      - /Users/koala/rocketmq/data/192.168.2.250/logs:/root/logs
     command: sh mqnamesrv
 
   #Service for broker
@@ -17,15 +17,15 @@ services:
     image: apache/rocketmq:5.1.0
     container_name: rocketmq-broker
     links:
-      - namesrv
+      - 192.168.2.250
     depends_on:
-      - namesrv
+      - 192.168.2.250
     ports:
       - 10909:10909
       - 10911:10911
       - 10912:10912
     environment:
-      - NAMESRV_ADDR=namesrv:9876
+      - NAMESRV_ADDR=192.168.2.250:55002
       - JAVA_OPT_EXT=-server -Xms512m -Xmx512m -Xmn256m
     volumes:
       - /Users/koala/rocketmq/data/broker/logs:/home/rocketmq/logs
@@ -40,8 +40,8 @@ services:
     ports:
       - 55003:8080
     links:
-      - namesrv
+      - 192.168.2.250
     depends_on:
-      - namesrv
+      - 192.168.2.250
     environment:
-      - NAMESRV_ADDR=namesrv:9876
+      - NAMESRV_ADDR=192.168.2.250:55002
