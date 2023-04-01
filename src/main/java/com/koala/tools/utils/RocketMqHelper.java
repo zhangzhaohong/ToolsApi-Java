@@ -9,6 +9,7 @@ import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.messaging.Message;
+import org.springframework.stereotype.Component;
 
 /**
  * @author koala
@@ -16,6 +17,8 @@ import org.springframework.messaging.Message;
  * @date 2023/3/31 20:40
  * @description 使用component注解后注入失败
  */
+@SuppressWarnings("AlibabaClassNamingShouldBeCamel")
+@Component
 public class RocketMqHelper {
     /**
      * 日志
@@ -26,7 +29,7 @@ public class RocketMqHelper {
      * rocketmq模板注入
      */
     @Resource
-    private RocketMQTemplate rocketMqTemplate;
+    private RocketMQTemplate rocketMQTemplate;
 
     @PostConstruct
     public void init() {
@@ -62,7 +65,7 @@ public class RocketMqHelper {
      * @param message 消息实体
      */
     public void asyncSend(String topic, Message<?> message) {
-        rocketMqTemplate.asyncSend(topic, message, getDefaultSendCallBack());
+        rocketMQTemplate.asyncSend(topic, message, getDefaultSendCallBack());
     }
 
     /**
@@ -73,7 +76,7 @@ public class RocketMqHelper {
      * @param sendCallback 回调函数
      */
     public void asyncSend(String topic, Message<?> message, SendCallback sendCallback) {
-        rocketMqTemplate.asyncSend(topic, message, sendCallback);
+        rocketMQTemplate.asyncSend(topic, message, sendCallback);
     }
 
     /**
@@ -85,7 +88,7 @@ public class RocketMqHelper {
      * @param timeout      超时时间
      */
     public void asyncSend(String topic, Message<?> message, SendCallback sendCallback, long timeout) {
-        rocketMqTemplate.asyncSend(topic, message, sendCallback, timeout);
+        rocketMQTemplate.asyncSend(topic, message, sendCallback, timeout);
     }
 
     /**
@@ -98,7 +101,7 @@ public class RocketMqHelper {
      * @param delayLevel   延迟消息的级别
      */
     public void asyncSend(String topic, Message<?> message, SendCallback sendCallback, long timeout, int delayLevel) {
-        rocketMqTemplate.asyncSend(topic, message, sendCallback, timeout, delayLevel);
+        rocketMQTemplate.asyncSend(topic, message, sendCallback, timeout, delayLevel);
     }
 
     /**
@@ -122,7 +125,7 @@ public class RocketMqHelper {
      */
     public void syncSendOrderly(String topic, Message<?> message, String hashKey) {
         LOG.info("发送顺序消息，topic: {},hashKey: {}", topic, hashKey);
-        rocketMqTemplate.syncSendOrderly(topic, message, hashKey);
+        rocketMQTemplate.syncSendOrderly(topic, message, hashKey);
     }
 
     /**
@@ -135,7 +138,7 @@ public class RocketMqHelper {
      */
     public void syncSendOrderly(String topic, Message<?> message, String hashKey, long timeout) {
         LOG.info("发送顺序消息，topic: {},hashKey: {},timeout: {}", topic, hashKey, timeout);
-        rocketMqTemplate.syncSendOrderly(topic, message, hashKey, timeout);
+        rocketMQTemplate.syncSendOrderly(topic, message, hashKey, timeout);
     }
 
     /**
