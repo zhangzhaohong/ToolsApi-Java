@@ -1,4 +1,4 @@
-package com.koala.tools.utils;
+package com.koala.tools.rocketmq;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;

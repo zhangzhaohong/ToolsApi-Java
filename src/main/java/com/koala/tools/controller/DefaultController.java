@@ -6,7 +6,7 @@ import com.koala.tools.redis.service.RedisService;
 import com.koala.tools.rocketmq.enums.TopicEnums;
 import com.koala.tools.rocketmq.model.DemoModel;
 import com.koala.tools.utils.GsonUtil;
-import com.koala.tools.utils.RocketMqHelper;
+import com.koala.tools.rocketmq.RocketMqHelper;
 import lombok.NonNull;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.MediaType;
