@@ -75,6 +75,16 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <dependency>
+            <groupId>org.apache.rocketmq</groupId>
+            <artifactId>rocketmq-client</artifactId>
+            <version>5.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.rocketmq</groupId>
+            <artifactId>rocketmq-common</artifactId>
+            <version>5.1.0</version>
+        </dependency>
         <!-- mybatis-plus 3.5.3 才支持 spring boot 3-->
         <dependency>
             <groupId>com.baomidou</groupId>
