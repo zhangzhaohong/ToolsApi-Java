@@ -3,7 +3,8 @@ package com.koala.tools.controller;
 import com.koala.tools.http.annotation.MixedHttpRequest;
 import com.koala.tools.models.demo.TestModel;
 import com.koala.tools.redis.service.RedisService;
-import com.koala.tools.rocketmq.enums.TopicEnums;
+import com.koala.tools.rocketmq.data.TopicData;
+import com.koala.tools.rocketmq.data.TopicEnums;
 import com.koala.tools.rocketmq.model.DemoModel;
 import com.koala.tools.utils.GsonUtil;
 import com.koala.tools.rocketmq.RocketMqHelper;
@@ -97,7 +98,7 @@ public class DefaultController {
 
     @GetMapping("mq/test")
     public String pushMq() {
-        rocketMqHelper.asyncSend(TopicEnums.DEMO.getTopicName(), MessageBuilder.withPayload(new DemoModel(System.currentTimeMillis(), "Hello world")).build());
+        rocketMqHelper.asyncSend(TopicData.DEMO, MessageBuilder.withPayload(new DemoModel(System.currentTimeMillis(), "Hello world")).build());
         return "ok";
     }
 

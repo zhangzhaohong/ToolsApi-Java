@@ -1,5 +1,6 @@
 package com.koala.tools.rocketmq.consumer;
 
+import com.koala.tools.rocketmq.data.TopicData;
 import com.koala.tools.rocketmq.model.DemoModel;
 import com.koala.tools.utils.GsonUtil;
 import org.apache.rocketmq.spring.annotation.RocketMQMessageListener;
@@ -15,7 +16,7 @@ import org.springframework.stereotype.Component;
  * @description
  */
 @Component
-@RocketMQMessageListener(consumerGroup = "${rocketmq.consumer.group}", topic = "demo")
+@RocketMQMessageListener(consumerGroup = "${rocketmq.consumer.group}", topic = TopicData.DEMO)
 public class DemoRocketMqListener implements RocketMQListener<DemoModel> {
 
     private static final Logger LOG = LoggerFactory.getLogger(DemoRocketMqListener.class);
