@@ -16,7 +16,7 @@ import org.springframework.messaging.Message;
  * @date 2023/3/31 20:40
  * @description 使用component注解后注入失败
  */
-@SuppressWarnings("AlibabaClassNamingShouldBeCamel")
+@SuppressWarnings({"AlibabaClassNamingShouldBeCamel", "AlibabaLowerCamelCaseVariableNaming"})
 public class RocketMqHelper {
     /**
      * 日志
