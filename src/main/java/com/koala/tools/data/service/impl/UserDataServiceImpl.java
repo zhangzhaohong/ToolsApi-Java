@@ -3,7 +3,7 @@ package com.koala.tools.data.service.impl;
 import com.koala.tools.data.dataModel.userData.UserDataTable;
 import com.koala.tools.data.mapper.UserDataMapper;
 import com.koala.tools.data.service.UserDataService;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 
 /**

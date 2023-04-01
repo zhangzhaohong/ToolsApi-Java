@@ -2,7 +2,7 @@ package com.koala.tools.controller;
 
 import com.koala.tools.data.dataModel.userData.UserDataTable;
 import com.koala.tools.data.service.UserDataService;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

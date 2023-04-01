@@ -1,14 +1,15 @@
 package com.koala.tools.utils;
 
-import jakarta.annotation.PostConstruct;
-import jakarta.annotation.PreDestroy;
-import jakarta.annotation.Resource;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import javax.annotation.Resource;
 import org.apache.rocketmq.client.producer.SendCallback;
 import org.apache.rocketmq.client.producer.SendResult;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.messaging.Message;
+import org.springframework.stereotype.Component;
 
 /**
  * @author koala
@@ -16,6 +17,7 @@ import org.springframework.messaging.Message;
  * @date 2023/3/31 20:40
  * @description 使用component注解后注入失败
  */
+@Component
 @SuppressWarnings({"AlibabaClassNamingShouldBeCamel", "AlibabaLowerCamelCaseVariableNaming"})
 public class RocketMqHelper {
     /**
