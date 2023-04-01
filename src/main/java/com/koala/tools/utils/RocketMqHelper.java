@@ -18,7 +18,6 @@ import org.springframework.stereotype.Component;
  * @description 使用component注解后注入失败
  */
 @SuppressWarnings("AlibabaClassNamingShouldBeCamel")
-@Component
 public class RocketMqHelper {
     /**
      * 日志
