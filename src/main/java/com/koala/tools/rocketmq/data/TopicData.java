@@ -8,4 +8,6 @@ package com.koala.tools.rocketmq.data;
  */
 public class TopicData {
     public static final String DEMO = "demo";
+    public static final String DEMO_CHANNEL_1 = "channel_1";
+    public static final String DEMO_CHANNEL_2 = "channel_2";
 }
