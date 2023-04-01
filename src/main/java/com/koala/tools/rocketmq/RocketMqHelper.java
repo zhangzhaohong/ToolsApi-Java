@@ -33,7 +33,7 @@ public class RocketMqHelper {
 
     @PostConstruct
     public void init() {
-        LOG.info("RocketMq助手初始化");
+        LOG.info("on init RocketMq");
     }
 
     /**
@@ -124,7 +124,7 @@ public class RocketMqHelper {
      * @param hashKey
      */
     public void syncSendOrderly(String topic, Message<?> message, String hashKey) {
-        LOG.info("发送顺序消息，topic: {},hashKey: {}", topic, hashKey);
+        LOG.info("on send syncSendOrderly，topic: {},hashKey: {}", topic, hashKey);
         rocketMQTemplate.syncSendOrderly(topic, message, hashKey);
     }
 
@@ -137,7 +137,7 @@ public class RocketMqHelper {
      * @param timeout
      */
     public void syncSendOrderly(String topic, Message<?> message, String hashKey, long timeout) {
-        LOG.info("发送顺序消息，topic: {},hashKey: {},timeout: {}", topic, hashKey, timeout);
+        LOG.info("on send syncSendOrderly，topic: {},hashKey: {},timeout: {}", topic, hashKey, timeout);
         rocketMQTemplate.syncSendOrderly(topic, message, hashKey, timeout);
     }
 
@@ -150,12 +150,12 @@ public class RocketMqHelper {
         return new SendCallback() {
             @Override
             public void onSuccess(SendResult sendResult) {
-                LOG.info("发送MQ成功");
+                LOG.info("on send mq message success");
             }
 
             @Override
             public void onException(Throwable throwable) {
-                LOG.error("发送MQ失败: {}", throwable.getMessage());
+                LOG.error("on send mq message failed: {}", throwable.getMessage());
             }
         };
     }
@@ -163,6 +163,6 @@ public class RocketMqHelper {
 
     @PreDestroy
     public void destroy() {
-        LOG.info("RocketMq助手注销");
+        LOG.info("on destroy RocketMq");
     }
 }
