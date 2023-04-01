@@ -23,6 +23,7 @@ public class DemoRocketMqListener implements RocketMQListener<DemoModel> {
 
     @Override
     public void onMessage(DemoModel demoModel) {
-        LOG.info("on message[{}]: {}", System.currentTimeMillis(), GsonUtil.toString(demoModel));
+        Long current = System.currentTimeMillis();
+        LOG.info("on message[{}] - [cost: {}]: {}", current, (current - demoModel.getId()) + "ms", GsonUtil.toString(demoModel));
     }
 }
