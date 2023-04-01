@@ -3,10 +3,14 @@ package com.koala.tools.controller;
 import com.koala.tools.http.annotation.MixedHttpRequest;
 import com.koala.tools.models.demo.TestModel;
 import com.koala.tools.redis.service.RedisService;
+import com.koala.tools.rocketmq.enums.TopicEnums;
+import com.koala.tools.rocketmq.model.DemoModel;
 import com.koala.tools.utils.GsonUtil;
+import com.koala.tools.utils.RocketMqHelper;
 import lombok.NonNull;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.MediaType;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -25,6 +29,9 @@ public class DefaultController {
 
     @Resource
     private RedisTemplate<String, String> redisTemplate;
+
+    @Resource
+    private RocketMqHelper rocketMqHelper;
 
     @Resource(name = "RedisService")
     private RedisService redisService;
@@ -69,7 +76,7 @@ public class DefaultController {
 
     @GetMapping("redis/getList")
     public List<String> getListRedis(@NonNull @MixedHttpRequest String key) {
-        return redisTemplate.opsForList().range(key, 0 , -1);
+        return redisTemplate.opsForList().range(key, 0, -1);
     }
 
     @GetMapping("redis/set/input")
@@ -86,6 +93,12 @@ public class DefaultController {
     @GetMapping("redis/set/get")
     public Set<String> setGet(@MixedHttpRequest String key) {
         return redisTemplate.opsForSet().members(key);
+    }
+
+    @GetMapping("mq/test")
+    public String pushMq() {
+        rocketMqHelper.asyncSend(TopicEnums.DEMO.getTopicName(), MessageBuilder.withPayload(new DemoModel(System.currentTimeMillis(), "Hello world")).build());
+        return "ok";
     }
 
 }
