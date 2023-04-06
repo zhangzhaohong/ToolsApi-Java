@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
  * @description
  */
 @Component
-@RocketMQMessageListener(consumerGroup = "${rocketmq.consumer.group}", topic = TopicData.DEMO, selectorExpression = TopicData.DEMO_CHANNEL_1, consumeThreadNumber = 2)
+@RocketMQMessageListener(consumerGroup = "${rocketmq.consumer.group}", topic = TopicData.DEMO, selectorExpression = TopicData.DEMO_CHANNEL_1, consumeThreadNumber = 4)
 public class DemoRocketMqListener implements RocketMQListener<DemoModel> {
 
     private static final Logger LOG = LoggerFactory.getLogger(DemoRocketMqListener.class);
@@ -24,7 +24,7 @@ public class DemoRocketMqListener implements RocketMQListener<DemoModel> {
     @Override
     public void onMessage(DemoModel demoModel) {
         try {
-            Thread.sleep(5000);
+            Thread.sleep(2000);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
