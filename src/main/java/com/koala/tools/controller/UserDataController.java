@@ -2,7 +2,11 @@ package com.koala.tools.controller;
 
 import com.koala.tools.data.dataModel.userData.UserDataTable;
 import com.koala.tools.data.service.UserDataService;
+
 import javax.annotation.Resource;
+
+import com.koala.tools.http.annotation.MixedHttpRequest;
+import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,10 +30,10 @@ public class UserDataController {
     private UserDataService userDataService;
 
     @GetMapping("/user/register")
-    public Long register() {
+    public Long register(@MixedHttpRequest String nickName, @NonNull @MixedHttpRequest String password, @MixedHttpRequest Integer roleType, @MixedHttpRequest String specialRoles, @MixedHttpRequest String email) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
         Date date = new Date();
-        UserDataTable userData = new UserDataTable(Long.parseLong(simpleDateFormat.format(date)), "test", "123456", -1, "[]");
+        UserDataTable userData = new UserDataTable(Long.parseLong(simpleDateFormat.format(date)), nickName, password, roleType, specialRoles, email);
         return userDataService.registerUser(userData);
     }
 

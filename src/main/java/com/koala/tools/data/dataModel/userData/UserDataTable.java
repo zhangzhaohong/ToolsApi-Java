@@ -1,7 +1,6 @@
 package com.koala.tools.data.dataModel.userData;
 
 import com.baomidou.mybatisplus.annotation.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -22,6 +21,7 @@ public class UserDataTable implements Serializable {
     private String password;
     private Integer roleType;
     private String specialRoles;
+    private String email;
     @TableField(fill = FieldFill.INSERT)
     private String userToken = null;
     @TableField(fill = FieldFill.INSERT)
@@ -29,11 +29,12 @@ public class UserDataTable implements Serializable {
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private Long updated = null;
 
-    public UserDataTable(Long userId, String nickName, String password, Integer roleType, String specialRoles) {
+    public UserDataTable(Long userId, String nickName, String password, Integer roleType, String specialRoles, String email) {
         this.userId = userId;
         this.nickName = nickName;
         this.password = password;
         this.roleType = roleType;
         this.specialRoles = specialRoles;
+        this.email = email;
     }
 }
