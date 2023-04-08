@@ -1,7 +1,7 @@
 package com.koala.tools.http.processor;
 
 import com.koala.tools.http.annotation.MixedHttpRequest;
-import jakarta.servlet.ServletRequest;
+import javax.servlet.ServletRequest;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.core.MethodParameter;
@@ -13,7 +13,7 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 import org.springframework.web.servlet.mvc.method.annotation.RequestResponseBodyMethodProcessor;
 import org.springframework.web.servlet.mvc.method.annotation.ServletModelAttributeMethodProcessor;
 
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;

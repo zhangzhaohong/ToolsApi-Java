@@ -3,14 +3,18 @@ package com.koala.tools.interceptor;
 import com.koala.tools.BeanContext;
 import com.koala.tools.redis.RedisLockUtil;
 import com.koala.tools.utils.RemoteIpUtils;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Arrays;
+import java.util.Objects;
 
 import static com.koala.tools.utils.RespUtil.formatRespDataWithCustomMsg;
 
@@ -27,9 +31,11 @@ public class FirewallInterceptor implements HandlerInterceptor {
 
     private static final String IP_URL_REQ_TIME = "ip_url_times_";
 
-    private static final long LIMIT_TIMES = 5;
+    private static final Integer LIMIT_TIMES = 5;
 
-    private static final int IP_LOCK_TIME = 60 * 60;
+    private static final Integer IP_LOCK_TIME = 60 * 60;
+
+    private static final String[] WHITE_LIST_HOST = new String[]{"127.0.0.1", "0:0:0:0:0:0:0:1"};
 
     private RedisLockUtil getRedisLockUtil() {
         return BeanContext.getBean(RedisLockUtil.class);
@@ -39,6 +45,10 @@ public class FirewallInterceptor implements HandlerInterceptor {
     public boolean preHandle(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler) throws Exception {
         final String ip = RemoteIpUtils.getRemoteIpByServletRequest(request, true);
         log.info("request请求地址uri={},ip={}", request.getRequestURI(), ip);
+        if (Arrays.asList(WHITE_LIST_HOST).contains(ip)) {
+            log.info("白名单IP，自动放过={}", ip);
+            return true;
+        }
         RedisLockUtil redisLockUtil = getRedisLockUtil();
         if (!redisLockUtil.getRedisStatus()) {
             log.info("redis连接异常，自动放过={}", ip);

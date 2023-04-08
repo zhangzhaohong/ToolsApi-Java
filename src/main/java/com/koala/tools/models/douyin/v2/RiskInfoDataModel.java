@@ -1,4 +1,4 @@
-package com.koala.tools.models.douyin;
+package com.koala.tools.models.douyin.v2;
 
 import com.google.gson.annotations.SerializedName;
 import lombok.Data;

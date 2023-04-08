@@ -1,21 +1,22 @@
-package com.koala.tools.models.douyin;
+package com.koala.tools.models.douyin.v1;
 
 import com.google.gson.annotations.SerializedName;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 
 /**
  * @author koala
  * @version 1.0
- * @date 2022/2/19 14:34
+ * @date 2022/2/19 20:38
  * @description
  */
 @Data
 public class ItemInfoRespModel implements Serializable {
+    @SerializedName("aweme_detail")
+    private AwemeDetailModel awemeDetailModel;
+    @SerializedName("log_pb")
+    private LogPbModel logPb;
     @SerializedName("status_code")
-    private Integer statusCode;
-    @SerializedName("item_list")
-    private ArrayList<ItemInfoDataModel> itemList = new ArrayList<>(0);
+    private int statusCode;
 }
