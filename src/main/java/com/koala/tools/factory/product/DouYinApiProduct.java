@@ -1,7 +1,7 @@
 package com.koala.tools.factory.product;
 
 import com.koala.tools.enums.DouYinTypeEnums;
-import com.koala.tools.models.douyin.ItemInfoRespModel;
+import com.koala.tools.models.douyin.v2.ItemInfoRespModel;
 import com.koala.tools.utils.GsonUtil;
 import com.koala.tools.utils.HeaderUtil;
 import com.koala.tools.utils.HttpClientUtil;

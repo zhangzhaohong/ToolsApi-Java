@@ -1,4 +1,4 @@
-package com.koala.tools.models.douyin;
+package com.koala.tools.models.douyin.v2;
 
 import com.google.gson.annotations.SerializedName;
 import lombok.Data;
@@ -9,11 +9,11 @@ import java.util.ArrayList;
 /**
  * @author koala
  * @version 1.0
- * @date 2022/2/19 15:05
+ * @date 2022/2/19 14:45
  * @description
  */
 @Data
-public class AuthorUrlInfoDataModel implements Serializable {
+public class VideoCoverInfoDataModel implements Serializable {
     private String uri;
     @SerializedName("url_list")
     private ArrayList<String> urlList;
