@@ -41,6 +41,7 @@ public class LanZouApiProduct {
         HOST_LIST.add("https://www.lanzouw.com");
         HOST_LIST.add("https://wwx.lanzouj.com");
         HOST_LIST.add("https://wwi.lanzouj.com");
+        HOST_LIST.add("https://wwtr.lanzoue.com");
         INVALID_LIST.put(201, Arrays.asList("文件取消分享了", "文件不存在", "访问地址错误，请核查"));
         INVALID_LIST.put(202, List.of("输入密码"));
     }
@@ -226,10 +227,8 @@ public class LanZouApiProduct {
         }
         fileInfo.setUpdateTime(updateTime);
         fileInfo.setAuthor(PatternUtil.matchData("发布者:<\\/span>(.*?)<span class=\"mt2\">", inputPageInfo));
-        String down1 = PatternUtil.matchData("var\\ loaddown\\ =\\ '(.*?)';", inputPageInfo);
-        String down2 = PatternUtil.matchData("var\\ downloads\\ =\\ '(.*?)';", inputPageInfo);
-        fileInfo.setDownloadHost(PatternUtil.matchData("submit.href\\ =\\ '(.*?)'" + (!Objects.isNull(down1) ? "\\ \\+\\ loaddown" : !Objects.isNull(down2) ? "\\ \\+\\ downloads" : ""), inputPageInfo));
-        fileInfo.setDownloadPath(!Objects.isNull(down1) ? down1 : down2);
+        fileInfo.setDownloadHost(PatternUtil.matchData("var\\ tedomain\\ =\\ '(.*?)';", inputPageInfo));
+        fileInfo.setDownloadPath(PatternUtil.matchData("var\\ domianload\\ =\\ '(.*?)';", inputPageInfo));
         fileInfo.setDownloadUrl(!Objects.isNull(fileInfo.getDownloadHost()) && !Objects.isNull(fileInfo.getDownloadPath()) ? fileInfo.getDownloadHost() + fileInfo.getDownloadPath() : null);
         fileInfo.setRedirectUrl(!Objects.isNull(fileInfo.getDownloadHost()) && !Objects.isNull(fileInfo.getDownloadPath()) ? getRedirectUrl(fileInfo.getDownloadHost() + fileInfo.getDownloadPath()) : null);
         logger.info("[LanZouApiProduct]({}) fileInfo: {}", id, fileInfo);
