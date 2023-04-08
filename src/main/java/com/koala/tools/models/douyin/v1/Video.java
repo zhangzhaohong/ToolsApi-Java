@@ -44,4 +44,10 @@ public class Video {
     private PlayAddrInfoModel playAddrH264;
     private String ratio;
     private int width;
+    @SerializedName("real_path")
+    private String realPath = null;
+    @SerializedName("mock_preview_vid_path")
+    private String mockPreviewVidPath = null;
+    @SerializedName("mock_download_vid_path")
+    private String mockDownloadVidPath = null;
 }

@@ -1,7 +1,7 @@
 package com.koala.tools.factory.product;
 
 import com.koala.tools.enums.DouYinTypeEnums;
-import com.koala.tools.models.douyin.v2.ItemInfoRespModel;
+import com.koala.tools.models.douyin.v1.ItemInfoRespModel;
 import com.koala.tools.utils.GsonUtil;
 import com.koala.tools.utils.HeaderUtil;
 import com.koala.tools.utils.HttpClientUtil;
@@ -69,10 +69,8 @@ public class DouYinApiProduct {
 
     public void getItemInfoData() throws IOException, URISyntaxException {
         if (!Objects.isNull(itemId)) {
-            // String itemInfoPath = "https://www.iesdouyin.com/web/api/v2/aweme/iteminfo/?item_ids=" + itemId;
             String itemInfoPath = "https://www.douyin.com/aweme/v1/web/aweme/detail/?aweme_id=" + itemId + "&aid=1128&version_name=23.5.0&device_platform=android&os_version=2333&X-Bogus=DFSzswSLj-GANnEftcT4kU9WcBJ/";
             logger.info("[DouYinApiProduct]({}, {}) itemInfoPath: {}", id, itemId, itemInfoPath);
-            // String itemInfoResponse = HttpClientUtil.doGet(itemInfoPath, HeaderUtil.getDouYinDownloadHeader(), null);
             String itemInfoResponse = HttpClientUtil.doGet(itemInfoPath, HeaderUtil.getDouYinSpecialHeader(this.token, this.ticket), null);
             logger.info("[DouYinApiProduct]({}, {}) itemInfoResponse: {}", id, itemId, itemInfoResponse);
             try {
@@ -95,35 +93,18 @@ public class DouYinApiProduct {
     }
 
     public ItemInfoRespModel generateData() {
-        this.itemInfo.getItemList().forEach(item -> {
-            try {
-                switch (Objects.requireNonNull(DouYinTypeEnums.getEnumsByCode(item.getAwemeType()))) {
-                    case VIDEO_TYPE:
-                        String vid = item.getVideo().getVid();
-                        String ratio = item.getVideo().getRatio();
-                        if (StringUtils.isEmpty(ratio) || Objects.equals(ratio, "default")) {
-                            ratio = "540p";
-                        }
-                        if (!StringUtils.isEmpty(vid)) {
-                            String link = "https://aweme.snssdk.com/aweme/v1/play/?video_id=" + vid + "&line=0&ratio=" + ratio + "&media_type=4&vr_type=0&improve_bitrate=0&is_play_url=1&is_support_h265=0&source=PackSourceEnum_PUBLISH";
-                            item.getVideo().setRealPath(link);
-                            item.getVideo().setMockPreviewVidPath(host + "tools/DouYin/player/video?vid=" + vid + "&ratio=" + ratio + "&isDownload=0");
-                            item.getVideo().setMockDownloadVidPath(host + "tools/DouYin/player/video?vid=" + vid + "&ratio=" + ratio + "&isDownload=1");
-                            // logger.info("[DouYinApiProduct]({}, {}) realFile: {}", id, itemId,HttpClientUtil.doGetRedirectLocation(link, HeaderUtil.getDouYinDownloadHeader(), null));
-                        }
-                        break;
-                    case IMAGE_TYPE:
-                        item.setVideo(null);
-                        break;
-                    default:
-                        item.setVideo(null);
-                        item.setImages(null);
-                        break;
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
+        String vid = this.itemInfo.getAwemeDetailModel().getVideo().getPlayAddrInfoModel().getUri();
+        String ratio = this.itemInfo.getAwemeDetailModel().getVideo().getRatio();
+        if (StringUtils.isEmpty(ratio) || Objects.equals(ratio, "default")) {
+            ratio = "540p";
+        }
+        if (!StringUtils.isEmpty(vid)) {
+            String link = "https://aweme.snssdk.com/aweme/v1/play/?video_id=" + vid + "&line=0&ratio=" + ratio + "&media_type=4&vr_type=0&improve_bitrate=0&is_play_url=1&is_support_h265=0&source=PackSourceEnum_PUBLISH";
+            this.itemInfo.getAwemeDetailModel().getVideo().setRealPath(link);
+            this.itemInfo.getAwemeDetailModel().getVideo().setMockPreviewVidPath(host + "tools/DouYin/player/video?vid=" + vid + "&ratio=" + ratio + "&isDownload=0");
+            this.itemInfo.getAwemeDetailModel().getVideo().setMockDownloadVidPath(host + "tools/DouYin/player/video?vid=" + vid + "&ratio=" + ratio + "&isDownload=1");
+            // logger.info("[DouYinApiProduct]({}, {}) realFile: {}", id, itemId,HttpClientUtil.doGetRedirectLocation(link, HeaderUtil.getDouYinDownloadHeader(), null));
+        }
         logger.info("[DouYinApiProduct]({}, {}) itemInfo: {}", id, itemId, this.itemInfo);
         return this.itemInfo;
     }

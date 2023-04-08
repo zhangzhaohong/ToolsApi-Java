@@ -6,7 +6,7 @@ import com.koala.tools.factory.builder.DouYinApiBuilder;
 import com.koala.tools.factory.director.DouYinApiManager;
 import com.koala.tools.factory.product.DouYinApiProduct;
 import com.koala.tools.http.annotation.MixedHttpRequest;
-import com.koala.tools.models.douyin.v2.ItemInfoRespModel;
+import com.koala.tools.models.douyin.v1.ItemInfoRespModel;
 import com.koala.tools.utils.HeaderUtil;
 import com.koala.tools.utils.HttpClientUtil;
 import org.slf4j.Logger;
@@ -114,13 +114,13 @@ public class DouYinToolsController {
                     ItemInfoRespModel productData = product.generateData();
                     switch (Objects.requireNonNull(DouYinRequestTypeEnums.getEnumsByType(type))) {
                         case DOWNLOAD:
-                            if (!Objects.isNull(productData) && !Objects.isNull(productData.getItemList()) && !productData.getItemList().isEmpty() && !Objects.isNull(productData.getItemList().get(0).getVideo()) && !StringUtils.isEmpty(productData.getItemList().get(0).getVideo().getMockDownloadVidPath())) {
-                                redirectStrategy.sendRedirect(request, response, productData.getItemList().get(0).getVideo().getMockDownloadVidPath());
+                            if (!Objects.isNull(productData) && !Objects.isNull(productData.getAwemeDetailModel()) && !Objects.isNull(productData.getAwemeDetailModel().getVideo()) && !StringUtils.isEmpty(productData.getAwemeDetailModel().getVideo().getMockDownloadVidPath())) {
+                                redirectStrategy.sendRedirect(request, response, productData.getAwemeDetailModel().getVideo().getMockDownloadVidPath());
                             }
                             break;
                         case PREVIEW:
-                            if (!Objects.isNull(productData) && !Objects.isNull(productData.getItemList()) && !productData.getItemList().isEmpty() && !Objects.isNull(productData.getItemList().get(0).getVideo()) && !StringUtils.isEmpty(productData.getItemList().get(0).getVideo().getMockPreviewVidPath())) {
-                                redirectStrategy.sendRedirect(request, response, productData.getItemList().get(0).getVideo().getMockPreviewVidPath());
+                            if (!Objects.isNull(productData) && !Objects.isNull(productData.getAwemeDetailModel()) && !Objects.isNull(productData.getAwemeDetailModel().getVideo()) && !StringUtils.isEmpty(productData.getAwemeDetailModel().getVideo().getMockPreviewVidPath())) {
+                                redirectStrategy.sendRedirect(request, response, productData.getAwemeDetailModel().getVideo().getMockPreviewVidPath());
                             }
                             break;
                         case INFO:
