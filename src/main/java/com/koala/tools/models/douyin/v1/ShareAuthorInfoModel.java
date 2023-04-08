@@ -12,19 +12,13 @@ import java.io.Serializable;
  * @description
  */
 @Data
-public class ShareInfoModel implements Serializable {
+public class ShareAuthorInfoModel implements Serializable {
     @SerializedName("share_desc")
     private String shareDesc;
     @SerializedName("share_desc_info")
     private String shareDescInfo;
-    @SerializedName("share_qrcode_url")
-    private ShareQrCodeInfoModel shareQrCodeInfoModel;
-    @SerializedName("share_title")
-    private String shareTitle;
-    @SerializedName("share_title_myself")
-    private String shareTitleMyself;
+    @SerializedName("share_link_desc")
+    private String shareLinkDesc;
     @SerializedName("share_url")
     private String shareUrl;
-    @SerializedName("share_weibo_desc")
-    private String shareWeiboDesc;
 }

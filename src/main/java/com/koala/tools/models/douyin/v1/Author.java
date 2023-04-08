@@ -77,7 +77,7 @@ public class Author implements Serializable {
     private String secUid;
     private Integer secret;
     @SerializedName("share_info")
-    private ShareInfoModel shareInfoModel;
+    private ShareAuthorInfoModel shareInfoModel;
     @SerializedName("short_id")
     private String shortId;
     private String signature;
