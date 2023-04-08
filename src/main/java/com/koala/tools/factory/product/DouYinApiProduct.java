@@ -36,7 +36,7 @@ public class DouYinApiProduct {
 
     public void init() throws IOException {
         this.token = RandomStringUtils.randomAlphabetic(107);
-        List<Cookie> cookieData = HttpClientUtil.doPostJsonAndReturnCookie("https://ttwid.bytedance.com/ttwid/union/register/", TICKET_REGISTER_BODY);
+        List<Cookie> cookieData = HttpClientUtil.doPostJsonAndReturnCookie("https://ttwid.bytedance.com/ttwid/union/register/", HeaderUtil.getDouYinTicketGeneratorHeader(), TICKET_REGISTER_BODY);
         Optional<Cookie> ticketData = cookieData.stream().filter(item -> "ttwid".equals(item.getName())).findFirst();
         ticketData.ifPresent(cookie -> this.ticket = cookie.getValue());
     }
