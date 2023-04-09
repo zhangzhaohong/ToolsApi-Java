@@ -71,20 +71,26 @@ public class DouYinApiProduct {
 
     public void getItemInfoData() throws IOException, URISyntaxException {
         if (!Objects.isNull(itemId)) {
-            String itemInfoPath = "https://www.douyin.com/aweme/v1/web/aweme/detail/?aweme_id=" + itemId + "&aid=1128&version_name=23.5.0&device_platform=android&os_version=2333";
-            logger.info("[DouYinApiProduct]({}, {}) itemInfoPath: {}", id, itemId, itemInfoPath);
-            XbogusDataModel xbogusDataModel = XbogusUtil.encrypt(itemInfoPath);
-            if (Objects.isNull(xbogusDataModel) || ObjectUtils.isEmpty(xbogusDataModel.getUrl())) {
-                logger.error("[DouYinApiProduct]({}, {}) encrypt error, encryptResult: {}", id, itemId, xbogusDataModel);
-                throw new NullPointerException("encrypt error");
-            }
-            logger.info("[DouYinApiProduct]({}, {}) encryptResult: {}", id, itemId, xbogusDataModel);
-            String itemInfoResponse = HttpClientUtil.doGet(xbogusDataModel.getUrl(), HeaderUtil.getDouYinSpecialHeader(xbogusDataModel.getMstoken(), xbogusDataModel.getTtwid()), null);
-            logger.info("[DouYinApiProduct]({}, {}) itemInfoResponse: {}", id, itemId, itemInfoResponse);
-            try {
-                this.itemInfo = GsonUtil.toBean(itemInfoResponse, ItemInfoRespModel.class);
-            } catch (Exception e) {
-                e.printStackTrace();
+            switch (Objects.requireNonNull(DouYinTypeEnums.getEnumsByCode(this.itemTypeId))) {
+                case VIDEO_TYPE -> {
+                    String itemInfoPath = "https://www.douyin.com/aweme/v1/web/aweme/detail/?aweme_id=" + itemId + "&aid=1128&version_name=23.5.0&device_platform=android&os_version=2333";
+                    logger.info("[DouYinApiProduct]({}, {}) itemInfoPath: {}", id, itemId, itemInfoPath);
+                    XbogusDataModel xbogusDataModel = XbogusUtil.encrypt(itemInfoPath);
+                    if (Objects.isNull(xbogusDataModel) || ObjectUtils.isEmpty(xbogusDataModel.getUrl())) {
+                        logger.error("[DouYinApiProduct]({}, {}) encrypt error, encryptResult: {}", id, itemId, xbogusDataModel);
+                        throw new NullPointerException("encrypt error");
+                    }
+                    logger.info("[DouYinApiProduct]({}, {}) encryptResult: {}", id, itemId, xbogusDataModel);
+                    String itemInfoResponse = HttpClientUtil.doGet(xbogusDataModel.getUrl(), HeaderUtil.getDouYinSpecialHeader(xbogusDataModel.getMstoken(), xbogusDataModel.getTtwid()), null);
+                    logger.info("[DouYinApiProduct]({}, {}) itemInfoResponse: {}", id, itemId, itemInfoResponse);
+                    try {
+                        this.itemInfo = GsonUtil.toBean(itemInfoResponse, ItemInfoRespModel.class);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+                case IMAGE_TYPE, default ->
+                        logger.info("[DouYinApiProduct]({}, {}) Unsupported item type id: {}", id, itemId, itemTypeId);
             }
         }
     }
@@ -101,17 +107,23 @@ public class DouYinApiProduct {
     }
 
     public ItemInfoRespModel generateData() {
-        String vid = this.itemInfo.getAwemeDetailModel().getVideo().getPlayAddrInfoModel().getUri();
-        String ratio = this.itemInfo.getAwemeDetailModel().getVideo().getRatio();
-        if (ObjectUtils.isEmpty(ratio) || Objects.equals(ratio, "default")) {
-            ratio = "540p";
-        }
-        if (!ObjectUtils.isEmpty(vid)) {
-            String link = "https://aweme.snssdk.com/aweme/v1/play/?video_id=" + vid + "&line=0&ratio=" + ratio + "&media_type=4&vr_type=0&improve_bitrate=0&is_play_url=1&is_support_h265=0&source=PackSourceEnum_PUBLISH";
-            this.itemInfo.getAwemeDetailModel().getVideo().setRealPath(link);
-            this.itemInfo.getAwemeDetailModel().getVideo().setMockPreviewVidPath(host + "tools/DouYin/player/video?vid=" + vid + "&ratio=" + ratio + "&isDownload=0");
-            this.itemInfo.getAwemeDetailModel().getVideo().setMockDownloadVidPath(host + "tools/DouYin/player/video?vid=" + vid + "&ratio=" + ratio + "&isDownload=1");
-            // logger.info("[DouYinApiProduct]({}, {}) realFile: {}", id, itemId,HttpClientUtil.doGetRedirectLocation(link, HeaderUtil.getDouYinDownloadHeader(), null));
+        switch (Objects.requireNonNull(DouYinTypeEnums.getEnumsByCode(this.itemTypeId))) {
+            case VIDEO_TYPE -> {
+                String vid = this.itemInfo.getAwemeDetailModel().getVideo().getPlayAddrInfoModel().getUri();
+                String ratio = this.itemInfo.getAwemeDetailModel().getVideo().getRatio();
+                if (ObjectUtils.isEmpty(ratio) || Objects.equals(ratio, "default")) {
+                    ratio = "540p";
+                }
+                if (!ObjectUtils.isEmpty(vid)) {
+                    String link = "https://aweme.snssdk.com/aweme/v1/play/?video_id=" + vid + "&line=0&ratio=" + ratio + "&media_type=4&vr_type=0&improve_bitrate=0&is_play_url=1&is_support_h265=0&source=PackSourceEnum_PUBLISH";
+                    this.itemInfo.getAwemeDetailModel().getVideo().setRealPath(link);
+                    this.itemInfo.getAwemeDetailModel().getVideo().setMockPreviewVidPath(host + "tools/DouYin/player/video?vid=" + vid + "&ratio=" + ratio + "&isDownload=0");
+                    this.itemInfo.getAwemeDetailModel().getVideo().setMockDownloadVidPath(host + "tools/DouYin/player/video?vid=" + vid + "&ratio=" + ratio + "&isDownload=1");
+                    // logger.info("[DouYinApiProduct]({}, {}) realFile: {}", id, itemId,HttpClientUtil.doGetRedirectLocation(link, HeaderUtil.getDouYinDownloadHeader(), null));
+                }
+            }
+            case IMAGE_TYPE, default ->
+                    logger.info("[DouYinApiProduct]({}, {}) Unsupported item type id: {}", id, itemId, itemTypeId);
         }
         logger.info("[DouYinApiProduct]({}, {}) itemInfo: {}", id, itemId, this.itemInfo);
         return this.itemInfo;
