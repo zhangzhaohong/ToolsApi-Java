@@ -25,7 +25,7 @@ public class DouYinApiProduct {
     private String host;
     private String directUrl;
     private String id;
-    private Integer itemTypeId;
+    private Integer itemTypeId = -1;
     private String itemId;
     private ItemInfoRespModel itemInfo;
 
@@ -45,7 +45,11 @@ public class DouYinApiProduct {
 
     public void getItemIdByDirectUrl() {
         if (!Objects.isNull(this.directUrl)) {
-            this.itemId = PatternUtil.matchData("video/(.*?)/", this.directUrl);
+            switch (Objects.requireNonNull(DouYinTypeEnums.getEnumsByCode(this.itemTypeId))) {
+                case VIDEO_TYPE -> this.itemId = PatternUtil.matchData("video/(.*?)/", this.directUrl);
+                case IMAGE_TYPE, default ->
+                        logger.info("[DouYinApiProduct]({}, {}) Unsupported item type id: {}", id, itemId, itemTypeId);
+            }
         }
     }
 
