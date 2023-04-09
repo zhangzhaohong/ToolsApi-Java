@@ -1,5 +1,6 @@
 package com.koala.tools.factory.product;
 
+import com.koala.tools.enums.DouYinTypeEnums;
 import com.koala.tools.models.douyin.v1.ItemInfoRespModel;
 import com.koala.tools.models.xbogus.XbogusDataModel;
 import com.koala.tools.utils.*;
@@ -9,6 +10,7 @@ import org.springframework.util.ObjectUtils;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.Arrays;
 import java.util.Objects;
 
 /**
@@ -23,6 +25,7 @@ public class DouYinApiProduct {
     private String host;
     private String directUrl;
     private String id;
+    private Integer itemTypeId;
     private String itemId;
     private ItemInfoRespModel itemInfo;
 
@@ -43,6 +46,16 @@ public class DouYinApiProduct {
     public void getItemIdByDirectUrl() {
         if (!Objects.isNull(this.directUrl)) {
             this.itemId = PatternUtil.matchData("video/(.*?)/", this.directUrl);
+        }
+    }
+
+    public void getItemTypeByDirectUrl() {
+        if (!Objects.isNull(this.directUrl)) {
+            Arrays.stream(DouYinTypeEnums.values()).forEach(typeEnum -> {
+                if (!Objects.isNull(typeEnum.getPrefix()) && this.directUrl.contains(typeEnum.getPrefix())) {
+                    this.itemTypeId = typeEnum.getCode();
+                }
+            });
         }
     }
 
@@ -80,7 +93,7 @@ public class DouYinApiProduct {
      * 下面是打印log区域
      */
     public void printParams() {
-        logger.info("[DouYinApiProduct]({}, {}) params: {url={}, directPath={}}", id, itemId, url, directUrl);
+        logger.info("[DouYinApiProduct]({}, {}) params: {url={}, directPath={}, itemTypeId={}}", id, itemId, url, directUrl, itemTypeId);
     }
 
     public ItemInfoRespModel generateData() {
@@ -99,4 +112,5 @@ public class DouYinApiProduct {
         logger.info("[DouYinApiProduct]({}, {}) itemInfo: {}", id, itemId, this.itemInfo);
         return this.itemInfo;
     }
+
 }
