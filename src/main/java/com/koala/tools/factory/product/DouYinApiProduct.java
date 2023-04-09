@@ -2,10 +2,8 @@ package com.koala.tools.factory.product;
 
 import com.koala.tools.enums.DouYinTypeEnums;
 import com.koala.tools.models.douyin.v1.ItemInfoRespModel;
-import com.koala.tools.utils.GsonUtil;
-import com.koala.tools.utils.HeaderUtil;
-import com.koala.tools.utils.HttpClientUtil;
-import com.koala.tools.utils.PatternUtil;
+import com.koala.tools.models.xbogus.XbogusDataModel;
+import com.koala.tools.utils.*;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.http.cookie.Cookie;
 import org.slf4j.Logger;
@@ -24,22 +22,12 @@ import java.util.*;
  */
 public class DouYinApiProduct {
     private static final Logger logger = LoggerFactory.getLogger(DouYinApiProduct.class);
-    private static final String TICKET_REGISTER_BODY = "{\"region\":\"cn\",\"aid\":1768,\"needFid\":false,\"service\":\"www.ixigua.com\",\"migrate_info\":{\"ticket\":\"\",\"source\":\"node\"},\"cbUrlProtocol\":\"https\",\"union\":true}";
-    private String token;
-    private String ticket;
     private String url;
     private String host;
     private String directUrl;
     private String id;
     private String itemId;
     private ItemInfoRespModel itemInfo;
-
-    public void init() throws IOException {
-        this.token = RandomStringUtils.randomAlphabetic(107);
-        List<Cookie> cookieData = HttpClientUtil.doPostJsonAndReturnCookie("https://ttwid.bytedance.com/ttwid/union/register/", HeaderUtil.getDouYinTicketGeneratorHeader(), TICKET_REGISTER_BODY);
-        Optional<Cookie> ticketData = cookieData.stream().filter(item -> "ttwid".equals(item.getName())).findFirst();
-        ticketData.ifPresent(cookie -> this.ticket = cookie.getValue());
-    }
 
     public void setUrl(String url) {
         this.url = url;
@@ -69,9 +57,15 @@ public class DouYinApiProduct {
 
     public void getItemInfoData() throws IOException, URISyntaxException {
         if (!Objects.isNull(itemId)) {
-            String itemInfoPath = "https://www.douyin.com/aweme/v1/web/aweme/detail/?aweme_id=" + itemId + "&aid=1128&version_name=23.5.0&device_platform=android&os_version=2333&X-Bogus=DFSzswSLj-GANnEftcT4kU9WcBJ/";
+            String itemInfoPath = "https://www.douyin.com/aweme/v1/web/aweme/detail/?aweme_id=" + itemId + "&aid=1128&version_name=23.5.0&device_platform=android&os_version=2333";
             logger.info("[DouYinApiProduct]({}, {}) itemInfoPath: {}", id, itemId, itemInfoPath);
-            String itemInfoResponse = HttpClientUtil.doGet(itemInfoPath, HeaderUtil.getDouYinSpecialHeader(this.token, this.ticket), null);
+            XbogusDataModel xbogusDataModel = XbogusUtil.encrypt(itemInfoPath);
+            if (Objects.isNull(xbogusDataModel) || StringUtils.isEmpty(xbogusDataModel.getUrl()) || Objects.isNull(xbogusDataModel.getUrl())) {
+                logger.error("[DouYinApiProduct]({}, {}) encrypt error, encryptResult: {}", id, itemId, xbogusDataModel);
+                throw new NullPointerException("encrypt error");
+            }
+            logger.info("[DouYinApiProduct]({}, {}) encryptResult: {}", id, itemId, xbogusDataModel);
+            String itemInfoResponse = HttpClientUtil.doGet(xbogusDataModel.getUrl(), HeaderUtil.getDouYinSpecialHeader(xbogusDataModel.getMstoken(), xbogusDataModel.getTtwid()), null);
             logger.info("[DouYinApiProduct]({}, {}) itemInfoResponse: {}", id, itemId, itemInfoResponse);
             try {
                 this.itemInfo = GsonUtil.toBean(itemInfoResponse, ItemInfoRespModel.class);

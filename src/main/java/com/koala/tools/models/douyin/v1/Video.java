@@ -14,7 +14,7 @@ import java.util.List;
 @Data
 public class Video {
     @SerializedName("big_thumbs")
-    private String bigThumbs;
+    private Object bigThumbs;
     @SerializedName("bit_rate")
     private List<BitRateInfoModel> bitRateInfoModelList;
     @SerializedName("bit_rate_audio")

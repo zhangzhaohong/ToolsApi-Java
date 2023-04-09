@@ -11,12 +11,6 @@ import java.net.URISyntaxException;
  */
 public class ConcreteDouYinApiBuilder extends DouYinApiBuilder {
     @Override
-    public DouYinApiBuilder init() throws IOException {
-        product.init();
-        return this;
-    }
-
-    @Override
     public DouYinApiBuilder url(String url) {
         product.setUrl(url);
         return this;
