@@ -4,7 +4,6 @@ import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.CookieStore;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -20,13 +19,13 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.springframework.util.ObjectUtils;
-import org.springframework.util.StringUtils;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
@@ -347,7 +346,7 @@ public class HttpClientUtil {
                     responseHeader.forEach(response::addHeader);
                     response.addHeader("Content-Length", String.valueOf(entity.getContentLength()));
                     String rangeString = request.getHeader("Range");
-                    if (!StringUtils.isEmpty(rangeString)) {
+                    if (!ObjectUtils.isEmpty(rangeString)) {
                         long range = Long.parseLong(rangeString.substring(rangeString.indexOf("=") + 1, rangeString.indexOf("-")));
                         response.addHeader("Content-Range", String.valueOf(range + (entity.getContentLength()) - 1));
                     }

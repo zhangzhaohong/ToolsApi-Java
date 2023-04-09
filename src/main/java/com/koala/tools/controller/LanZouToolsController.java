@@ -9,7 +9,7 @@ import com.koala.tools.factory.product.LanZouApiProduct;
 import com.koala.tools.models.file.FileInfoModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.StringUtils;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -74,19 +74,19 @@ public class LanZouToolsController {
         }
         Optional<Map.Entry<Integer, String>> optional = product.checkStatus().entrySet().stream().findFirst();
         if (optional.isPresent()) {
-            if (Objects.equals(optional.get().getKey(), LanZouResponseEnums.GET_FILE_WITH_PASSWORD.getCode()) && StringUtils.isEmpty(password)) {
+            if (Objects.equals(optional.get().getKey(), LanZouResponseEnums.GET_FILE_WITH_PASSWORD.getCode()) && ObjectUtils.isEmpty(password)) {
                 return formatRespData(LanZouResponseEnums.GET_FILE_WITH_PASSWORD, null);
             }
             if (!Objects.equals(optional.get().getKey(), LanZouResponseEnums.GET_FILE_SUCCESS.getCode()) && !Objects.equals(optional.get().getKey(), LanZouResponseEnums.GET_FILE_WITH_PASSWORD.getCode())) {
                 return formatRespDataWithCustomMsg(optional.get().getKey(), optional.get().getValue(), null);
             }
             // 处理数据
-            if (Objects.equals(optional.get().getKey(), LanZouResponseEnums.GET_FILE_WITH_PASSWORD.getCode()) && !StringUtils.isEmpty(password)) {
+            if (Objects.equals(optional.get().getKey(), LanZouResponseEnums.GET_FILE_WITH_PASSWORD.getCode()) && !ObjectUtils.isEmpty(password)) {
                 Object fileInfo = product.getFileWithPassword();
                 if (fileInfo instanceof FileInfoModel) {
                     switch (Objects.requireNonNull(LanZouTypeEnums.getEnumsByType(type))) {
                         case DOWNLOAD:
-                            if (StringUtils.isEmpty(((FileInfoModel) fileInfo).getDownloadUrl())) {
+                            if (ObjectUtils.isEmpty(((FileInfoModel) fileInfo).getDownloadUrl())) {
                                 return formatRespData(LanZouResponseEnums.FAILURE, fileInfo);
                             } else {
                                 if (!Objects.isNull(((FileInfoModel) fileInfo).getRedirectUrl())) {
@@ -113,7 +113,7 @@ public class LanZouToolsController {
                 }
                 switch (Objects.requireNonNull(LanZouTypeEnums.getEnumsByType(type))) {
                     case DOWNLOAD:
-                        if (StringUtils.isEmpty(fileInfo.getDownloadUrl())) {
+                        if (ObjectUtils.isEmpty(fileInfo.getDownloadUrl())) {
                             return formatRespData(LanZouResponseEnums.FAILURE, fileInfo);
                         } else {
                             if (!Objects.isNull(fileInfo.getRedirectUrl())) {

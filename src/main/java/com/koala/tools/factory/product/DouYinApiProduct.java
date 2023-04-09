@@ -1,18 +1,15 @@
 package com.koala.tools.factory.product;
 
-import com.koala.tools.enums.DouYinTypeEnums;
 import com.koala.tools.models.douyin.v1.ItemInfoRespModel;
 import com.koala.tools.models.xbogus.XbogusDataModel;
 import com.koala.tools.utils.*;
-import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.http.cookie.Cookie;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.StringUtils;
+import org.springframework.util.ObjectUtils;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.*;
+import java.util.Objects;
 
 /**
  * @author koala
@@ -60,7 +57,7 @@ public class DouYinApiProduct {
             String itemInfoPath = "https://www.douyin.com/aweme/v1/web/aweme/detail/?aweme_id=" + itemId + "&aid=1128&version_name=23.5.0&device_platform=android&os_version=2333";
             logger.info("[DouYinApiProduct]({}, {}) itemInfoPath: {}", id, itemId, itemInfoPath);
             XbogusDataModel xbogusDataModel = XbogusUtil.encrypt(itemInfoPath);
-            if (Objects.isNull(xbogusDataModel) || StringUtils.isEmpty(xbogusDataModel.getUrl()) || Objects.isNull(xbogusDataModel.getUrl())) {
+            if (Objects.isNull(xbogusDataModel) || ObjectUtils.isEmpty(xbogusDataModel.getUrl())) {
                 logger.error("[DouYinApiProduct]({}, {}) encrypt error, encryptResult: {}", id, itemId, xbogusDataModel);
                 throw new NullPointerException("encrypt error");
             }
@@ -89,10 +86,10 @@ public class DouYinApiProduct {
     public ItemInfoRespModel generateData() {
         String vid = this.itemInfo.getAwemeDetailModel().getVideo().getPlayAddrInfoModel().getUri();
         String ratio = this.itemInfo.getAwemeDetailModel().getVideo().getRatio();
-        if (StringUtils.isEmpty(ratio) || Objects.equals(ratio, "default")) {
+        if (ObjectUtils.isEmpty(ratio) || Objects.equals(ratio, "default")) {
             ratio = "540p";
         }
-        if (!StringUtils.isEmpty(vid)) {
+        if (!ObjectUtils.isEmpty(vid)) {
             String link = "https://aweme.snssdk.com/aweme/v1/play/?video_id=" + vid + "&line=0&ratio=" + ratio + "&media_type=4&vr_type=0&improve_bitrate=0&is_play_url=1&is_support_h265=0&source=PackSourceEnum_PUBLISH";
             this.itemInfo.getAwemeDetailModel().getVideo().setRealPath(link);
             this.itemInfo.getAwemeDetailModel().getVideo().setMockPreviewVidPath(host + "tools/DouYin/player/video?vid=" + vid + "&ratio=" + ratio + "&isDownload=0");

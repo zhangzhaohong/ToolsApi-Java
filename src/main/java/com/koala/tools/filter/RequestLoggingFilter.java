@@ -7,7 +7,7 @@ import com.koala.tools.utils.JsonUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.http.MediaType;
-import org.springframework.util.StringUtils;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.multipart.MultipartResolver;
 
 import javax.servlet.*;
@@ -91,7 +91,7 @@ public class RequestLoggingFilter implements Filter {
             // 获取body
             try {
                 String body = customWrapper.getBody();
-                if (!StringUtils.isEmpty(body) && JsonUtils.isJson(body)) {
+                if (!ObjectUtils.isEmpty(body) && JsonUtils.isJson(body)) {
                     map.put("Body", GsonUtil.toMaps(body));
                 }
             } catch (Exception e) {
@@ -113,7 +113,7 @@ public class RequestLoggingFilter implements Filter {
 
     private ServletRequest getRequest(ServletRequest request) {
         String contentType = request.getContentType();
-        if (!StringUtils.isEmpty(contentType) && contentType.contains("multipart") && request instanceof HttpServletRequest) {
+        if (!ObjectUtils.isEmpty(contentType) && contentType.contains("multipart") && request instanceof HttpServletRequest) {
             return multipartResolver.resolveMultipart((HttpServletRequest) request);
         } else {
             return request;
