@@ -10,7 +10,7 @@ import com.koala.tools.utils.PatternUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
-import org.springframework.util.StringUtils;
+import org.springframework.util.ObjectUtils;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -55,14 +55,14 @@ public class LanZouApiProduct {
     }
 
     public void getIdByUrl() {
-        if (!StringUtils.isEmpty(this.url)) {
+        if (!ObjectUtils.isEmpty(this.url)) {
             String rule = "com/";
             this.id = this.url.substring(this.url.lastIndexOf(rule) + rule.length(), Objects.equals(this.url.lastIndexOf("/"), this.url.lastIndexOf(rule) + rule.length() - 1) ? this.url.length() : this.url.lastIndexOf("/"));
         }
     }
 
     public void initPageData() throws IOException, URISyntaxException {
-        if (!StringUtils.isEmpty(this.id)) {
+        if (!ObjectUtils.isEmpty(this.id)) {
             this.pageData = getPageInfo(0, this.id, 1);
         }
     }
@@ -77,7 +77,7 @@ public class LanZouApiProduct {
             }
         } else {
             String data = requestPageData(index, id, mode);
-            if (StringUtils.isEmpty(data)) {
+            if (ObjectUtils.isEmpty(data)) {
                 index++;
                 return getPageInfo(index, id, mode);
             } else {
@@ -151,7 +151,7 @@ public class LanZouApiProduct {
     public Object getFileWithPassword() throws IOException, URISyntaxException {
         String sign = PatternUtil.matchData("'sign':'(.*?)'", this.pageData);
         logger.info("[LanZouApiProduct]({}) sign: {}", id, sign);
-        if (StringUtils.isEmpty(sign)) {
+        if (ObjectUtils.isEmpty(sign)) {
             // 目录
             String scriptData = PatternUtil.matchData("<script type=\"text/javascript\">(.*?)</script>", this.pageData.replace("\n", ""));
             String paramsData = PatternUtil.matchData("data:\\{(.*?)\\},", this.pageData.replace(" ", "").replace("\n", ""));

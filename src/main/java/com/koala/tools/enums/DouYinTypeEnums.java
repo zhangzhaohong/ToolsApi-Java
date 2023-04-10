@@ -13,15 +13,17 @@ import java.util.Optional;
  */
 @Getter
 public enum DouYinTypeEnums {
-    VIDEO_TYPE("video", 4),
-    IMAGE_TYPE("image", 2);
+    VIDEO_TYPE("video", 4, "/video/"),
+    IMAGE_TYPE("image", 2, null);
 
     private final String type;
     private final Integer code;
+    private final String prefix;
 
-    DouYinTypeEnums(String type, Integer code) {
+    DouYinTypeEnums(String type, Integer code, String prefix) {
         this.type = type;
         this.code = code;
+        this.prefix = prefix;
     }
 
     public static DouYinTypeEnums getEnumsByCode(Integer code) {

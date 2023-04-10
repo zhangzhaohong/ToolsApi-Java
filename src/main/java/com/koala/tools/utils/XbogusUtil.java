@@ -1,9 +1,8 @@
 package com.koala.tools.utils;
 
-import com.google.gson.Gson;
 import com.koala.tools.models.xbogus.XbogusDataModel;
 import com.koala.tools.models.xbogus.XbogusRespDataModel;
-import org.springframework.util.StringUtils;
+import org.springframework.util.ObjectUtils;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -25,9 +24,9 @@ public class XbogusUtil {
         params.put("url", url);
         params.put("userAgent", USER_AGENT);
         String response = HttpClientUtil.doPostJson(HOST, GsonUtil.toString(params));
-        if (!StringUtils.isEmpty(response)) {
+        if (!ObjectUtils.isEmpty(response)) {
             XbogusRespDataModel respData = GsonUtil.toBean(response, XbogusRespDataModel.class);
-            if (!Objects.isNull(respData) && !Objects.isNull(respData.getData()) && !Objects.isNull(respData.getData().getUrl()) && !StringUtils.isEmpty(respData.getData().getUrl())) {
+            if (!Objects.isNull(respData) && !Objects.isNull(respData.getData()) && !ObjectUtils.isEmpty(respData.getData().getUrl())) {
                 return respData.getData();
             }
             return null;
