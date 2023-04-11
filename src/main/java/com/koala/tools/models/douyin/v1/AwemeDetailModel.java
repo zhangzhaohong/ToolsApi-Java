@@ -85,9 +85,9 @@ public class AwemeDetailModel implements Serializable {
     private String imageInfos;
     @SerializedName("image_list")
     private String imageList;
-    private String images;
+    private Object images;
     @SerializedName("img_bitrate")
-    private String imgBitrate;
+    private Object imgBitrate;
     @SerializedName("impression_data")
     private ImpressionDataModel impressionDataModel;
     @SerializedName("interaction_stickers")

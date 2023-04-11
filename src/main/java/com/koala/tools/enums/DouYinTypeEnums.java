@@ -13,6 +13,7 @@ import java.util.Optional;
  */
 @Getter
 public enum DouYinTypeEnums {
+    NOTE_TYPE("note", 5, "/note/"),
     VIDEO_TYPE("video", 4, "/video/"),
     IMAGE_TYPE("image", 2, null);
 

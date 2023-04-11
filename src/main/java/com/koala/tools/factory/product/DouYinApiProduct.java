@@ -46,6 +46,7 @@ public class DouYinApiProduct {
     public void getItemIdByDirectUrl() {
         if (!Objects.isNull(this.directUrl)) {
             switch (Objects.requireNonNull(DouYinTypeEnums.getEnumsByCode(this.itemTypeId))) {
+                case NOTE_TYPE -> this.itemId = PatternUtil.matchData("note/(.*?)/", this.directUrl);
                 case VIDEO_TYPE -> this.itemId = PatternUtil.matchData("video/(.*?)/", this.directUrl);
                 case IMAGE_TYPE, default ->
                         logger.info("[DouYinApiProduct]({}, {}) Unsupported item type id: {}", id, itemId, itemTypeId);
@@ -72,7 +73,7 @@ public class DouYinApiProduct {
     public void getItemInfoData() throws IOException, URISyntaxException {
         if (!Objects.isNull(itemId)) {
             switch (Objects.requireNonNull(DouYinTypeEnums.getEnumsByCode(this.itemTypeId))) {
-                case VIDEO_TYPE -> {
+                case VIDEO_TYPE, NOTE_TYPE -> {
                     String itemInfoPath = "https://www.douyin.com/aweme/v1/web/aweme/detail/?aweme_id=" + itemId + "&aid=1128&version_name=23.5.0&device_platform=android&os_version=2333";
                     logger.info("[DouYinApiProduct]({}, {}) itemInfoPath: {}", id, itemId, itemInfoPath);
                     XbogusDataModel xbogusDataModel = XbogusUtil.encrypt(itemInfoPath);
@@ -108,6 +109,9 @@ public class DouYinApiProduct {
 
     public ItemInfoRespModel generateData() {
         switch (Objects.requireNonNull(DouYinTypeEnums.getEnumsByCode(this.itemTypeId))) {
+            case NOTE_TYPE -> {
+                // do nothing
+            }
             case VIDEO_TYPE -> {
                 String vid = this.itemInfo.getAwemeDetailModel().getVideo().getPlayAddrInfoModel().getUri();
                 String ratio = this.itemInfo.getAwemeDetailModel().getVideo().getRatio();
