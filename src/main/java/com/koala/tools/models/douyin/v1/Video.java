@@ -3,6 +3,7 @@ package com.koala.tools.models.douyin.v1;
 import com.google.gson.annotations.SerializedName;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -12,7 +13,7 @@ import java.util.List;
  * @description
  */
 @Data
-public class Video {
+public class Video implements Serializable {
     @SerializedName("big_thumbs")
     private Object bigThumbs;
     @SerializedName("bit_rate")

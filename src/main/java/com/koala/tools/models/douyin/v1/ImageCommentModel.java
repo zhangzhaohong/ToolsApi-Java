@@ -2,6 +2,8 @@ package com.koala.tools.models.douyin.v1;
 
 import lombok.Data;
 
+import java.io.Serializable;
+
 /**
  * @author koala
  * @version 1.0
@@ -9,6 +11,6 @@ import lombok.Data;
  * @description
  */
 @Data
-public class ImageCommentModel {
+public class ImageCommentModel implements Serializable {
 
 }
