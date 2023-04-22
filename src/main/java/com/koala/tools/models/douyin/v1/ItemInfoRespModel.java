@@ -15,6 +15,8 @@ import java.io.Serializable;
 public class ItemInfoRespModel implements Serializable {
     @SerializedName("aweme_detail")
     private AwemeDetailModel<?> awemeDetailModel;
+    @SerializedName("filter_detail")
+    private FilterDetailModel filterDetailModel = null;
     @SerializedName("log_pb")
     private LogPbModel logPb;
     @SerializedName("status_code")
