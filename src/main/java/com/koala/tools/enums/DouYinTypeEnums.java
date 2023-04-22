@@ -13,15 +13,15 @@ import java.util.Optional;
  */
 @Getter
 public enum DouYinTypeEnums {
-    NOTE_TYPE("note", 5, "/note/"),
-    VIDEO_TYPE("video", 4, "/video/"),
-    IMAGE_TYPE("image", 2, null);
+    NOTE_TYPE("note", 5, new String[]{"/note/"}),
+    VIDEO_TYPE("video", 4, new String[]{"/video/"}),
+    IMAGE_TYPE("image", 2, new String[]{});
 
     private final String type;
     private final Integer code;
-    private final String prefix;
+    private final String[] prefix;
 
-    DouYinTypeEnums(String type, Integer code, String prefix) {
+    DouYinTypeEnums(String type, Integer code, String[] prefix) {
         this.type = type;
         this.code = code;
         this.prefix = prefix;

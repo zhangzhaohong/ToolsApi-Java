@@ -57,9 +57,11 @@ public class DouYinApiProduct {
     public void getItemTypeByDirectUrl() {
         if (!Objects.isNull(this.directUrl)) {
             Arrays.stream(DouYinTypeEnums.values()).forEach(typeEnum -> {
-                if (!Objects.isNull(typeEnum.getPrefix()) && this.directUrl.contains(typeEnum.getPrefix())) {
-                    this.itemTypeId = typeEnum.getCode();
-                }
+                Arrays.stream(typeEnum.getPrefix()).forEach(prefix -> {
+                    if (!ObjectUtils.isEmpty(prefix) && this.directUrl.contains(prefix)) {
+                        this.itemTypeId = typeEnum.getCode();
+                    }
+                });
             });
         }
     }
