@@ -13,15 +13,17 @@ import java.util.Optional;
  */
 @Getter
 public enum DouYinTypeEnums {
-    NOTE_TYPE("note", 5, new String[]{"/note/"}),
-    VIDEO_TYPE("video", 4, new String[]{"/video/"}),
-    IMAGE_TYPE("image", 2, new String[]{});
+    LIVE_TYPE_1("live_1", 7, "live.douyin.com"),
+    LIVE_TYPE_2("live_2", 6, "/webcast/reflow/"),
+    NOTE_TYPE("note", 5, "/note/"),
+    VIDEO_TYPE("video", 4, "/video/"),
+    IMAGE_TYPE("image", 2, null);
 
     private final String type;
     private final Integer code;
-    private final String[] prefix;
+    private final String prefix;
 
-    DouYinTypeEnums(String type, Integer code, String[] prefix) {
+    DouYinTypeEnums(String type, Integer code, String prefix) {
         this.type = type;
         this.code = code;
         this.prefix = prefix;
