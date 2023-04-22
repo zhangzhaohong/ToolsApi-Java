@@ -13,7 +13,7 @@ import java.util.List;
  * @description
  */
 @Data
-public class Video implements Serializable {
+public class Video<Object extends Serializable> implements Serializable {
     @SerializedName("big_thumbs")
     private Object bigThumbs;
     @SerializedName("bit_rate")

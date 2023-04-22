@@ -14,7 +14,7 @@ import java.io.Serializable;
 @Data
 public class ItemInfoRespModel implements Serializable {
     @SerializedName("aweme_detail")
-    private AwemeDetailModel awemeDetailModel;
+    private AwemeDetailModel<?> awemeDetailModel;
     @SerializedName("log_pb")
     private LogPbModel logPb;
     @SerializedName("status_code")

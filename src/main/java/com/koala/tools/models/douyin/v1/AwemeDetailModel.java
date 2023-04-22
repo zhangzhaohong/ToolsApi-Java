@@ -13,7 +13,7 @@ import java.util.List;
  * @description
  */
 @Data
-public class AwemeDetailModel implements Serializable {
+public class AwemeDetailModel<Object extends Serializable> implements Serializable {
     @SerializedName("admire_auth")
     private AdmireAuthModel admireAuthModel;
     private String anchors;
@@ -175,7 +175,7 @@ public class AwemeDetailModel implements Serializable {
     private Integer userDigged;
     @SerializedName("user_recommend_status")
     private Integer userRecommendStatus;
-    private Video video;
+    private Video<?> video;
     @SerializedName("video_game_data_channel_config")
     private VideoGameDataChannelConfigModel videoGameDataChannelConfigModel;
     @SerializedName("video_labels")
