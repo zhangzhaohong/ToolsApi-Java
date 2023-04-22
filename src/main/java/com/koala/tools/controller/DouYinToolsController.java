@@ -6,7 +6,7 @@ import com.koala.tools.factory.builder.DouYinApiBuilder;
 import com.koala.tools.factory.director.DouYinApiManager;
 import com.koala.tools.factory.product.DouYinApiProduct;
 import com.koala.tools.http.annotation.MixedHttpRequest;
-import com.koala.tools.models.douyin.v1.ItemInfoRespModel;
+import com.koala.tools.models.douyin.v1.itemInfo.ItemInfoRespModel;
 import com.koala.tools.utils.HeaderUtil;
 import com.koala.tools.utils.HttpClientUtil;
 import org.slf4j.Logger;

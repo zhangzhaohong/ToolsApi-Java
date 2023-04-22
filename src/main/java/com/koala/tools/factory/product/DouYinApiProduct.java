@@ -1,8 +1,9 @@
 package com.koala.tools.factory.product;
 
 import com.koala.tools.enums.DouYinTypeEnums;
-import com.koala.tools.models.douyin.v1.ItemInfoRespModel;
-import com.koala.tools.models.douyin.v1.RoomInfoRespModel;
+import com.koala.tools.models.douyin.v1.itemInfo.ItemInfoRespModel;
+import com.koala.tools.models.douyin.v1.roomInfo.RoomInfoRespModel;
+import com.koala.tools.models.douyin.v1.roomInfoData.RoomInfoDataRespModel;
 import com.koala.tools.models.xbogus.XbogusDataModel;
 import com.koala.tools.utils.*;
 import org.slf4j.Logger;
@@ -29,6 +30,7 @@ public class DouYinApiProduct {
     private Integer itemTypeId = -1;
     private String itemId;
     private ItemInfoRespModel itemInfo;
+    private RoomInfoDataRespModel roomInfoData;
 
     public void setUrl(String url) {
         this.url = url;
@@ -96,6 +98,17 @@ public class DouYinApiProduct {
                     logger.info("[DouYinApiProduct]({}, {}) itemInfoResponse: {}", id, itemId, itemInfoResponse);
                     try {
                         this.itemInfo = GsonUtil.toBean(itemInfoResponse, ItemInfoRespModel.class);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+                case LIVE_TYPE_1, LIVE_TYPE_2 -> {
+                    String liveInfoDataPath = "https://live.douyin.com/webcast/room/web/enter/?aid=6383&device_platform=web&web_rid=" + this.itemId;
+                    logger.info("[DouYinApiProduct]({}, {}) liveInfoDataPath: {}", id, itemId, liveInfoDataPath);
+                    String liveInfoDataResponse = doGetXbogusRequest(liveInfoDataPath);
+                    logger.info("[DouYinApiProduct]({}, {}) liveInfoDataResponse: {}", id, itemId, liveInfoDataResponse);
+                    try {
+                        this.roomInfoData = GsonUtil.toBean(liveInfoDataResponse, RoomInfoDataRespModel.class);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
