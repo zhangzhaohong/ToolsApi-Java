@@ -78,10 +78,10 @@ public class DouYinToolsController {
     }
 
     @GetMapping("previewVideo")
-    public void previewVideo(@RequestParam String livePath, HttpServletRequest request, HttpServletResponse response) throws IOException, URISyntaxException {
+    public void previewVideo(@RequestParam String livePath, @RequestParam(value = "isDownload", required = false, defaultValue = "false") Boolean isDownload, HttpServletRequest request, HttpServletResponse response) throws IOException, URISyntaxException {
         String url = new String(Base64Utils.decodeFromUrlSafeString(livePath));
         logger.info("[previewVideo] inputUrl: {}, Sec-Fetch-Dest: {}", url, request.getHeader("Sec-Fetch-Dest"));
-        HttpClientUtil.doRelay(url, HeaderUtil.getDouYinDownloadHeader(), null, 206, HeaderUtil.getMockVideoHeader(false), request, response);
+        HttpClientUtil.doRelay(url, HeaderUtil.getDouYinDownloadHeader(), null, 206, HeaderUtil.getMockVideoHeader(isDownload), request, response);
     }
 
     @GetMapping(value = "api", produces = {"application/json;charset=utf-8"})

@@ -9,10 +9,12 @@ import com.koala.tools.models.xbogus.XbogusDataModel;
 import com.koala.tools.utils.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.Base64Utils;
 import org.springframework.util.ObjectUtils;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -145,7 +147,10 @@ public class DouYinApiProduct {
                 }
                 if (!ObjectUtils.isEmpty(vid)) {
                     if (this.version.equals(2)) {
-                        this.itemInfo.getAwemeDetailModel().getVideo().setRealPath(this.itemInfo.getAwemeDetailModel().getVideo().getPlayAddrInfoModel().getUrlList().get(0));
+                        String link = this.itemInfo.getAwemeDetailModel().getVideo().getPlayAddrInfoModel().getUrlList().get(0);
+                        this.itemInfo.getAwemeDetailModel().getVideo().setRealPath(link);
+                        this.itemInfo.getAwemeDetailModel().getVideo().setMockPreviewVidPath(host + "/tools/DouYin/previewVideo?livePath=" + Base64Utils.encodeToUrlSafeString(link.getBytes(StandardCharsets.UTF_8)));
+                        this.itemInfo.getAwemeDetailModel().getVideo().setMockDownloadVidPath(host + "/tools/DouYin/previewVideo?livePath=" + Base64Utils.encodeToUrlSafeString(link.getBytes(StandardCharsets.UTF_8)) + "&isDownload=true");
                     } else if (this.version.equals(1)) {
                         String link = "https://aweme.snssdk.com/aweme/v1/play/?video_id=" + vid + "&line=0&ratio=" + ratio + "&media_type=4&vr_type=0&improve_bitrate=0&is_play_url=1&is_support_h265=0&source=PackSourceEnum_PUBLISH";
                         this.itemInfo.getAwemeDetailModel().getVideo().setRealPath(link);
