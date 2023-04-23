@@ -11,6 +11,7 @@ import java.io.Serializable;
  * @description
  */
 @Data
-public class Items implements Serializable {
-
+public class LiveMatrixInfoModel implements Serializable {
+    private Long id;
+    private String name;
 }

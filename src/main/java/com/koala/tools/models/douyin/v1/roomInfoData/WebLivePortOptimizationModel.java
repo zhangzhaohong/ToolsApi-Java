@@ -1,3 +1,4 @@
+
 package com.koala.tools.models.douyin.v1.roomInfoData;
 
 import com.google.gson.annotations.SerializedName;
@@ -12,7 +13,7 @@ import java.io.Serializable;
  * @description
  */
 @Data
-public class Programme implements Serializable {
-    @SerializedName("enable_programme")
-    private boolean enableProgramme;
+public class WebLivePortOptimizationModel implements Serializable {
+    @SerializedName("strategy_config")
+    private StrategyConfigModel strategyConfig;
 }

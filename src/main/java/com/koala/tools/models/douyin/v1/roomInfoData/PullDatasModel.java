@@ -1,3 +1,4 @@
+
 package com.koala.tools.models.douyin.v1.roomInfoData;
 
 import lombok.Data;
@@ -11,6 +12,6 @@ import java.io.Serializable;
  * @description
  */
 @Data
-public class Items implements Serializable {
+public class PullDatasModel implements Serializable {
 
 }

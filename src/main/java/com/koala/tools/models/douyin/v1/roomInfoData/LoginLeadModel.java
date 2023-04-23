@@ -12,7 +12,9 @@ import java.io.Serializable;
  * @description
  */
 @Data
-public class Programme implements Serializable {
-    @SerializedName("enable_programme")
-    private boolean enableProgramme;
+public class LoginLeadModel implements Serializable {
+    @SerializedName("is_login")
+    private Boolean isLogin;
+    private Integer level;
+    private Items items;
 }

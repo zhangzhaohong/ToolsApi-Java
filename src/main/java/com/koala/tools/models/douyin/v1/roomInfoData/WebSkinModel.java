@@ -1,5 +1,6 @@
 package com.koala.tools.models.douyin.v1.roomInfoData;
 
+import com.google.gson.annotations.SerializedName;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -11,6 +12,7 @@ import java.io.Serializable;
  * @description
  */
 @Data
-public class Items implements Serializable {
-
+public class WebSkinModel implements Serializable {
+    @SerializedName("enable_skin")
+    private boolean enableSkin;
 }

@@ -11,6 +11,8 @@ import java.io.Serializable;
  * @description
  */
 @Data
-public class Items implements Serializable {
-
+public class StrategyConfigModel implements Serializable {
+    private StrategyConfigDataModel background;
+    private StrategyConfigDataModel detail;
+    private StrategyConfigDataModel tab;
 }

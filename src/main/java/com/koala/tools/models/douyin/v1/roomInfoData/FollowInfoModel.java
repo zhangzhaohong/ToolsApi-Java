@@ -12,7 +12,9 @@ import java.io.Serializable;
  * @description
  */
 @Data
-public class Programme implements Serializable {
-    @SerializedName("enable_programme")
-    private boolean enableProgramme;
+public class FollowInfoModel implements Serializable {
+    @SerializedName("follow_status")
+    private Integer followStatus;
+    @SerializedName("follow_status_str")
+    private String followStatusStr;
 }

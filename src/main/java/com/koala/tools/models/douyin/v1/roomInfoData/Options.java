@@ -1,5 +1,9 @@
-
 package com.koala.tools.models.douyin.v1.roomInfoData;
+
+import com.google.gson.annotations.SerializedName;
+import lombok.Data;
+
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -8,22 +12,9 @@ import java.util.List;
  * @date 2023/4/22 21:51
  * @description
  */
-public class Options {
-
-    private Default_quality default_quality;
-    private List<Qualities> qualities;
-    public void setDefault_quality(Default_quality default_quality) {
-         this.default_quality = default_quality;
-     }
-     public Default_quality getDefault_quality() {
-         return default_quality;
-     }
-
-    public void setQualities(List<Qualities> qualities) {
-         this.qualities = qualities;
-     }
-     public List<Qualities> getQualities() {
-         return qualities;
-     }
-
+@Data
+public class Options implements Serializable {
+    @SerializedName("default_quality")
+    private QualityModel defaultQuality;
+    private List<QualityModel> qualities;
 }

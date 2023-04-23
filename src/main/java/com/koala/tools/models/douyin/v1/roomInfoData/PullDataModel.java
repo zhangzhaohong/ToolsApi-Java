@@ -12,7 +12,8 @@ import java.io.Serializable;
  * @description
  */
 @Data
-public class Programme implements Serializable {
-    @SerializedName("enable_programme")
-    private boolean enableProgramme;
+public class PullDataModel implements Serializable {
+    private Options options;
+    @SerializedName("stream_data")
+    private String streamData;
 }

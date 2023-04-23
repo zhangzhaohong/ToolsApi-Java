@@ -11,6 +11,6 @@ import java.io.Serializable;
  * @description
  */
 @Data
-public class Items implements Serializable {
+public class PartitionRoadMapModel implements Serializable {
 
 }

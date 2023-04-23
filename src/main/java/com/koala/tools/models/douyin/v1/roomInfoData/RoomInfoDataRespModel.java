@@ -1,5 +1,9 @@
-
 package com.koala.tools.models.douyin.v1.roomInfoData;
+
+import com.google.gson.annotations.SerializedName;
+import lombok.Data;
+
+import java.io.Serializable;
 
 /**
  * @author koala
@@ -7,30 +11,10 @@ package com.koala.tools.models.douyin.v1.roomInfoData;
  * @date 2023/4/22 21:51
  * @description
  */
-public class RoomInfoDataRespModel {
-
-    private int status_code;
-    private Data data;
+@Data
+public class RoomInfoDataRespModel implements Serializable {
+    @SerializedName("status_code")
+    private Integer statusCode;
+    private RoomData data;
     private Extra extra;
-    public void setStatus_code(int status_code) {
-         this.status_code = status_code;
-     }
-     public int getStatus_code() {
-         return status_code;
-     }
-
-    public void setData(Data data) {
-         this.data = data;
-     }
-     public Data getData() {
-         return data;
-     }
-
-    public void setExtra(Extra extra) {
-         this.extra = extra;
-     }
-     public Extra getExtra() {
-         return extra;
-     }
-
 }

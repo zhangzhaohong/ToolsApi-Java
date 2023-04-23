@@ -1,5 +1,9 @@
-
 package com.koala.tools.models.douyin.v1.roomInfoData;
+
+import com.google.gson.annotations.SerializedName;
+import lombok.Data;
+
+import java.io.Serializable;
 
 /**
  * @author koala
@@ -7,22 +11,10 @@ package com.koala.tools.models.douyin.v1.roomInfoData;
  * @date 2023/4/22 21:51
  * @description
  */
-public class SpecialStyle {
-
-    private Chat Chat;
-    private Like Like;
-    public void setChat(Chat Chat) {
-         this.Chat = Chat;
-     }
-     public Chat getChat() {
-         return Chat;
-     }
-
-    public void setLike(Like Like) {
-         this.Like = Like;
-     }
-     public Like getLike() {
-         return Like;
-     }
-
+@Data
+public class SpecialStyle implements Serializable {
+    @SerializedName("Chat")
+    private SpecialStyleModel chat;
+    @SerializedName("Like")
+    private SpecialStyleModel like;
 }

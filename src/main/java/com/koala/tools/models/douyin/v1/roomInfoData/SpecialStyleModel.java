@@ -12,7 +12,11 @@ import java.io.Serializable;
  * @description
  */
 @Data
-public class Programme implements Serializable {
-    @SerializedName("enable_programme")
-    private boolean enableProgramme;
+public class SpecialStyleModel implements Serializable {
+    @SerializedName("UnableStyle")
+    private Integer unableStyle;
+    @SerializedName("Content")
+    private String content;
+    @SerializedName("OffType")
+    private Integer offType;
 }

@@ -12,7 +12,9 @@ import java.io.Serializable;
  * @description
  */
 @Data
-public class Programme implements Serializable {
-    @SerializedName("enable_programme")
-    private boolean enableProgramme;
+public class AppointmentInfoModel implements Serializable {
+    @SerializedName("appointment_id")
+    private Integer appointmentId;
+    @SerializedName("is_subscribe")
+    private Boolean isSubscribe;
 }
