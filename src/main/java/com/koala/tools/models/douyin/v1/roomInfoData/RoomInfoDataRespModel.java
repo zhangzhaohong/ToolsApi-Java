@@ -15,6 +15,6 @@ import java.io.Serializable;
 public class RoomInfoDataRespModel implements Serializable {
     @SerializedName("status_code")
     private Integer statusCode;
-    private RoomData data;
+    private RoomData<?> data;
     private Extra extra;
 }

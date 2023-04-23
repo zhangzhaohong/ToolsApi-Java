@@ -13,7 +13,7 @@ import java.util.List;
  * @description
  */
 @Data
-public class RoomData implements Serializable {
+public class RoomData<Object extends Serializable> implements Serializable {
     private List<RoomItemInfoDataModel> data;
     @SerializedName("enter_room_id")
     private String enterRoomId;
@@ -28,7 +28,7 @@ public class RoomData implements Serializable {
     @SerializedName("partition_road_map")
     private PartitionRoadMapModel partitionRoadMap;
     @SerializedName("similar_rooms")
-    private List<String> similarRooms;
+    private Object similarRooms;
     @SerializedName("shark_decision_conf")
     private String sharkDecisionConf;
     @SerializedName("web_stream_url")
