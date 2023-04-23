@@ -1,4 +1,3 @@
-
 package com.koala.tools.models.douyin.v1.roomInfoData;
 
 import lombok.Data;
