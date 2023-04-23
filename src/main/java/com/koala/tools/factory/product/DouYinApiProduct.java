@@ -1,6 +1,7 @@
 package com.koala.tools.factory.product;
 
 import com.koala.tools.enums.DouYinTypeEnums;
+import com.koala.tools.models.douyin.v1.PublicTiktokDataRespModel;
 import com.koala.tools.models.douyin.v1.itemInfo.ItemInfoRespModel;
 import com.koala.tools.models.douyin.v1.roomInfo.RoomInfoRespModel;
 import com.koala.tools.models.douyin.v1.roomInfoData.RoomInfoDataRespModel;
@@ -119,10 +120,6 @@ public class DouYinApiProduct {
         }
     }
 
-    public ItemInfoRespModel getItemInfo() {
-        return itemInfo;
-    }
-
     /**
      * 下面是打印log区域
      */
@@ -130,10 +127,14 @@ public class DouYinApiProduct {
         logger.info("[DouYinApiProduct]({}, {}) params: {url={}, directPath={}, itemTypeId={}}", id, itemId, url, directUrl, itemTypeId);
     }
 
-    public ItemInfoRespModel generateData() {
+    public PublicTiktokDataRespModel generateData() {
+        PublicTiktokDataRespModel publicData = null;
         switch (Objects.requireNonNull(DouYinTypeEnums.getEnumsByCode(this.itemTypeId))) {
             case NOTE_TYPE -> {
                 // do nothing
+            }
+            case LIVE_TYPE_1, LIVE_TYPE_2 -> {
+                publicData = new PublicTiktokDataRespModel(this.itemTypeId, null, this.roomInfoData);
             }
             case VIDEO_TYPE -> {
                 String vid = this.itemInfo.getAwemeDetailModel().getVideo().getPlayAddrInfoModel().getUri();
@@ -147,13 +148,14 @@ public class DouYinApiProduct {
                     this.itemInfo.getAwemeDetailModel().getVideo().setMockPreviewVidPath(host + "tools/DouYin/player/video?vid=" + vid + "&ratio=" + ratio + "&isDownload=0");
                     this.itemInfo.getAwemeDetailModel().getVideo().setMockDownloadVidPath(host + "tools/DouYin/player/video?vid=" + vid + "&ratio=" + ratio + "&isDownload=1");
                     // logger.info("[DouYinApiProduct]({}, {}) realFile: {}", id, itemId,HttpClientUtil.doGetRedirectLocation(link, HeaderUtil.getDouYinDownloadHeader(), null));
+                    publicData = new PublicTiktokDataRespModel(this.itemTypeId, this.itemInfo, null);
                 }
             }
             case IMAGE_TYPE, default ->
                     logger.info("[DouYinApiProduct]({}, {}) Unsupported item type id: {}", id, itemId, itemTypeId);
         }
-        logger.info("[DouYinApiProduct]({}, {}) itemInfo: {}", id, itemId, this.itemInfo);
-        return this.itemInfo;
+        logger.info("[DouYinApiProduct]({}, {}) publicData: {}", id, itemId, publicData);
+        return publicData;
     }
 
     private String doGetXbogusRequest(String inputUrl) throws IOException, URISyntaxException {

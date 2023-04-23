@@ -15,7 +15,8 @@ public enum DouYinResponseEnums {
     INVALID_LINK(101, "INVALID_LINK"),
     INVALID_TYPE(102, "INVALID_TYPE"),
     GET_DATA_SUCCESS(200, "GET_DATA_SUCCESS"),
-    GET_INFO_ERROR(201, "GET_INFO_ERROR");
+    GET_INFO_ERROR(201, "GET_INFO_ERROR"),
+    UNSUPPORTED_OPERATION(202, "UNSUPPORTED_OPERATION");
 
     private final Integer code;
     private final String message;

@@ -6,6 +6,7 @@ import com.koala.tools.factory.builder.DouYinApiBuilder;
 import com.koala.tools.factory.director.DouYinApiManager;
 import com.koala.tools.factory.product.DouYinApiProduct;
 import com.koala.tools.http.annotation.MixedHttpRequest;
+import com.koala.tools.models.douyin.v1.PublicTiktokDataRespModel;
 import com.koala.tools.models.douyin.v1.itemInfo.ItemInfoRespModel;
 import com.koala.tools.utils.HeaderUtil;
 import com.koala.tools.utils.HttpClientUtil;
@@ -32,6 +33,9 @@ import java.util.Optional;
 
 import static com.koala.tools.enums.DouYinResponseEnums.*;
 import static com.koala.tools.enums.DouYinResponseEnums.INVALID_TYPE;
+import static com.koala.tools.enums.DouYinTypeEnums.LIVE_TYPE_1;
+import static com.koala.tools.enums.DouYinTypeEnums.LIVE_TYPE_2;
+import static com.koala.tools.enums.DouYinTypeEnums.VIDEO_TYPE;
 import static com.koala.tools.utils.RespUtil.formatRespData;
 
 /**
@@ -106,35 +110,46 @@ public class DouYinToolsController {
             e.printStackTrace();
             return formatRespData(FAILURE, null);
         }
-        if (!Objects.isNull(product.getItemInfo())) {
-            if (!Objects.equals(product.getItemInfo().getStatusCode(), 0)) {
-                return formatRespData(GET_INFO_ERROR, null);
-            } else {
-                try {
-                    ItemInfoRespModel productData = product.generateData();
-                    switch (Objects.requireNonNull(DouYinRequestTypeEnums.getEnumsByType(type))) {
-                        case DOWNLOAD:
-                            if (!Objects.isNull(productData) && !Objects.isNull(productData.getAwemeDetailModel()) && !Objects.isNull(productData.getAwemeDetailModel().getVideo()) && !ObjectUtils.isEmpty(productData.getAwemeDetailModel().getVideo().getMockDownloadVidPath())) {
-                                redirectStrategy.sendRedirect(request, response, productData.getAwemeDetailModel().getVideo().getMockDownloadVidPath());
+        PublicTiktokDataRespModel productData = product.generateData();
+        if (!Objects.isNull(productData)) {
+            try {
+                switch (Objects.requireNonNull(DouYinRequestTypeEnums.getEnumsByType(type))) {
+                    case DOWNLOAD:
+                        if (checkCanDownload(productData.getItemTypeId())) {
+                            ItemInfoRespModel tmp = productData.getItemInfoData();
+                            if (!Objects.isNull(tmp) && !Objects.isNull(tmp.getAwemeDetailModel()) && !Objects.isNull(tmp.getAwemeDetailModel().getVideo()) && !ObjectUtils.isEmpty(tmp.getAwemeDetailModel().getVideo().getMockDownloadVidPath())) {
+                                redirectStrategy.sendRedirect(request, response, tmp.getAwemeDetailModel().getVideo().getMockDownloadVidPath());
                             }
-                            break;
-                        case PREVIEW:
-                            if (!Objects.isNull(productData) && !Objects.isNull(productData.getAwemeDetailModel()) && !Objects.isNull(productData.getAwemeDetailModel().getVideo()) && !ObjectUtils.isEmpty(productData.getAwemeDetailModel().getVideo().getMockPreviewVidPath())) {
-                                redirectStrategy.sendRedirect(request, response, productData.getAwemeDetailModel().getVideo().getMockPreviewVidPath());
+                        } else {
+                            return formatRespData(UNSUPPORTED_OPERATION, null);
+                        }
+                        break;
+                    case PREVIEW:
+                        if (checkCanPreview(productData.getItemTypeId())) {
+                            ItemInfoRespModel tmp = productData.getItemInfoData();
+                            if (!Objects.isNull(tmp) && !Objects.isNull(tmp.getAwemeDetailModel()) && !Objects.isNull(tmp.getAwemeDetailModel().getVideo()) && !ObjectUtils.isEmpty(tmp.getAwemeDetailModel().getVideo().getMockPreviewVidPath())) {
+                                redirectStrategy.sendRedirect(request, response, tmp.getAwemeDetailModel().getVideo().getMockPreviewVidPath());
                             }
-                            break;
-                        case INFO:
-                        case INVALID_TYPE:
-                        default:
-                            break;
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
+                        } else {
+                            return formatRespData(UNSUPPORTED_OPERATION, null);
+                        }
+                        break;
+                    case INFO, INVALID_TYPE, default:
+                        break;
                 }
-                return formatRespData(GET_DATA_SUCCESS, product.generateData());
+                return formatRespData(GET_DATA_SUCCESS, productData);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        } else {
-            return formatRespData(GET_INFO_ERROR, null);
         }
+        return formatRespData(GET_INFO_ERROR, null);
+    }
+
+    private Boolean checkCanDownload(Integer itemTypeId) {
+        return itemTypeId.equals(VIDEO_TYPE.getCode());
+    }
+
+    private Boolean checkCanPreview(Integer itemTypeId) {
+        return itemTypeId.equals(VIDEO_TYPE.getCode()) || itemTypeId.equals(LIVE_TYPE_1.getCode()) || itemTypeId.equals(LIVE_TYPE_2.getCode());
     }
 }
