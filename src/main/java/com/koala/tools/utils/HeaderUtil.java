@@ -88,7 +88,7 @@ public class HeaderUtil {
         header.put("Expect", "100-continue");
         header.put("Cache-Control", "max-age=604800, must-revalidate");
         header.put("Content-Type", "video/x-flv");
-        header.put("Content-Disposition", "inline; " + "filename=" + UUID.randomUUID().toString().replace("-", "") + ".mp4");
+        header.put("Content-Disposition", "inline");
         header.put("User-Agent", "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1");
         header.put("X-FORWARDED-FOR", getRandomIpAddress());
         header.put("CLIENT-IP", getRandomIpAddress());
