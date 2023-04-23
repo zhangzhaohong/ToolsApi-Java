@@ -144,13 +144,13 @@ public class DouYinApiProduct {
                     ratio = "540p";
                 }
                 if (!ObjectUtils.isEmpty(vid)) {
-                    if (this.version.equals(1)) {
+                    if (this.version.equals(2)) {
+                        this.itemInfo.getAwemeDetailModel().getVideo().setRealPath(this.itemInfo.getAwemeDetailModel().getVideo().getPlayAddrInfoModel().getUrlList().get(0));
+                    } else if (this.version.equals(1)) {
                         String link = "https://aweme.snssdk.com/aweme/v1/play/?video_id=" + vid + "&line=0&ratio=" + ratio + "&media_type=4&vr_type=0&improve_bitrate=0&is_play_url=1&is_support_h265=0&source=PackSourceEnum_PUBLISH";
                         this.itemInfo.getAwemeDetailModel().getVideo().setRealPath(link);
                         this.itemInfo.getAwemeDetailModel().getVideo().setMockPreviewVidPath(host + "tools/DouYin/player/video?vid=" + vid + "&ratio=" + ratio + "&isDownload=0");
                         this.itemInfo.getAwemeDetailModel().getVideo().setMockDownloadVidPath(host + "tools/DouYin/player/video?vid=" + vid + "&ratio=" + ratio + "&isDownload=1");
-                    } else if (this.version.equals(2)) {
-                        this.itemInfo.getAwemeDetailModel().getVideo().setRealPath(this.itemInfo.getAwemeDetailModel().getVideo().getPlayAddrInfoModel().getUrlList().get(0));
                     }
                     // logger.info("[DouYinApiProduct]({}, {}) realFile: {}", id, itemId,HttpClientUtil.doGetRedirectLocation(link, HeaderUtil.getDouYinDownloadHeader(), null));
                     publicData = new PublicTiktokDataRespModel(this.itemTypeId, this.itemInfo, null);
