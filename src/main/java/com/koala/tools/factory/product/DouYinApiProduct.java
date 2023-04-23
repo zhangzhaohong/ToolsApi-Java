@@ -132,37 +132,43 @@ public class DouYinApiProduct {
 
     public PublicTiktokDataRespModel generateData() {
         PublicTiktokDataRespModel publicData = null;
-        switch (Objects.requireNonNull(DouYinTypeEnums.getEnumsByCode(this.itemTypeId))) {
-            case NOTE_TYPE -> {
-                // do nothing
-            }
-            case LIVE_TYPE_1, LIVE_TYPE_2 -> {
-                publicData = new PublicTiktokDataRespModel(this.itemTypeId, null, this.roomInfoData);
-            }
-            case VIDEO_TYPE -> {
-                String vid = this.itemInfo.getAwemeDetailModel().getVideo().getPlayAddrInfoModel().getUri();
-                String ratio = this.itemInfo.getAwemeDetailModel().getVideo().getRatio();
-                if (ObjectUtils.isEmpty(ratio) || Objects.equals(ratio, "default")) {
-                    ratio = "540p";
+        try {
+            switch (Objects.requireNonNull(DouYinTypeEnums.getEnumsByCode(this.itemTypeId))) {
+                case NOTE_TYPE -> {
+                    // do nothing
                 }
-                if (!ObjectUtils.isEmpty(vid)) {
-                    if (this.version.equals(2)) {
-                        String link = this.itemInfo.getAwemeDetailModel().getVideo().getPlayAddrInfoModel().getUrlList().get(0);
-                        this.itemInfo.getAwemeDetailModel().getVideo().setRealPath(link);
-                        this.itemInfo.getAwemeDetailModel().getVideo().setMockPreviewVidPath(host + "/tools/DouYin/previewVideo?livePath=" + Base64Utils.encodeToUrlSafeString(link.getBytes(StandardCharsets.UTF_8)));
-                        this.itemInfo.getAwemeDetailModel().getVideo().setMockDownloadVidPath(host + "/tools/DouYin/previewVideo?livePath=" + Base64Utils.encodeToUrlSafeString(link.getBytes(StandardCharsets.UTF_8)) + "&isDownload=true");
-                    } else if (this.version.equals(1)) {
-                        String link = "https://aweme.snssdk.com/aweme/v1/play/?video_id=" + vid + "&line=0&ratio=" + ratio + "&media_type=4&vr_type=0&improve_bitrate=0&is_play_url=1&is_support_h265=0&source=PackSourceEnum_PUBLISH";
-                        this.itemInfo.getAwemeDetailModel().getVideo().setRealPath(link);
-                        this.itemInfo.getAwemeDetailModel().getVideo().setMockPreviewVidPath(host + "tools/DouYin/player/video?vid=" + vid + "&ratio=" + ratio + "&isDownload=0");
-                        this.itemInfo.getAwemeDetailModel().getVideo().setMockDownloadVidPath(host + "tools/DouYin/player/video?vid=" + vid + "&ratio=" + ratio + "&isDownload=1");
+                case LIVE_TYPE_1, LIVE_TYPE_2 -> {
+                    String link = this.roomInfoData.getData().getData().get(0).getStreamUrl().getFlvPullUrl().getFullHd1().replaceFirst("http://", "https://");
+                    this.roomInfoData.getData().getData().get(0).getStreamUrl().setMockPreviewVidPath(host + "tools/DouYin/preview/liveStream?livePath=" + Base64Utils.encodeToUrlSafeString(link.getBytes(StandardCharsets.UTF_8)));
+                    publicData = new PublicTiktokDataRespModel(this.itemTypeId, null, this.roomInfoData);
+                }
+                case VIDEO_TYPE -> {
+                    String vid = this.itemInfo.getAwemeDetailModel().getVideo().getPlayAddrInfoModel().getUri();
+                    String ratio = this.itemInfo.getAwemeDetailModel().getVideo().getRatio();
+                    if (ObjectUtils.isEmpty(ratio) || Objects.equals(ratio, "default")) {
+                        ratio = "540p";
                     }
-                    // logger.info("[DouYinApiProduct]({}, {}) realFile: {}", id, itemId,HttpClientUtil.doGetRedirectLocation(link, HeaderUtil.getDouYinDownloadHeader(), null));
-                    publicData = new PublicTiktokDataRespModel(this.itemTypeId, this.itemInfo, null);
+                    if (!ObjectUtils.isEmpty(vid)) {
+                        if (this.version.equals(2)) {
+                            String link = this.itemInfo.getAwemeDetailModel().getVideo().getPlayAddrInfoModel().getUrlList().get(0);
+                            this.itemInfo.getAwemeDetailModel().getVideo().setRealPath(link);
+                            this.itemInfo.getAwemeDetailModel().getVideo().setMockPreviewVidPath(host + "tools/DouYin/preview/video?livePath=" + Base64Utils.encodeToUrlSafeString(link.getBytes(StandardCharsets.UTF_8)));
+                            this.itemInfo.getAwemeDetailModel().getVideo().setMockDownloadVidPath(host + "tools/DouYin/preview/video?livePath=" + Base64Utils.encodeToUrlSafeString(link.getBytes(StandardCharsets.UTF_8)) + "&isDownload=true");
+                        } else if (this.version.equals(1)) {
+                            String link = "https://aweme.snssdk.com/aweme/v1/play/?video_id=" + vid + "&line=0&ratio=" + ratio + "&media_type=4&vr_type=0&improve_bitrate=0&is_play_url=1&is_support_h265=0&source=PackSourceEnum_PUBLISH";
+                            this.itemInfo.getAwemeDetailModel().getVideo().setRealPath(link);
+                            this.itemInfo.getAwemeDetailModel().getVideo().setMockPreviewVidPath(host + "tools/DouYin/player/video?vid=" + vid + "&ratio=" + ratio + "&isDownload=0");
+                            this.itemInfo.getAwemeDetailModel().getVideo().setMockDownloadVidPath(host + "tools/DouYin/player/video?vid=" + vid + "&ratio=" + ratio + "&isDownload=1");
+                        }
+                        // logger.info("[DouYinApiProduct]({}, {}) realFile: {}", id, itemId,HttpClientUtil.doGetRedirectLocation(link, HeaderUtil.getDouYinDownloadHeader(), null));
+                        publicData = new PublicTiktokDataRespModel(this.itemTypeId, this.itemInfo, null);
+                    }
                 }
+                case IMAGE_TYPE, default ->
+                        logger.info("[DouYinApiProduct]({}, {}) Unsupported item type id: {}", id, itemId, itemTypeId);
             }
-            case IMAGE_TYPE, default ->
-                    logger.info("[DouYinApiProduct]({}, {}) Unsupported item type id: {}", id, itemId, itemTypeId);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         logger.info("[DouYinApiProduct]({}, {}) publicData: {}", id, itemId, publicData);
         return publicData;
