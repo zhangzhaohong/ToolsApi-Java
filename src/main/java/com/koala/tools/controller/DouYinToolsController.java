@@ -69,7 +69,7 @@ public class DouYinToolsController {
         if (ObjectUtils.isEmpty(redirectUrl)) {
             return formatRespData(FAILURE, null);
         }
-        if (isDownload.equals("0")) {
+        if ("0".equals(isDownload)) {
             redirectStrategy.sendRedirect(request, response, "/tools/DouYin/previewVideo?livePath=" + Base64Utils.encodeToUrlSafeString(redirectUrl.getBytes(StandardCharsets.UTF_8)));
         } else {
             HttpClientUtil.doRelay(redirectUrl, HeaderUtil.getDouYinDownloadHeader(), null, 206, HeaderUtil.getMockVideoHeader(true), request, response);
@@ -85,7 +85,7 @@ public class DouYinToolsController {
     }
 
     @GetMapping(value = "api", produces = {"application/json;charset=utf-8"})
-    public Object getDouYinInfos(@MixedHttpRequest(required = false) String link, @RequestParam(value = "type", required = false, defaultValue = "info") String type, HttpServletRequest request, HttpServletResponse response) throws IOException, URISyntaxException {
+    public Object getDouYinInfos(@MixedHttpRequest(required = false) String link, @RequestParam(value = "type", required = false, defaultValue = "info") String type, @RequestParam(value = "version", required = false, defaultValue = "2") Integer version, HttpServletRequest request, HttpServletResponse response) {
         if (ObjectUtils.isEmpty(link)) {
             return formatRespData(INVALID_LINK, null);
         }
@@ -105,7 +105,7 @@ public class DouYinToolsController {
         DouYinApiManager manager = new DouYinApiManager(builder);
         DouYinApiProduct product = null;
         try {
-            product = manager.construct(host, url);
+            product = manager.construct(host, url, version);
         } catch (Exception e) {
             e.printStackTrace();
             return formatRespData(FAILURE, null);

@@ -24,6 +24,7 @@ import java.util.Objects;
  */
 public class DouYinApiProduct {
     private static final Logger logger = LoggerFactory.getLogger(DouYinApiProduct.class);
+    private Integer version = 2;
     private String url;
     private String host;
     private String directUrl;
@@ -52,7 +53,7 @@ public class DouYinApiProduct {
             DouYinTypeEnums douYinTypeEnum = DouYinTypeEnums.getEnumsByCode(this.itemTypeId);
             switch (Objects.requireNonNull(douYinTypeEnum)) {
                 case NOTE_TYPE, VIDEO_TYPE ->
-                        this.itemId = PatternUtil.matchData(douYinTypeEnum.getType() + "(.*?)/", this.directUrl);
+                        this.itemId = PatternUtil.matchData(douYinTypeEnum.getType() + "/(.*?)/", this.directUrl);
                 case LIVE_TYPE_1 ->
                         this.itemId = PatternUtil.matchData("https://" + douYinTypeEnum.getType() + "/(.*?)", this.directUrl);
                 case LIVE_TYPE_2 -> {
@@ -90,10 +91,10 @@ public class DouYinApiProduct {
     }
 
     public void getItemInfoData() throws IOException, URISyntaxException {
-        if (!Objects.isNull(itemId)) {
+        if (!Objects.isNull(this.itemId)) {
             switch (Objects.requireNonNull(DouYinTypeEnums.getEnumsByCode(this.itemTypeId))) {
                 case VIDEO_TYPE, NOTE_TYPE -> {
-                    String itemInfoPath = "https://www.douyin.com/aweme/v1/web/aweme/detail/?aweme_id=" + itemId + "&aid=1128&version_name=23.5.0&device_platform=android&os_version=2333";
+                    String itemInfoPath = "https://www.douyin.com/aweme/v1/web/aweme/detail/?aweme_id=" + this.itemId + "&device_platform=webapp&aid=6383";
                     logger.info("[DouYinApiProduct]({}, {}) itemInfoPath: {}", id, itemId, itemInfoPath);
                     String itemInfoResponse = doGetXbogusRequest(itemInfoPath);
                     logger.info("[DouYinApiProduct]({}, {}) itemInfoResponse: {}", id, itemId, itemInfoResponse);
@@ -105,9 +106,9 @@ public class DouYinApiProduct {
                 }
                 case LIVE_TYPE_1, LIVE_TYPE_2 -> {
                     String liveInfoDataPath = "https://live.douyin.com/webcast/room/web/enter/?aid=6383&device_platform=web&web_rid=" + this.itemId;
-                    logger.info("[DouYinApiProduct]({}, {}) liveInfoDataPath: {}", id, itemId, liveInfoDataPath);
+                    logger.info("[DouYinApiProduct]({}, {}) liveInfoDataPath: {}", id, this.itemId, liveInfoDataPath);
                     String liveInfoDataResponse = doGetXbogusRequest(liveInfoDataPath);
-                    logger.info("[DouYinApiProduct]({}, {}) liveInfoDataResponse: {}", id, itemId, liveInfoDataResponse);
+                    logger.info("[DouYinApiProduct]({}, {}) liveInfoDataResponse: {}", id, this.itemId, liveInfoDataResponse);
                     try {
                         this.roomInfoData = GsonUtil.toBean(liveInfoDataResponse, RoomInfoDataRespModel.class);
                     } catch (Exception e) {
@@ -143,10 +144,14 @@ public class DouYinApiProduct {
                     ratio = "540p";
                 }
                 if (!ObjectUtils.isEmpty(vid)) {
-                    String link = "https://aweme.snssdk.com/aweme/v1/play/?video_id=" + vid + "&line=0&ratio=" + ratio + "&media_type=4&vr_type=0&improve_bitrate=0&is_play_url=1&is_support_h265=0&source=PackSourceEnum_PUBLISH";
-                    this.itemInfo.getAwemeDetailModel().getVideo().setRealPath(link);
-                    this.itemInfo.getAwemeDetailModel().getVideo().setMockPreviewVidPath(host + "tools/DouYin/player/video?vid=" + vid + "&ratio=" + ratio + "&isDownload=0");
-                    this.itemInfo.getAwemeDetailModel().getVideo().setMockDownloadVidPath(host + "tools/DouYin/player/video?vid=" + vid + "&ratio=" + ratio + "&isDownload=1");
+                    if (this.version.equals(1)) {
+                        String link = "https://aweme.snssdk.com/aweme/v1/play/?video_id=" + vid + "&line=0&ratio=" + ratio + "&media_type=4&vr_type=0&improve_bitrate=0&is_play_url=1&is_support_h265=0&source=PackSourceEnum_PUBLISH";
+                        this.itemInfo.getAwemeDetailModel().getVideo().setRealPath(link);
+                        this.itemInfo.getAwemeDetailModel().getVideo().setMockPreviewVidPath(host + "tools/DouYin/player/video?vid=" + vid + "&ratio=" + ratio + "&isDownload=0");
+                        this.itemInfo.getAwemeDetailModel().getVideo().setMockDownloadVidPath(host + "tools/DouYin/player/video?vid=" + vid + "&ratio=" + ratio + "&isDownload=1");
+                    } else if (this.version.equals(2)) {
+                        this.itemInfo.getAwemeDetailModel().getVideo().setRealPath(this.itemInfo.getAwemeDetailModel().getVideo().getPlayAddrInfoModel().getUrlList().get(0));
+                    }
                     // logger.info("[DouYinApiProduct]({}, {}) realFile: {}", id, itemId,HttpClientUtil.doGetRedirectLocation(link, HeaderUtil.getDouYinDownloadHeader(), null));
                     publicData = new PublicTiktokDataRespModel(this.itemTypeId, this.itemInfo, null);
                 }
@@ -168,4 +173,8 @@ public class DouYinApiProduct {
         return HttpClientUtil.doGet(xbogusDataModel.getUrl(), HeaderUtil.getDouYinSpecialHeader(xbogusDataModel.getMstoken(), xbogusDataModel.getTtwid()), null);
     }
 
+    public void setVersion(Integer version) {
+        this.version = version;
+        logger.info("[DouYinApiProduct]({}, {}) setting version success: {}", id, itemId, version);
+    }
 }

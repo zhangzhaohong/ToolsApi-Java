@@ -44,6 +44,8 @@ public abstract class DouYinApiBuilder {
      */
     public abstract DouYinApiBuilder getItemInfo() throws IOException, URISyntaxException;
 
+    public abstract DouYinApiBuilder version(Integer version);
+
     /**
      * 打印初始化入参
      */

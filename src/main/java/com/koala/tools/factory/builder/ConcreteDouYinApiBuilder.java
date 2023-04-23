@@ -53,6 +53,12 @@ public class ConcreteDouYinApiBuilder extends DouYinApiBuilder {
     }
 
     @Override
+    public DouYinApiBuilder version(Integer version) {
+        product.setVersion(version);
+        return this;
+    }
+
+    @Override
     public void printParams() {
         product.printParams();
     }
