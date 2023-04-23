@@ -14,7 +14,7 @@ import java.io.Serializable;
 @Data
 public class AppointmentInfoModel implements Serializable {
     @SerializedName("appointment_id")
-    private Integer appointmentId;
+    private Long appointmentId;
     @SerializedName("is_subscribe")
     private Boolean isSubscribe;
 }
