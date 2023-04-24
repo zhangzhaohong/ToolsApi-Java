@@ -27,7 +27,7 @@ import java.util.Objects;
  */
 public class DouYinApiProduct {
     private static final Logger logger = LoggerFactory.getLogger(DouYinApiProduct.class);
-    private Integer version = 2;
+    private Integer version = 3;
     private String url;
     private String host;
     private String directUrl;
