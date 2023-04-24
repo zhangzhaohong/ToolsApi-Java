@@ -1,8 +1,16 @@
 .custom-container {
     margin: 0 auto !important;
+    background: black;
 }
 
 .custom-style {
     width: 100vw !important;
     height: 100vh !important;
+}
+
+.video-container {
+    height: 100vh !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    display: block;
 }
