@@ -1,6 +1,7 @@
 package com.koala.tools.controller;
 
 import com.koala.tools.enums.DouYinRequestTypeEnums;
+import com.koala.tools.enums.DouYinTypeEnums;
 import com.koala.tools.factory.builder.ConcreteDouYinApiBuilder;
 import com.koala.tools.factory.builder.DouYinApiBuilder;
 import com.koala.tools.factory.director.DouYinApiManager;
@@ -8,6 +9,7 @@ import com.koala.tools.factory.product.DouYinApiProduct;
 import com.koala.tools.http.annotation.MixedHttpRequest;
 import com.koala.tools.models.douyin.v1.PublicTiktokDataRespModel;
 import com.koala.tools.models.douyin.v1.itemInfo.ItemInfoRespModel;
+import com.koala.tools.models.douyin.v1.roomInfoData.RoomInfoDataRespModel;
 import com.koala.tools.utils.HeaderUtil;
 import com.koala.tools.utils.HttpClientUtil;
 import org.slf4j.Logger;
@@ -17,6 +19,7 @@ import org.springframework.security.web.RedirectStrategy;
 import org.springframework.ui.Model;
 import org.springframework.util.Base64Utils;
 import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -131,10 +134,26 @@ public class DouYinToolsController {
                         break;
                     case PREVIEW:
                         if (checkCanPreview(productData.getItemTypeId())) {
-                            ItemInfoRespModel tmp = productData.getItemInfoData();
-                            if (!Objects.isNull(tmp) && !Objects.isNull(tmp.getAwemeDetailModel()) && !Objects.isNull(tmp.getAwemeDetailModel().getVideo()) && !ObjectUtils.isEmpty(tmp.getAwemeDetailModel().getVideo().getMockPreviewVidPath())) {
-                                redirectStrategy.sendRedirect(request, response, tmp.getAwemeDetailModel().getVideo().getMockPreviewVidPath());
+                            DouYinTypeEnums douYinTypeEnum = DouYinTypeEnums.getEnumsByCode(productData.getItemTypeId());
+                            switch (Objects.requireNonNull(douYinTypeEnum)) {
+                                case VIDEO_TYPE -> {
+                                    ItemInfoRespModel tmp = productData.getItemInfoData();
+                                    if (!Objects.isNull(tmp) && !Objects.isNull(tmp.getAwemeDetailModel()) && !Objects.isNull(tmp.getAwemeDetailModel().getVideo()) && !ObjectUtils.isEmpty(tmp.getAwemeDetailModel().getVideo().getMockPreviewVidPath())) {
+                                        redirectStrategy.sendRedirect(request, response, tmp.getAwemeDetailModel().getVideo().getMockPreviewVidPath());
+                                    }
+                                }
+                                case LIVE_TYPE_1, LIVE_TYPE_2 -> {
+                                    RoomInfoDataRespModel tmp = productData.getRoomItemInfoData();
+                                    if (!Objects.isNull(tmp) && !Objects.isNull(tmp.getData()) && !Objects.isNull(tmp.getData().getData()) && !Objects.isNull(tmp.getData().getData().get(0)) && !Objects.isNull(tmp
+                                            .getData().getData().get(0).getStreamUrl()) && StringUtils.hasLength(tmp.getData().getData().get(0).getStreamUrl().getMockPreviewVidPath())) {
+                                        redirectStrategy.sendRedirect(request, response, tmp.getData().getData().get(0).getStreamUrl().getMockPreviewVidPath());
+                                    }
+                                }
+                                default -> {
+                                    return formatRespData(UNSUPPORTED_OPERATION, null);
+                                }
                             }
+
                         } else {
                             return formatRespData(UNSUPPORTED_OPERATION, null);
                         }
