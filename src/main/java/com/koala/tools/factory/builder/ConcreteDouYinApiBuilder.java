@@ -35,7 +35,7 @@ public class ConcreteDouYinApiBuilder extends DouYinApiBuilder {
     }
 
     @Override
-    public DouYinApiBuilder getItemIdByDirectUrl() {
+    public DouYinApiBuilder getItemIdByDirectUrl() throws IOException, URISyntaxException {
         product.getItemIdByDirectUrl();
         return this;
     }
@@ -49,6 +49,12 @@ public class ConcreteDouYinApiBuilder extends DouYinApiBuilder {
     @Override
     public DouYinApiBuilder getItemInfo() throws IOException, URISyntaxException {
         product.getItemInfoData();
+        return this;
+    }
+
+    @Override
+    public DouYinApiBuilder version(Integer version) {
+        product.setVersion(version);
         return this;
     }
 

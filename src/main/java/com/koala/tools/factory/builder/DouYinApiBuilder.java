@@ -32,7 +32,7 @@ public abstract class DouYinApiBuilder {
     /**
      * @return Builder
      */
-    public abstract DouYinApiBuilder getItemIdByDirectUrl();
+    public abstract DouYinApiBuilder getItemIdByDirectUrl() throws IOException, URISyntaxException;
 
     /**
      * @return Builder
@@ -43,6 +43,8 @@ public abstract class DouYinApiBuilder {
      * @return Builder
      */
     public abstract DouYinApiBuilder getItemInfo() throws IOException, URISyntaxException;
+
+    public abstract DouYinApiBuilder version(Integer version);
 
     /**
      * 打印初始化入参

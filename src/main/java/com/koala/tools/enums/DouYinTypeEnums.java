@@ -13,6 +13,9 @@ import java.util.Optional;
  */
 @Getter
 public enum DouYinTypeEnums {
+    LIVE_TYPE_1("live_1", 7, "live.douyin.com"),
+    LIVE_TYPE_2("live_2", 6, "/webcast/reflow/"),
+    NOTE_TYPE("note", 5, "/note/"),
     VIDEO_TYPE("video", 4, "/video/"),
     IMAGE_TYPE("image", 2, null);
 
