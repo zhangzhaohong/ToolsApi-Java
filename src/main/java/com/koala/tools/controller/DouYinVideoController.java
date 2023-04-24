@@ -25,12 +25,23 @@ public class DouYinVideoController {
 
     @GetMapping("/video")
     public String video(@RequestParam(value = "title", required = false, defaultValue = "VideoPlayer") String title, @RequestParam(value = "livePath", required = false) String livePath, Model model, HttpServletRequest request) {
-        String itemTitle = new String(Base64Utils.decodeFromUrlSafeString(title));
+        String itemTitle = "VideoPlayer".equals(title) ? title : new String(Base64Utils.decodeFromUrlSafeString(title));
         String url = new String(Base64Utils.decodeFromUrlSafeString(livePath));
         logger.info("[previewVideo] itemTitle: {}, inputUrl: {}, Sec-Fetch-Dest: {}", itemTitle, url, request.getHeader("Sec-Fetch-Dest"));
         model.addAttribute("title", itemTitle);
         model.addAttribute("path", url);
         return "video/index";
     }
+
+    @GetMapping("/live")
+    public String live(@RequestParam(value = "title", required = false, defaultValue = "LivePlayer") String title, @RequestParam(value = "livePath", required = false) String livePath, Model model, HttpServletRequest request) {
+        String itemTitle = "LivePlayer".equals(title) ? title : new String(Base64Utils.decodeFromUrlSafeString(title));
+        String url = new String(Base64Utils.decodeFromUrlSafeString(livePath));
+        logger.info("[previewLive] itemTitle: {}, inputUrl: {}, Sec-Fetch-Dest: {}", itemTitle, url, request.getHeader("Sec-Fetch-Dest"));
+        model.addAttribute("title", itemTitle);
+        model.addAttribute("path", url);
+        return "live/index";
+    }
+
 
 }
