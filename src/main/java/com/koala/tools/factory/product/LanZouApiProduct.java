@@ -149,7 +149,9 @@ public class LanZouApiProduct {
     }
 
     public Object getFileWithPassword() throws IOException, URISyntaxException {
-        String sign = PatternUtil.matchData("'sign':'(.*?)'", this.pageData);
+        String sign1 = PatternUtil.matchData("'sign':'(.*?)'", this.pageData);
+        String sign2 = PatternUtil.matchData("var postsign = '(.*?)';", this.pageData);
+        String sign = ObjectUtils.isEmpty(sign1) ? sign2 : sign1;
         logger.info("[LanZouApiProduct]({}) sign: {}", id, sign);
         if (ObjectUtils.isEmpty(sign)) {
             // 目录
