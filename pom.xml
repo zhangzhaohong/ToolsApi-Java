@@ -75,6 +75,11 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <!-- thymeleaf -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
+        </dependency>
         <!-- mybatis-plus 3.5.3 才支持 spring boot 3-->
         <dependency>
             <groupId>com.baomidou</groupId>

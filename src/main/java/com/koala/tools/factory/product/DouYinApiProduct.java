@@ -149,7 +149,14 @@ public class DouYinApiProduct {
                         ratio = "540p";
                     }
                     if (!ObjectUtils.isEmpty(vid)) {
-                        if (this.version.equals(2)) {
+                        if (this.version.equals(3)) {
+                            String link = this.itemInfo.getAwemeDetailModel().getVideo().getPlayAddrInfoModel().getUrlList().get(0);
+                            String title = this.itemInfo.getAwemeDetailModel().getDesc();
+                            String previewPath = host + "tools/DouYin/preview/video?livePath=" + Base64Utils.encodeToUrlSafeString(link.getBytes(StandardCharsets.UTF_8));
+                            this.itemInfo.getAwemeDetailModel().getVideo().setRealPath(link);
+                            this.itemInfo.getAwemeDetailModel().getVideo().setMockPreviewVidPath(host + "tools/DouYin/pro/player/video?" + (ObjectUtils.isEmpty(title) ? "" : "title=" + Base64Utils.encodeToUrlSafeString(title.getBytes(StandardCharsets.UTF_8)) + "&") + "livePath=" + Base64Utils.encodeToUrlSafeString(previewPath.getBytes(StandardCharsets.UTF_8)));
+                            this.itemInfo.getAwemeDetailModel().getVideo().setMockDownloadVidPath(host + "tools/DouYin/preview/video?livePath=" + Base64Utils.encodeToUrlSafeString(link.getBytes(StandardCharsets.UTF_8)) + "&isDownload=true");
+                        } else if (this.version.equals(2)) {
                             String link = this.itemInfo.getAwemeDetailModel().getVideo().getPlayAddrInfoModel().getUrlList().get(0);
                             this.itemInfo.getAwemeDetailModel().getVideo().setRealPath(link);
                             this.itemInfo.getAwemeDetailModel().getVideo().setMockPreviewVidPath(host + "tools/DouYin/preview/video?livePath=" + Base64Utils.encodeToUrlSafeString(link.getBytes(StandardCharsets.UTF_8)));
