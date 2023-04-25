@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import javax.servlet.http.HttpServletRequest;
 
 import static com.koala.tools.enums.DouYinResponseEnums.UNAVAILABLE_PLAYER;
-import static com.koala.tools.enums.DouYinResponseEnums.UNSUPPORTED_OPERATION;
 import static com.koala.tools.utils.RespUtil.formatRespData;
 
 /**
@@ -29,7 +28,7 @@ public class DouYinVideoController {
     private static final Logger logger = LoggerFactory.getLogger(DouYinVideoController.class);
 
     @GetMapping("/video")
-    public String video(@RequestParam(value = "title", required = false, defaultValue = "VideoPlayer") String title, @RequestParam(value = "livePath", required = false) String livePath, @RequestParam(value = "version", required = false, defaultValue = "2") String version, Model model, HttpServletRequest request) {
+    public String video(@RequestParam(value = "title", required = false, defaultValue = "VideoPlayer") String title, @RequestParam(value = "livePath", required = false, defaultValue = "") String livePath, @RequestParam(value = "version", required = false, defaultValue = "2") String version, Model model, HttpServletRequest request) {
         String itemTitle = "VideoPlayer".equals(title) ? title : new String(Base64Utils.decodeFromUrlSafeString(title));
         String url = new String(Base64Utils.decodeFromUrlSafeString(livePath));
         logger.info("[videoPlayer] itemTitle: {}, inputUrl: {}, Sec-Fetch-Dest: {}", itemTitle, url, request.getHeader("Sec-Fetch-Dest"));
@@ -44,7 +43,7 @@ public class DouYinVideoController {
     }
 
     @GetMapping("/live")
-    public String live(@RequestParam(value = "title", required = false, defaultValue = "LivePlayer") String title, @RequestParam(value = "livePath", required = false) String livePath, Model model, HttpServletRequest request) {
+    public String live(@RequestParam(value = "title", required = false, defaultValue = "LivePlayer") String title, @RequestParam(value = "livePath", required = false, defaultValue = "") String livePath, Model model, HttpServletRequest request) {
         String itemTitle = "LivePlayer".equals(title) ? title : new String(Base64Utils.decodeFromUrlSafeString(title));
         String url = new String(Base64Utils.decodeFromUrlSafeString(livePath));
         logger.info("[livePlayer] itemTitle: {}, inputUrl: {}, Sec-Fetch-Dest: {}", itemTitle, url, request.getHeader("Sec-Fetch-Dest"));
