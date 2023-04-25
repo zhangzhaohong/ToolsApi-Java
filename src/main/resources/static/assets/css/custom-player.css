@@ -1,16 +1,18 @@
 .custom-container {
     margin: 0 auto !important;
-    background: black;
+    background: black !important;
+    overflow: hidden !important;
 }
 
 .custom-style {
     width: 100vw !important;
     height: 100vh !important;
+    aspect-ratio: unset !important;
 }
 
 .video-container {
     height: 100vh !important;
     margin-left: auto !important;
     margin-right: auto !important;
-    display: block;
+    display: block !important;
 }
