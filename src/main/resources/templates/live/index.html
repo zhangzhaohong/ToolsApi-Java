@@ -8,7 +8,7 @@
 </head>
 <body class="custom-container">
 <video
-        id="videoElement"
+        id="live-player"
         class="video-container"
         th:data="${path}"
         controls
@@ -20,7 +20,7 @@
 </body>
 <script>
     if (flvjs.isSupported()) {
-        const videoElement = document.getElementById('videoElement');
+        const videoElement = document.getElementById('live-player');
         const path = videoElement.getAttribute("data");
         const flvPlayer = flvjs.createPlayer({
             type: 'flv',
