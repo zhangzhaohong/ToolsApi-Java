@@ -16,11 +16,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.web.DefaultRedirectStrategy;
 import org.springframework.security.web.RedirectStrategy;
-import org.springframework.ui.Model;
 import org.springframework.util.Base64Utils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -33,10 +35,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import static com.koala.tools.enums.DouYinResponseEnums.*;
-import static com.koala.tools.enums.DouYinResponseEnums.INVALID_TYPE;
-import static com.koala.tools.enums.DouYinTypeEnums.LIVE_TYPE_1;
-import static com.koala.tools.enums.DouYinTypeEnums.LIVE_TYPE_2;
-import static com.koala.tools.enums.DouYinTypeEnums.VIDEO_TYPE;
+import static com.koala.tools.enums.DouYinTypeEnums.*;
 import static com.koala.tools.utils.RespUtil.formatRespData;
 
 /**
