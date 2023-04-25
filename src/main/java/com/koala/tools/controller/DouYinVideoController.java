@@ -51,6 +51,5 @@ public class DouYinVideoController {
         model.addAttribute("path", url);
         return "live/index";
     }
-
-
+    
 }
