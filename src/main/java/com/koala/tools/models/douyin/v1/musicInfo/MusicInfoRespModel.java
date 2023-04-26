@@ -14,6 +14,7 @@ import java.util.List;
  */
 @Data
 public class MusicInfoRespModel implements Serializable {
+    @SerializedName("aweme_list")
     private List<AwemeMusicDetailModel> awemeMusicDetail;
     private Integer cursor;
     private Extra extra;

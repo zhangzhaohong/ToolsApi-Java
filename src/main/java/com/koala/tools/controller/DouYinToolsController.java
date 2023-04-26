@@ -70,7 +70,7 @@ public class DouYinToolsController {
             return formatRespData(FAILURE, null);
         }
         if ("0".equals(isDownload)) {
-            redirectStrategy.sendRedirect(request, response, "/tools/DouYin/preview/video?livePath=" + Base64Utils.encodeToUrlSafeString(redirectUrl.getBytes(StandardCharsets.UTF_8)));
+            redirectStrategy.sendRedirect(request, response, "/tools/DouYin/preview/video?path=" + Base64Utils.encodeToUrlSafeString(redirectUrl.getBytes(StandardCharsets.UTF_8)));
         } else {
             HttpClientUtil.doRelay(redirectUrl, HeaderUtil.getDouYinDownloadHeader(), null, 206, HeaderUtil.getMockVideoHeader(true), request, response);
         }
@@ -78,15 +78,15 @@ public class DouYinToolsController {
     }
 
     @GetMapping("preview/video")
-    public void previewVideo(@RequestParam String livePath, @RequestParam(value = "isDownload", required = false, defaultValue = "false") Boolean isDownload, HttpServletRequest request, HttpServletResponse response) throws IOException, URISyntaxException {
-        String url = new String(Base64Utils.decodeFromUrlSafeString(livePath));
+    public void previewVideo(@RequestParam String path, @RequestParam(value = "isDownload", required = false, defaultValue = "false") Boolean isDownload, HttpServletRequest request, HttpServletResponse response) throws IOException, URISyntaxException {
+        String url = new String(Base64Utils.decodeFromUrlSafeString(path));
         logger.info("[previewVideo] inputUrl: {}, Sec-Fetch-Dest: {}", url, request.getHeader("Sec-Fetch-Dest"));
         HttpClientUtil.doRelay(url, HeaderUtil.getDouYinDownloadHeader(), null, 206, HeaderUtil.getMockVideoHeader(isDownload), request, response);
     }
 
     @GetMapping("preview/liveStream")
-    public void previewLiveStream(@RequestParam String livePath, HttpServletRequest request, HttpServletResponse response) throws IOException, URISyntaxException {
-        String url = new String(Base64Utils.decodeFromUrlSafeString(livePath));
+    public void previewLiveStream(@RequestParam String path, HttpServletRequest request, HttpServletResponse response) throws IOException, URISyntaxException {
+        String url = new String(Base64Utils.decodeFromUrlSafeString(path));
         logger.info("[previewLive] inputUrl: {}, Sec-Fetch-Dest: {}", url, request.getHeader("Sec-Fetch-Dest"));
         HttpClientUtil.doRelay(url, HeaderUtil.getDouYinDownloadHeader(), null, 206, HeaderUtil.getMockLiveStreamHeader(), request, response);
     }
