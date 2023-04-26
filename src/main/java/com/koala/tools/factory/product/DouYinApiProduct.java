@@ -57,8 +57,10 @@ public class DouYinApiProduct {
         if (!Objects.isNull(this.directUrl)) {
             DouYinTypeEnums douYinTypeEnum = DouYinTypeEnums.getEnumsByCode(this.itemTypeId);
             switch (Objects.requireNonNull(douYinTypeEnum)) {
+                case MUSIC_TYPE ->
+                        this.itemId = PatternUtil.matchData(douYinTypeEnum.getPrefix() + "(.*?)\\?", this.directUrl);
                 case NOTE_TYPE, VIDEO_TYPE ->
-                        this.itemId = PatternUtil.matchData(douYinTypeEnum.getType() + "/(.*?)/", this.directUrl);
+                        this.itemId = PatternUtil.matchData(douYinTypeEnum.getPrefix() + "(.*?)/", this.directUrl);
                 case LIVE_TYPE_1 ->
                         this.itemId = this.directUrl.replaceFirst("https://" + douYinTypeEnum.getPrefix() + "/", "");
                 case LIVE_TYPE_2 -> {
@@ -102,6 +104,14 @@ public class DouYinApiProduct {
     public void getItemInfoData() throws IOException, URISyntaxException {
         if (!Objects.isNull(this.itemId)) {
             switch (Objects.requireNonNull(DouYinTypeEnums.getEnumsByCode(this.itemTypeId))) {
+                case MUSIC_TYPE -> {
+                    int count = 35;
+                    int cursor = 0;
+                    String musicInfoPath = "https://www.douyin.com/aweme/v1/web/music/aweme/?music_id=" + this.itemId + "&cursor=" + cursor + "&count=" + count + "&device_platform=webapp&aid=6383";
+                    logger.info("[DouYinApiProduct]({}, {}) musicInfoPath: {}", id, itemId, musicInfoPath);
+                    String musicInfoResponse = doGetXbogusRequest(musicInfoPath);
+                    logger.info("[DouYinApiProduct]({}, {}) itemInfoResponse: {}", id, itemId, musicInfoResponse);
+                }
                 case VIDEO_TYPE, NOTE_TYPE -> {
                     String itemInfoPath = "https://www.douyin.com/aweme/v1/web/aweme/detail/?aweme_id=" + this.itemId + "&device_platform=webapp&aid=6383";
                     logger.info("[DouYinApiProduct]({}, {}) itemInfoPath: {}", id, itemId, itemInfoPath);

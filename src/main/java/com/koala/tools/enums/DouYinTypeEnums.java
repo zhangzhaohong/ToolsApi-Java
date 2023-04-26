@@ -13,6 +13,7 @@ import java.util.Optional;
  */
 @Getter
 public enum DouYinTypeEnums {
+    MUSIC_TYPE("music", 8, "/music/"),
     LIVE_TYPE_1("live_1", 7, "live.douyin.com"),
     LIVE_TYPE_2("live_2", 6, "/webcast/reflow/"),
     NOTE_TYPE("note", 5, "/note/"),
