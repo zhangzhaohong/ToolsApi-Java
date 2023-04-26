@@ -9,6 +9,7 @@ import com.koala.tools.factory.product.DouYinApiProduct;
 import com.koala.tools.http.annotation.MixedHttpRequest;
 import com.koala.tools.models.douyin.v1.PublicTiktokDataRespModel;
 import com.koala.tools.models.douyin.v1.itemInfo.ItemInfoRespModel;
+import com.koala.tools.models.douyin.v1.musicInfo.MusicInfoRespModel;
 import com.koala.tools.models.douyin.v1.roomInfoData.RoomInfoDataRespModel;
 import com.koala.tools.utils.HeaderUtil;
 import com.koala.tools.utils.HttpClientUtil;
@@ -142,6 +143,12 @@ public class DouYinToolsController {
                         if (checkCanPreview(productData.getItemTypeId())) {
                             DouYinTypeEnums douYinTypeEnum = DouYinTypeEnums.getEnumsByCode(productData.getItemTypeId());
                             switch (Objects.requireNonNull(douYinTypeEnum)) {
+                                case MUSIC_TYPE -> {
+                                    MusicInfoRespModel tmp = productData.getMusicItemInfoData();
+                                    if (!Objects.isNull(tmp) && !Objects.isNull(tmp.getAwemeMusicDetail()) && !Objects.isNull(tmp.getAwemeMusicDetail().get(0)) && !Objects.isNull(tmp.getAwemeMusicDetail().get(0).getMusic()) && !ObjectUtils.isEmpty(tmp.getAwemeMusicDetail().get(0).getMusic().getMockPreviewMusicPath())) {
+                                        redirectStrategy.sendRedirect(request, response, tmp.getAwemeMusicDetail().get(0).getMusic().getMockPreviewMusicPath());
+                                    }
+                                }
                                 case VIDEO_TYPE -> {
                                     ItemInfoRespModel tmp = productData.getItemInfoData();
                                     if (!Objects.isNull(tmp) && !Objects.isNull(tmp.getAwemeDetailModel()) && !Objects.isNull(tmp.getAwemeDetailModel().getVideo()) && !ObjectUtils.isEmpty(tmp.getAwemeDetailModel().getVideo().getMockPreviewVidPath())) {
@@ -180,6 +187,6 @@ public class DouYinToolsController {
     }
 
     private Boolean checkCanPreview(Integer itemTypeId) {
-        return itemTypeId.equals(VIDEO_TYPE.getCode()) || itemTypeId.equals(LIVE_TYPE_1.getCode()) || itemTypeId.equals(LIVE_TYPE_2.getCode());
+        return itemTypeId.equals(VIDEO_TYPE.getCode()) || itemTypeId.equals(LIVE_TYPE_1.getCode()) || itemTypeId.equals(LIVE_TYPE_2.getCode()) || itemTypeId.equals(MUSIC_TYPE.getCode());
     }
 }
