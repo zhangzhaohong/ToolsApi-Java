@@ -4,6 +4,11 @@
     overflow: hidden !important;
 }
 
+.custom-music-container {
+    margin: 0 auto !important;
+    overflow: hidden !important;
+}
+
 .custom-style {
     width: 100vw !important;
     height: 100vh !important;
