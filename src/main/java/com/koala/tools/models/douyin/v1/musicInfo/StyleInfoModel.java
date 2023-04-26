@@ -4,7 +4,6 @@ import com.google.gson.annotations.SerializedName;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.util.List;
 
 /**
  * @author koala
@@ -13,9 +12,10 @@ import java.util.List;
  * @description
  */
 @Data
-public class Extra implements Serializable {
-    @SerializedName("fatal_item_ids")
-    private List<String> fatalItemIds;
-    private String logid;
-    private long now;
+public class StyleInfoModel implements Serializable {
+    @SerializedName("default_icon")
+    private String defaultIcon;
+    private String extra;
+    @SerializedName("scene_icon")
+    private String sceneIcon;
 }

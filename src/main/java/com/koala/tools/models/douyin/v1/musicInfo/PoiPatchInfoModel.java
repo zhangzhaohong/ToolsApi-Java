@@ -4,7 +4,6 @@ import com.google.gson.annotations.SerializedName;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.util.List;
 
 /**
  * @author koala
@@ -13,9 +12,8 @@ import java.util.List;
  * @description
  */
 @Data
-public class Extra implements Serializable {
-    @SerializedName("fatal_item_ids")
-    private List<String> fatalItemIds;
-    private String logid;
-    private long now;
+public class PoiPatchInfoModel implements Serializable {
+    private String extra;
+    @SerializedName("item_patch_poi_prompt_mark")
+    private Integer itemPatchPoiPromptMark;
 }

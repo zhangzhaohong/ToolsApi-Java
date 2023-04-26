@@ -4,18 +4,17 @@ import com.google.gson.annotations.SerializedName;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.util.List;
 
 /**
  * @author koala
  * @version 1.0
- * @date 2023/4/26 13:29
+ * @date 2022/2/19 20:38
  * @description
  */
 @Data
-public class Extra implements Serializable {
-    @SerializedName("fatal_item_ids")
-    private List<String> fatalItemIds;
-    private String logid;
-    private long now;
+public class DiggLottieModel implements Serializable {
+    @SerializedName("can_bomb")
+    private Integer canBomb;
+    @SerializedName("lottie_id")
+    private String lottieId;
 }

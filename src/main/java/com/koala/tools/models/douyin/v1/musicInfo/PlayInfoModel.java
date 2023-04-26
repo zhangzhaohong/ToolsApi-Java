@@ -9,11 +9,11 @@ import java.util.List;
 /**
  * @author koala
  * @version 1.0
- * @date 2023/4/26 13:29
+ * @date 2022/2/19 20:38
  * @description
  */
 @Data
-public class Icon implements Serializable {
+public class PlayInfoModel implements Serializable {
     private int height;
     private String uri;
     @SerializedName("url_key")

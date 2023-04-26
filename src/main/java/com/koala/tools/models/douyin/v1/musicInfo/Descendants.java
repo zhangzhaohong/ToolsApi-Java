@@ -1,5 +1,9 @@
-
 package com.koala.tools.models.douyin.v1.musicInfo;
+
+import com.google.gson.annotations.SerializedName;
+import lombok.Data;
+
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -8,22 +12,9 @@ import java.util.List;
  * @date 2023/4/26 13:29
  * @description
  */
-public class Descendants {
-
-    private String notify_msg;
+@Data
+public class Descendants implements Serializable {
+    @SerializedName("notify_msg")
+    private String notifyMsg;
     private List<String> platforms;
-    public void setNotify_msg(String notify_msg) {
-         this.notify_msg = notify_msg;
-     }
-     public String getNotify_msg() {
-         return notify_msg;
-     }
-
-    public void setPlatforms(List<String> platforms) {
-         this.platforms = platforms;
-     }
-     public List<String> getPlatforms() {
-         return platforms;
-     }
-
 }

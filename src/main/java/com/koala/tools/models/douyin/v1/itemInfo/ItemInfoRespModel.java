@@ -20,5 +20,5 @@ public class ItemInfoRespModel implements Serializable {
     @SerializedName("log_pb")
     private LogPbModel logPb;
     @SerializedName("status_code")
-    private int statusCode;
+    private Integer statusCode;
 }
