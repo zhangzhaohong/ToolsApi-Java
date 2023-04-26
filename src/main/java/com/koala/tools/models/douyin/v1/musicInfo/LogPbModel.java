@@ -1,4 +1,4 @@
-package com.koala.tools.models.douyin.v1.itemInfo;
+package com.koala.tools.models.douyin.v1.musicInfo;
 
 import com.google.gson.annotations.SerializedName;
 import lombok.Data;
@@ -12,7 +12,7 @@ import java.io.Serializable;
  * @description
  */
 @Data
-public class LunaInfoModel implements Serializable {
-    @SerializedName("is_luna_user")
-    private Boolean isLunaUser;
+public class LogPbModel implements Serializable {
+    @SerializedName("impr_id")
+    private String imprId;
 }

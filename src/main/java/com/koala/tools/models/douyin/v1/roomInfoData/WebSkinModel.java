@@ -14,5 +14,5 @@ import java.io.Serializable;
 @Data
 public class WebSkinModel implements Serializable {
     @SerializedName("enable_skin")
-    private boolean enableSkin;
+    private Boolean enableSkin;
 }

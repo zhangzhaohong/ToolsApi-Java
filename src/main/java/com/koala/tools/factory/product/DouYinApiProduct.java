@@ -3,6 +3,7 @@ package com.koala.tools.factory.product;
 import com.koala.tools.enums.DouYinTypeEnums;
 import com.koala.tools.models.douyin.v1.PublicTiktokDataRespModel;
 import com.koala.tools.models.douyin.v1.itemInfo.ItemInfoRespModel;
+import com.koala.tools.models.douyin.v1.musicInfo.MusicInfoRespModel;
 import com.koala.tools.models.douyin.v1.roomInfo.RoomInfoRespModel;
 import com.koala.tools.models.douyin.v1.roomInfoData.RoomInfoDataRespModel;
 import com.koala.tools.models.xbogus.XbogusDataModel;
@@ -36,8 +37,9 @@ public class DouYinApiProduct {
     private String id;
     private Integer itemTypeId = -1;
     private String itemId;
-    private ItemInfoRespModel itemInfo;
-    private RoomInfoDataRespModel roomInfoData;
+    private ItemInfoRespModel itemInfo = null;
+    private MusicInfoRespModel musicItemInfo = null;
+    private RoomInfoDataRespModel roomInfoData = null;
 
     public void setUrl(String url) {
         this.url = url;
@@ -57,8 +59,10 @@ public class DouYinApiProduct {
         if (!Objects.isNull(this.directUrl)) {
             DouYinTypeEnums douYinTypeEnum = DouYinTypeEnums.getEnumsByCode(this.itemTypeId);
             switch (Objects.requireNonNull(douYinTypeEnum)) {
+                case MUSIC_TYPE ->
+                        this.itemId = PatternUtil.matchData(douYinTypeEnum.getPrefix() + "(.*?)\\?", this.directUrl);
                 case NOTE_TYPE, VIDEO_TYPE ->
-                        this.itemId = PatternUtil.matchData(douYinTypeEnum.getType() + "/(.*?)/", this.directUrl);
+                        this.itemId = PatternUtil.matchData(douYinTypeEnum.getPrefix() + "(.*?)/", this.directUrl);
                 case LIVE_TYPE_1 ->
                         this.itemId = this.directUrl.replaceFirst("https://" + douYinTypeEnum.getPrefix() + "/", "");
                 case LIVE_TYPE_2 -> {
@@ -102,6 +106,19 @@ public class DouYinApiProduct {
     public void getItemInfoData() throws IOException, URISyntaxException {
         if (!Objects.isNull(this.itemId)) {
             switch (Objects.requireNonNull(DouYinTypeEnums.getEnumsByCode(this.itemTypeId))) {
+                case MUSIC_TYPE -> {
+                    int count = 1;
+                    int cursor = 0;
+                    String musicInfoPath = "https://www.douyin.com/aweme/v1/web/music/aweme/?music_id=" + this.itemId + "&cursor=" + cursor + "&count=" + count + "&device_platform=webapp&aid=6383";
+                    logger.info("[DouYinApiProduct]({}, {}) musicInfoPath: {}", id, itemId, musicInfoPath);
+                    String musicInfoDataResponse = doGetXbogusRequest(musicInfoPath);
+                    logger.info("[DouYinApiProduct]({}, {}) itemInfoResponse: {}", id, itemId, musicInfoDataResponse);
+                    try {
+                        this.musicItemInfo = GsonUtil.toBean(musicInfoDataResponse, MusicInfoRespModel.class);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
                 case VIDEO_TYPE, NOTE_TYPE -> {
                     String itemInfoPath = "https://www.douyin.com/aweme/v1/web/aweme/detail/?aweme_id=" + this.itemId + "&device_platform=webapp&aid=6383";
                     logger.info("[DouYinApiProduct]({}, {}) itemInfoPath: {}", id, itemId, itemInfoPath);
@@ -141,21 +158,30 @@ public class DouYinApiProduct {
         PublicTiktokDataRespModel publicData = null;
         try {
             switch (Objects.requireNonNull(DouYinTypeEnums.getEnumsByCode(this.itemTypeId))) {
+                case MUSIC_TYPE -> {
+                    if (!Objects.isNull(this.musicItemInfo.getAwemeMusicDetail().get(0).getMusic())) {
+                        if (this.version.equals(3)) {
+                            String link = this.musicItemInfo.getAwemeMusicDetail().get(0).getMusic().getPlayUrl().getUri();
+                            String title = this.musicItemInfo.getAwemeMusicDetail().get(0).getMusic().getTitle();
+                            this.musicItemInfo.getAwemeMusicDetail().get(0).getMusic().setMockPreviewMusicPath(host + "tools/DouYin/pro/player/music?" + (StringUtils.hasLength(title) ? "title=" + Base64Utils.encodeToUrlSafeString(title.getBytes(StandardCharsets.UTF_8)) + "&" : "") + "path=" + Base64Utils.encodeToUrlSafeString(link.getBytes(StandardCharsets.UTF_8)));
+                            this.musicItemInfo.getAwemeMusicDetail().get(0).getMusic().setMockDownloadMusicPath(host + "tools/DouYin/download/music?path=" + Base64Utils.encodeToUrlSafeString(link.getBytes(StandardCharsets.UTF_8)));
+                        }
+                    }
+                }
                 case NOTE_TYPE -> {
-                    // do nothing
+
                 }
                 case LIVE_TYPE_1, LIVE_TYPE_2 -> {
                     if (!Objects.isNull(this.roomInfoData.getData().getData().get(0).getStreamUrl())) {
                         if (this.version.equals(3)) {
                             String link = this.roomInfoData.getData().getData().get(0).getStreamUrl().getFlvPullUrl().getFullHd1().replaceFirst("http://", "https://");
                             String title = this.roomInfoData.getData().getData().get(0).getOwner().getNickname() + "的直播间";
-                            this.roomInfoData.getData().getData().get(0).getStreamUrl().setMockPreviewVidPath(host + "tools/DouYin/pro/player/live?" + (StringUtils.hasLength(title) && !"的直播间".equals(title) ? "title=" + Base64Utils.encodeToUrlSafeString(title.getBytes(StandardCharsets.UTF_8)) + "&" : "") + "livePath=" + Base64Utils.encodeToUrlSafeString(link.getBytes(StandardCharsets.UTF_8)));
+                            this.roomInfoData.getData().getData().get(0).getStreamUrl().setMockPreviewVidPath(host + "tools/DouYin/pro/player/live?" + (StringUtils.hasLength(title) && !"的直播间".equals(title) ? "title=" + Base64Utils.encodeToUrlSafeString(title.getBytes(StandardCharsets.UTF_8)) + "&" : "") + "path=" + Base64Utils.encodeToUrlSafeString(link.getBytes(StandardCharsets.UTF_8)));
                         } else if (this.version.equals(2)) {
                             String link = this.roomInfoData.getData().getData().get(0).getStreamUrl().getFlvPullUrl().getFullHd1().replaceFirst("http://", "https://");
-                            this.roomInfoData.getData().getData().get(0).getStreamUrl().setMockPreviewVidPath(host + "tools/DouYin/preview/liveStream?livePath=" + Base64Utils.encodeToUrlSafeString(link.getBytes(StandardCharsets.UTF_8)));
+                            this.roomInfoData.getData().getData().get(0).getStreamUrl().setMockPreviewVidPath(host + "tools/DouYin/preview/liveStream?path=" + Base64Utils.encodeToUrlSafeString(link.getBytes(StandardCharsets.UTF_8)));
                         }
                     }
-                    publicData = new PublicTiktokDataRespModel(this.itemTypeId, null, this.roomInfoData);
                 }
                 case VIDEO_TYPE -> {
                     String vid = this.itemInfo.getAwemeDetailModel().getVideo().getPlayAddrInfoModel().getUri();
@@ -167,15 +193,15 @@ public class DouYinApiProduct {
                         if (this.version.equals(3)) {
                             String link = this.itemInfo.getAwemeDetailModel().getVideo().getPlayAddrInfoModel().getUrlList().get(0);
                             String title = this.itemInfo.getAwemeDetailModel().getDesc();
-                            String previewPath = host + "tools/DouYin/preview/video?livePath=" + Base64Utils.encodeToUrlSafeString(link.getBytes(StandardCharsets.UTF_8));
+                            String previewPath = host + "tools/DouYin/preview/video?path=" + Base64Utils.encodeToUrlSafeString(link.getBytes(StandardCharsets.UTF_8));
                             this.itemInfo.getAwemeDetailModel().getVideo().setRealPath(link);
-                            this.itemInfo.getAwemeDetailModel().getVideo().setMockPreviewVidPath(host + "tools/DouYin/pro/player/video?" + (StringUtils.hasLength(title) ? "title=" + Base64Utils.encodeToUrlSafeString(title.getBytes(StandardCharsets.UTF_8)) + "&" : "") + "livePath=" + Base64Utils.encodeToUrlSafeString(previewPath.getBytes(StandardCharsets.UTF_8)));
-                            this.itemInfo.getAwemeDetailModel().getVideo().setMockDownloadVidPath(host + "tools/DouYin/preview/video?livePath=" + Base64Utils.encodeToUrlSafeString(link.getBytes(StandardCharsets.UTF_8)) + "&isDownload=true");
+                            this.itemInfo.getAwemeDetailModel().getVideo().setMockPreviewVidPath(host + "tools/DouYin/pro/player/video?" + (StringUtils.hasLength(title) ? "title=" + Base64Utils.encodeToUrlSafeString(title.getBytes(StandardCharsets.UTF_8)) + "&" : "") + "path=" + Base64Utils.encodeToUrlSafeString(previewPath.getBytes(StandardCharsets.UTF_8)));
+                            this.itemInfo.getAwemeDetailModel().getVideo().setMockDownloadVidPath(host + "tools/DouYin/preview/video?path=" + Base64Utils.encodeToUrlSafeString(link.getBytes(StandardCharsets.UTF_8)) + "&isDownload=true");
                         } else if (this.version.equals(2)) {
                             String link = this.itemInfo.getAwemeDetailModel().getVideo().getPlayAddrInfoModel().getUrlList().get(0);
                             this.itemInfo.getAwemeDetailModel().getVideo().setRealPath(link);
-                            this.itemInfo.getAwemeDetailModel().getVideo().setMockPreviewVidPath(host + "tools/DouYin/preview/video?livePath=" + Base64Utils.encodeToUrlSafeString(link.getBytes(StandardCharsets.UTF_8)));
-                            this.itemInfo.getAwemeDetailModel().getVideo().setMockDownloadVidPath(host + "tools/DouYin/preview/video?livePath=" + Base64Utils.encodeToUrlSafeString(link.getBytes(StandardCharsets.UTF_8)) + "&isDownload=true");
+                            this.itemInfo.getAwemeDetailModel().getVideo().setMockPreviewVidPath(host + "tools/DouYin/preview/video?path=" + Base64Utils.encodeToUrlSafeString(link.getBytes(StandardCharsets.UTF_8)));
+                            this.itemInfo.getAwemeDetailModel().getVideo().setMockDownloadVidPath(host + "tools/DouYin/preview/video?path=" + Base64Utils.encodeToUrlSafeString(link.getBytes(StandardCharsets.UTF_8)) + "&isDownload=true");
                         } else if (this.version.equals(1)) {
                             String link = "https://aweme.snssdk.com/aweme/v1/play/?video_id=" + vid + "&line=0&ratio=" + ratio + "&media_type=4&vr_type=0&improve_bitrate=0&is_play_url=1&is_support_h265=0&source=PackSourceEnum_PUBLISH";
                             this.itemInfo.getAwemeDetailModel().getVideo().setRealPath(link);
@@ -183,7 +209,6 @@ public class DouYinApiProduct {
                             this.itemInfo.getAwemeDetailModel().getVideo().setMockDownloadVidPath(host + "tools/DouYin/player/video?vid=" + vid + "&ratio=" + ratio + "&isDownload=1");
                         }
                         // logger.info("[DouYinApiProduct]({}, {}) realFile: {}", id, itemId,HttpClientUtil.doGetRedirectLocation(link, HeaderUtil.getDouYinDownloadHeader(), null));
-                        publicData = new PublicTiktokDataRespModel(this.itemTypeId, this.itemInfo, null);
                     }
                 }
                 case IMAGE_TYPE, default ->
@@ -192,6 +217,7 @@ public class DouYinApiProduct {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        publicData = new PublicTiktokDataRespModel(this.itemTypeId, this.itemInfo, this.musicItemInfo, this.roomInfoData);
         logger.info("[DouYinApiProduct]({}, {}) publicData: {}", id, itemId, publicData);
         return publicData;
     }

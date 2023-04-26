@@ -2,6 +2,7 @@ package com.koala.tools.models.douyin.v1;
 
 import com.google.gson.annotations.SerializedName;
 import com.koala.tools.models.douyin.v1.itemInfo.ItemInfoRespModel;
+import com.koala.tools.models.douyin.v1.musicInfo.MusicInfoRespModel;
 import com.koala.tools.models.douyin.v1.roomInfoData.RoomInfoDataRespModel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -19,6 +20,8 @@ public class PublicTiktokDataRespModel {
     private Integer itemTypeId;
     @SerializedName("item_info_data")
     private ItemInfoRespModel itemInfoData;
+    @SerializedName("music_item_info_data")
+    private MusicInfoRespModel musicItemInfoData;
     @SerializedName("room_item_info_data")
     private RoomInfoDataRespModel roomItemInfoData;
 }

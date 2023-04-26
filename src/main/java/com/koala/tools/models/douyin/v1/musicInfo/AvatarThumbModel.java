@@ -1,4 +1,4 @@
-package com.koala.tools.models.douyin.v1.itemInfo;
+package com.koala.tools.models.douyin.v1.musicInfo;
 
 import com.google.gson.annotations.SerializedName;
 import lombok.Data;
@@ -13,7 +13,7 @@ import java.util.List;
  * @description
  */
 @Data
-public class CoverThumbModel implements Serializable {
+public class AvatarThumbModel implements Serializable {
     private Integer height;
     private String uri;
     @SerializedName("url_list")

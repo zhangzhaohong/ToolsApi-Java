@@ -23,14 +23,14 @@ import static com.koala.tools.utils.RespUtil.formatRespData;
 @SuppressWarnings("AlibabaUndefineMagicConstant")
 @Controller
 @RequestMapping("tools/DouYin/pro/player")
-public class DouYinVideoController {
+public class DouYinPlayerController {
 
-    private static final Logger logger = LoggerFactory.getLogger(DouYinVideoController.class);
+    private static final Logger logger = LoggerFactory.getLogger(DouYinPlayerController.class);
 
     @GetMapping("/video")
-    public String video(@RequestParam(value = "title", required = false, defaultValue = "VideoPlayer") String title, @RequestParam(value = "livePath", required = false, defaultValue = "") String livePath, @RequestParam(value = "version", required = false, defaultValue = "2") String version, Model model, HttpServletRequest request) {
+    public String video(@RequestParam(value = "title", required = false, defaultValue = "VideoPlayer") String title, @RequestParam(value = "path", required = false, defaultValue = "") String path, @RequestParam(value = "version", required = false, defaultValue = "2") String version, Model model, HttpServletRequest request) {
         String itemTitle = "VideoPlayer".equals(title) ? title : new String(Base64Utils.decodeFromUrlSafeString(title));
-        String url = new String(Base64Utils.decodeFromUrlSafeString(livePath));
+        String url = new String(Base64Utils.decodeFromUrlSafeString(path));
         logger.info("[videoPlayer] itemTitle: {}, inputUrl: {}, Sec-Fetch-Dest: {}", itemTitle, url, request.getHeader("Sec-Fetch-Dest"));
         model.addAttribute("title", itemTitle);
         model.addAttribute("path", url);
@@ -43,13 +43,23 @@ public class DouYinVideoController {
     }
 
     @GetMapping("/live")
-    public String live(@RequestParam(value = "title", required = false, defaultValue = "LivePlayer") String title, @RequestParam(value = "livePath", required = false, defaultValue = "") String livePath, Model model, HttpServletRequest request) {
+    public String live(@RequestParam(value = "title", required = false, defaultValue = "LivePlayer") String title, @RequestParam(value = "path", required = false, defaultValue = "") String path, Model model, HttpServletRequest request) {
         String itemTitle = "LivePlayer".equals(title) ? title : new String(Base64Utils.decodeFromUrlSafeString(title));
-        String url = new String(Base64Utils.decodeFromUrlSafeString(livePath));
+        String url = new String(Base64Utils.decodeFromUrlSafeString(path));
         logger.info("[livePlayer] itemTitle: {}, inputUrl: {}, Sec-Fetch-Dest: {}", itemTitle, url, request.getHeader("Sec-Fetch-Dest"));
         model.addAttribute("title", itemTitle);
         model.addAttribute("path", url);
         return "live/index";
     }
-    
+
+    @GetMapping("/music")
+    public String music(@RequestParam(value = "title", required = false, defaultValue = "MusicPlayer") String title, @RequestParam(value = "path", required = false, defaultValue = "") String path, Model model, HttpServletRequest request) {
+        String itemTitle = "MusicPlayer".equals(title) ? title : new String(Base64Utils.decodeFromUrlSafeString(title));
+        String url = new String(Base64Utils.decodeFromUrlSafeString(path));
+        logger.info("[musicPlayer] itemTitle: {}, inputUrl: {}, Sec-Fetch-Dest: {}", itemTitle, url, request.getHeader("Sec-Fetch-Dest"));
+        model.addAttribute("title", itemTitle);
+        model.addAttribute("path", url);
+        return "music/plyr/index";
+    }
+
 }

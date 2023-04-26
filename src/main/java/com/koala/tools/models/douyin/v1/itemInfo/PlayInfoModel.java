@@ -14,11 +14,11 @@ import java.util.List;
  */
 @Data
 public class PlayInfoModel implements Serializable {
-    private int height;
+    private Integer height;
     private String uri;
     @SerializedName("url_key")
     private String urlKey;
     @SerializedName("url_list")
     private List<String> urlList;
-    private int width;
+    private Integer width;
 }

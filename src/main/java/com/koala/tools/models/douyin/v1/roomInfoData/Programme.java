@@ -14,5 +14,5 @@ import java.io.Serializable;
 @Data
 public class Programme implements Serializable {
     @SerializedName("enable_programme")
-    private boolean enableProgramme;
+    private Boolean enableProgramme;
 }
