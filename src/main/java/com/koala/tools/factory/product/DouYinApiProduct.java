@@ -105,7 +105,7 @@ public class DouYinApiProduct {
         if (!Objects.isNull(this.itemId)) {
             switch (Objects.requireNonNull(DouYinTypeEnums.getEnumsByCode(this.itemTypeId))) {
                 case MUSIC_TYPE -> {
-                    int count = 35;
+                    int count = 1;
                     int cursor = 0;
                     String musicInfoPath = "https://www.douyin.com/aweme/v1/web/music/aweme/?music_id=" + this.itemId + "&cursor=" + cursor + "&count=" + count + "&device_platform=webapp&aid=6383";
                     logger.info("[DouYinApiProduct]({}, {}) musicInfoPath: {}", id, itemId, musicInfoPath);
