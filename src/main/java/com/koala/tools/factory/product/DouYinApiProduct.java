@@ -169,7 +169,7 @@ public class DouYinApiProduct {
                     }
                 }
                 case NOTE_TYPE -> {
-                    
+
                 }
                 case LIVE_TYPE_1, LIVE_TYPE_2 -> {
                     if (!Objects.isNull(this.roomInfoData.getData().getData().get(0).getStreamUrl())) {
