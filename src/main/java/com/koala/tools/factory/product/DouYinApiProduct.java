@@ -37,9 +37,9 @@ public class DouYinApiProduct {
     private String id;
     private Integer itemTypeId = -1;
     private String itemId;
-    private ItemInfoRespModel itemInfo;
-    private MusicInfoRespModel musicItemInfo;
-    private RoomInfoDataRespModel roomInfoData;
+    private ItemInfoRespModel itemInfo = null;
+    private MusicInfoRespModel musicItemInfo = null;
+    private RoomInfoDataRespModel roomInfoData = null;
 
     public void setUrl(String url) {
         this.url = url;
