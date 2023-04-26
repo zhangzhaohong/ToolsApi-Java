@@ -14,7 +14,7 @@ import java.io.Serializable;
 @Data
 public class SeriesPaidInfoModel implements Serializable {
     @SerializedName("item_price")
-    private int itemPrice;
+    private Integer itemPrice;
     @SerializedName("series_paid_status")
-    private int seriesPaidStatus;
+    private Integer seriesPaidStatus;
 }

@@ -14,7 +14,7 @@ import java.io.Serializable;
 @Data
 public class LunaInfoModel implements Serializable {
     @SerializedName("has_copyright")
-    private boolean hasCopyright;
+    private Boolean hasCopyright;
     @SerializedName("is_luna_user")
-    private boolean isLunaUser;
+    private Boolean isLunaUser;
 }

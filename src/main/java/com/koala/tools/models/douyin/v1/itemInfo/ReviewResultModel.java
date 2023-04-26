@@ -14,5 +14,5 @@ import java.io.Serializable;
 @Data
 public class ReviewResultModel implements Serializable {
     @SerializedName("review_status")
-    private int reviewStatus;
+    private Integer reviewStatus;
 }

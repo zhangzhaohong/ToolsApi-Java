@@ -13,6 +13,6 @@ import java.io.Serializable;
 @Data
 public class ItemWarnNotificationModel implements Serializable {
     private String content;
-    private boolean show;
-    private int type;
+    private Boolean show;
+    private Integer type;
 }

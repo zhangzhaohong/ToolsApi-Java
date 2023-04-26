@@ -17,5 +17,5 @@ public class Extra implements Serializable {
     @SerializedName("fatal_item_ids")
     private List<String> fatalItemIds;
     private String logid;
-    private long now;
+    private Long now;
 }

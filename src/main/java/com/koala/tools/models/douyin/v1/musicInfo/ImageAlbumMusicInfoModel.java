@@ -14,8 +14,8 @@ import java.io.Serializable;
 @Data
 public class ImageAlbumMusicInfoModel implements Serializable {
     @SerializedName("begin_time")
-    private int beginTime;
+    private Integer beginTime;
     @SerializedName("end_time")
-    private int endTime;
-    private int volume;
+    private Integer endTime;
+    private Integer volume;
 }

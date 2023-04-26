@@ -14,5 +14,5 @@ import java.io.Serializable;
 @Data
 public class LunaInfoModel implements Serializable {
     @SerializedName("is_luna_user")
-    private boolean isLunaUser;
+    private Boolean isLunaUser;
 }

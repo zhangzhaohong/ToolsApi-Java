@@ -13,13 +13,13 @@ import java.io.Serializable;
  */
 @Data
 public class TextExtraModel implements Serializable {
-    private int end;
+    private Integer end;
     @SerializedName("hashtag_id")
     private String hashtagId;
     @SerializedName("hashtag_name")
     private String hashtagName;
     @SerializedName("is_commerce")
-    private boolean isCommerce;
-    private int start;
-    private int type;
+    private Boolean isCommerce;
+    private Integer start;
+    private Integer type;
 }

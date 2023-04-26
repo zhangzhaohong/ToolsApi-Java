@@ -14,9 +14,9 @@ import java.util.List;
  */
 @Data
 public class ShareQrCodeInfoModel implements Serializable {
-    private int height;
+    private Integer height;
     private String uri;
     @SerializedName("url_list")
     private List<String> urlList;
-    private int width;
+    private Integer width;
 }
