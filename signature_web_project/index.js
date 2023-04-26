@@ -19,6 +19,13 @@ app.post("/", async (req, res) => {
     const newUrl = `${url}&X-Bogus=${xbogus}`;
     const [xbogusToken, ttwid] = await Promise.all([msToken(107), getTtwid()]);
 
+    console.info({
+      xbogus: xbogus,
+      mstoken: xbogusToken,
+      ttwid: ttwid,
+      url: newUrl
+    });
+
     res.status(200).json({
       code: 200,
       msg: "success",
