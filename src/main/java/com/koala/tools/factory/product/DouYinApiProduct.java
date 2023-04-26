@@ -159,6 +159,13 @@ public class DouYinApiProduct {
         try {
             switch (Objects.requireNonNull(DouYinTypeEnums.getEnumsByCode(this.itemTypeId))) {
                 case MUSIC_TYPE -> {
+                    if (!Objects.isNull(this.musicItemInfo.getAwemeMusicDetail().get(0).getMusic())) {
+                        if (this.version.equals(3)) {
+                            String link = this.musicItemInfo.getAwemeMusicDetail().get(0).getMusic().getPlayUrl().getUri();
+                            String title = this.musicItemInfo.getAwemeMusicDetail().get(0).getMusic().getTitle();
+                            this.musicItemInfo.getAwemeMusicDetail().get(0).getMusic().setMockPreviewMusicPath(host + "tools/DouYin/pro/player/music?" + (StringUtils.hasLength(title) ? "title=" + Base64Utils.encodeToUrlSafeString(title.getBytes(StandardCharsets.UTF_8)) + "&" : "") + "path=" + Base64Utils.encodeToUrlSafeString(link.getBytes(StandardCharsets.UTF_8)));
+                        }
+                    }
                     publicData = new PublicTiktokDataRespModel(this.itemTypeId, null, this.musicItemInfo, null);
                 }
                 case NOTE_TYPE -> {
