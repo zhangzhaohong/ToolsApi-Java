@@ -27,3 +27,7 @@ hs_err_pid*
 target
 
 ToolsTmp
+
+signature_web_project/.idea
+
+signature_web_project/node_modules
