@@ -3,6 +3,7 @@ package com.koala.tools.factory.product;
 import com.koala.tools.enums.DouYinTypeEnums;
 import com.koala.tools.models.douyin.v1.PublicTiktokDataRespModel;
 import com.koala.tools.models.douyin.v1.itemInfo.ItemInfoRespModel;
+import com.koala.tools.models.douyin.v1.musicInfo.MusicInfoRespModel;
 import com.koala.tools.models.douyin.v1.roomInfo.RoomInfoRespModel;
 import com.koala.tools.models.douyin.v1.roomInfoData.RoomInfoDataRespModel;
 import com.koala.tools.models.xbogus.XbogusDataModel;
@@ -37,6 +38,7 @@ public class DouYinApiProduct {
     private Integer itemTypeId = -1;
     private String itemId;
     private ItemInfoRespModel itemInfo;
+    private MusicInfoRespModel musicItemInfo;
     private RoomInfoDataRespModel roomInfoData;
 
     public void setUrl(String url) {
@@ -109,8 +111,13 @@ public class DouYinApiProduct {
                     int cursor = 0;
                     String musicInfoPath = "https://www.douyin.com/aweme/v1/web/music/aweme/?music_id=" + this.itemId + "&cursor=" + cursor + "&count=" + count + "&device_platform=webapp&aid=6383";
                     logger.info("[DouYinApiProduct]({}, {}) musicInfoPath: {}", id, itemId, musicInfoPath);
-                    String musicInfoResponse = doGetXbogusRequest(musicInfoPath);
-                    logger.info("[DouYinApiProduct]({}, {}) itemInfoResponse: {}", id, itemId, musicInfoResponse);
+                    String musicInfoDataResponse = doGetXbogusRequest(musicInfoPath);
+                    logger.info("[DouYinApiProduct]({}, {}) itemInfoResponse: {}", id, itemId, musicInfoDataResponse);
+                    try {
+                        this.musicItemInfo = GsonUtil.toBean(musicInfoDataResponse, MusicInfoRespModel.class);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
                 case VIDEO_TYPE, NOTE_TYPE -> {
                     String itemInfoPath = "https://www.douyin.com/aweme/v1/web/aweme/detail/?aweme_id=" + this.itemId + "&device_platform=webapp&aid=6383";
@@ -151,6 +158,9 @@ public class DouYinApiProduct {
         PublicTiktokDataRespModel publicData = null;
         try {
             switch (Objects.requireNonNull(DouYinTypeEnums.getEnumsByCode(this.itemTypeId))) {
+                case MUSIC_TYPE -> {
+                    publicData = new PublicTiktokDataRespModel(this.itemTypeId, null, null, null);
+                }
                 case NOTE_TYPE -> {
                     // do nothing
                 }
@@ -165,7 +175,7 @@ public class DouYinApiProduct {
                             this.roomInfoData.getData().getData().get(0).getStreamUrl().setMockPreviewVidPath(host + "tools/DouYin/preview/liveStream?livePath=" + Base64Utils.encodeToUrlSafeString(link.getBytes(StandardCharsets.UTF_8)));
                         }
                     }
-                    publicData = new PublicTiktokDataRespModel(this.itemTypeId, null, this.roomInfoData);
+                    publicData = new PublicTiktokDataRespModel(this.itemTypeId, null, null, this.roomInfoData);
                 }
                 case VIDEO_TYPE -> {
                     String vid = this.itemInfo.getAwemeDetailModel().getVideo().getPlayAddrInfoModel().getUri();
@@ -193,7 +203,7 @@ public class DouYinApiProduct {
                             this.itemInfo.getAwemeDetailModel().getVideo().setMockDownloadVidPath(host + "tools/DouYin/player/video?vid=" + vid + "&ratio=" + ratio + "&isDownload=1");
                         }
                         // logger.info("[DouYinApiProduct]({}, {}) realFile: {}", id, itemId,HttpClientUtil.doGetRedirectLocation(link, HeaderUtil.getDouYinDownloadHeader(), null));
-                        publicData = new PublicTiktokDataRespModel(this.itemTypeId, this.itemInfo, null);
+                        publicData = new PublicTiktokDataRespModel(this.itemTypeId, this.itemInfo, null, null);
                     }
                 }
                 case IMAGE_TYPE, default ->
