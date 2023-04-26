@@ -167,10 +167,9 @@ public class DouYinApiProduct {
                             this.musicItemInfo.getAwemeMusicDetail().get(0).getMusic().setMockDownloadMusicPath(host + "tools/DouYin/download/music?path=" + Base64Utils.encodeToUrlSafeString(link.getBytes(StandardCharsets.UTF_8)));
                         }
                     }
-                    publicData = new PublicTiktokDataRespModel(this.itemTypeId, null, this.musicItemInfo, null);
                 }
                 case NOTE_TYPE -> {
-                    // do nothing
+                    
                 }
                 case LIVE_TYPE_1, LIVE_TYPE_2 -> {
                     if (!Objects.isNull(this.roomInfoData.getData().getData().get(0).getStreamUrl())) {
@@ -183,7 +182,6 @@ public class DouYinApiProduct {
                             this.roomInfoData.getData().getData().get(0).getStreamUrl().setMockPreviewVidPath(host + "tools/DouYin/preview/liveStream?path=" + Base64Utils.encodeToUrlSafeString(link.getBytes(StandardCharsets.UTF_8)));
                         }
                     }
-                    publicData = new PublicTiktokDataRespModel(this.itemTypeId, null, null, this.roomInfoData);
                 }
                 case VIDEO_TYPE -> {
                     String vid = this.itemInfo.getAwemeDetailModel().getVideo().getPlayAddrInfoModel().getUri();
@@ -211,7 +209,6 @@ public class DouYinApiProduct {
                             this.itemInfo.getAwemeDetailModel().getVideo().setMockDownloadVidPath(host + "tools/DouYin/player/video?vid=" + vid + "&ratio=" + ratio + "&isDownload=1");
                         }
                         // logger.info("[DouYinApiProduct]({}, {}) realFile: {}", id, itemId,HttpClientUtil.doGetRedirectLocation(link, HeaderUtil.getDouYinDownloadHeader(), null));
-                        publicData = new PublicTiktokDataRespModel(this.itemTypeId, this.itemInfo, null, null);
                     }
                 }
                 case IMAGE_TYPE, default ->
@@ -220,6 +217,7 @@ public class DouYinApiProduct {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        publicData = new PublicTiktokDataRespModel(this.itemTypeId, this.itemInfo, this.musicItemInfo, this.roomInfoData);
         logger.info("[DouYinApiProduct]({}, {}) publicData: {}", id, itemId, publicData);
         return publicData;
     }
