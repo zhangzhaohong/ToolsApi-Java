@@ -60,7 +60,7 @@ public class DouYinApiProduct {
                 case NOTE_TYPE, VIDEO_TYPE ->
                         this.itemId = PatternUtil.matchData(douYinTypeEnum.getType() + "/(.*?)/", this.directUrl);
                 case LIVE_TYPE_1 ->
-                        this.itemId = this.directUrl.replaceFirst("https://" + douYinTypeEnum.getPrefix() + "/", "");
+                        this.itemId = this.url.replaceFirst("https://" + douYinTypeEnum.getPrefix() + "/", "");
                 case LIVE_TYPE_2 -> {
                     String roomId = PatternUtil.matchData(douYinTypeEnum.getPrefix() + "(.*?)\\?", this.directUrl);
                     String liveInfoPath = "https://webcast.amemv.com/webcast/room/reflow/info/?live_id=1&room_id=" + roomId + "&app_id=1128";
@@ -91,11 +91,7 @@ public class DouYinApiProduct {
 
     public void getRedirectUrl() throws IOException, URISyntaxException {
         if (!Objects.isNull(this.url)) {
-            if (this.url.contains(LIVE_TYPE_1.getPrefix())) {
-                this.directUrl = this.url;
-            } else {
-                this.directUrl = HttpClientUtil.doGetRedirectLocation(this.url, null, HeaderUtil.getDouYinDownloadHeader());
-            }
+            this.directUrl = HttpClientUtil.doGetRedirectLocation(this.url, null, HeaderUtil.getDouYinDownloadHeader());
         }
     }
 
