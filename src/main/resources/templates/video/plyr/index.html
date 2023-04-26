@@ -3,19 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <title th:text="${title}"></title>
-    <link href="../assets/css/video-js.css" th:href="@{/assets/css/video-js.css}" rel="stylesheet">
+    <link href="../assets/css/plyr.css" th:href="@{/assets/css/plyr.css}" rel="stylesheet">
     <link href="../assets/css/custom-player.css" th:href="@{/assets/css/custom-player.css}" rel="stylesheet">
-    <script src="../assets/js/video.min.js" th:src="@{/assets/js/video.min.js}"></script>
+    <script src="../assets/js/plyr.polyfilled.js" th:src="@{/assets/js/plyr.polyfilled.js}"></script>
 </head>
 <body class="custom-container">
 <video
-        id="my-video"
-        class="video-js custom-style"
+        id="video-player"
+        class="custom-style"
+        playsinline
         controls
         preload="auto"
         width="640"
         height="264"
         data-setup="{}"
+        autoplay
 >
     <source src="" th:src="${path}" type="video/mp4"/>
     <p class="vjs-no-js">
