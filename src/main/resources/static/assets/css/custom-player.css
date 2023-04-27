@@ -4,9 +4,14 @@
     overflow: hidden !important;
 }
 
-.custom-music-container {
+.custom-music-container, .custom-picture-container {
     margin: 0 auto !important;
     overflow: hidden !important;
+}
+
+.swiper-item-container {
+    width: 100vw;
+    height: 100vh;
 }
 
 .custom-style {
@@ -20,4 +25,9 @@
     margin-left: auto !important;
     margin-right: auto !important;
     display: block !important;
+}
+
+.swiper {
+    width: 100vw;
+    height: 100vh;
 }

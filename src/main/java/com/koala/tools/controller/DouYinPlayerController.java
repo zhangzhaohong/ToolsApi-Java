@@ -62,4 +62,9 @@ public class DouYinPlayerController {
         return "music/plyr/index";
     }
 
+    @GetMapping("picture")
+    public String picture(Model model) {
+        return "picture/index";
+    }
+
 }
