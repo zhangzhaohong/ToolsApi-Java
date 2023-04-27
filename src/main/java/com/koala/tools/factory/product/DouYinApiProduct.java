@@ -176,10 +176,10 @@ public class DouYinApiProduct {
                         if (this.version.equals(3)) {
                             String link = this.roomInfoData.getData().getData().get(0).getStreamUrl().getFlvPullUrl().getFullHd1().replaceFirst("http://", "https://");
                             String title = this.roomInfoData.getData().getData().get(0).getOwner().getNickname() + "的直播间";
-                            this.roomInfoData.getData().getData().get(0).getStreamUrl().setMockPreviewVidPath(host + "tools/DouYin/pro/player/live?" + (StringUtils.hasLength(title) && !"的直播间".equals(title) ? "title=" + Base64Utils.encodeToUrlSafeString(title.getBytes(StandardCharsets.UTF_8)) + "&" : "") + "path=" + Base64Utils.encodeToUrlSafeString(link.getBytes(StandardCharsets.UTF_8)));
+                            this.roomInfoData.getData().getData().get(0).getStreamUrl().setMockPreviewLivePath(host + "tools/DouYin/pro/player/live?" + (StringUtils.hasLength(title) && !"的直播间".equals(title) ? "title=" + Base64Utils.encodeToUrlSafeString(title.getBytes(StandardCharsets.UTF_8)) + "&" : "") + "path=" + Base64Utils.encodeToUrlSafeString(link.getBytes(StandardCharsets.UTF_8)));
                         } else if (this.version.equals(2)) {
                             String link = this.roomInfoData.getData().getData().get(0).getStreamUrl().getFlvPullUrl().getFullHd1().replaceFirst("http://", "https://");
-                            this.roomInfoData.getData().getData().get(0).getStreamUrl().setMockPreviewVidPath(host + "tools/DouYin/preview/liveStream?path=" + Base64Utils.encodeToUrlSafeString(link.getBytes(StandardCharsets.UTF_8)));
+                            this.roomInfoData.getData().getData().get(0).getStreamUrl().setMockPreviewLivePath(host + "tools/DouYin/preview/liveStream?path=" + Base64Utils.encodeToUrlSafeString(link.getBytes(StandardCharsets.UTF_8)));
                         }
                     }
                 }
