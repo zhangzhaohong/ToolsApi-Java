@@ -14,8 +14,8 @@ import java.util.UUID;
  */
 public class ShortKeyGenerator {
 
-    public static String getKey(String input) {
-        String content = Objects.isNull(input) ? UUID.randomUUID().toString() : input;
+    public static String getKey(String url) {
+        String content = Objects.isNull(url) ? UUID.randomUUID().toString() : url;
         Optional<String> result = Arrays.stream(shortUrl(content)).findFirst();
         return result.orElse(null);
     }
@@ -52,7 +52,7 @@ public class ShortKeyGenerator {
     }
 }
 
-@SuppressWarnings("AlibabaCommentsMustBeJavadocFormat")
+@SuppressWarnings("ALL")
 class CMyEncrypt {
     // 十六进制下数字到字符的映射数组
     private final static String[] HEX_DIGITS = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F"};
