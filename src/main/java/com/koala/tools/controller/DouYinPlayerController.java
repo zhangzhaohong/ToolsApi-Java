@@ -1,18 +1,25 @@
 package com.koala.tools.controller;
 
+import com.koala.tools.models.douyin.v1.itemInfo.ImageDataModel;
+import com.koala.tools.redis.service.RedisService;
+import com.koala.tools.utils.GsonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.Base64Utils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
 import java.util.Arrays;
+import java.util.Objects;
 
+import static com.koala.tools.enums.DouYinResponseEnums.UNAVAILABLE_DATA;
 import static com.koala.tools.enums.DouYinResponseEnums.UNAVAILABLE_PLAYER;
 import static com.koala.tools.utils.RespUtil.formatRespData;
 
@@ -28,6 +35,9 @@ import static com.koala.tools.utils.RespUtil.formatRespData;
 public class DouYinPlayerController {
 
     private static final Logger logger = LoggerFactory.getLogger(DouYinPlayerController.class);
+
+    @Resource(name = "RedisService")
+    private RedisService redisService;
 
     @GetMapping("/video")
     public String video(@RequestParam(value = "title", required = false, defaultValue = "VideoPlayer") String title, @RequestParam(value = "path", required = false, defaultValue = "") String path, @RequestParam(value = "version", required = false, defaultValue = "2") String version, Model model, HttpServletRequest request) {
@@ -65,14 +75,15 @@ public class DouYinPlayerController {
     }
 
     @GetMapping("picture")
-    public String picture(Model model) {
-        model.addAttribute("data", Arrays.asList(
-                "https://p6-pc-sign.douyinpic.com/tos-cn-i-0813c001/cc3081c4104a4e10b13bce816e5e1263~tplv-dy-aweme-images:q75.webp?x-expires=1683784800&x-signature=ZAlRRBk%2BE0fl0%2FKICpRPVczyJXQ%3D&from=3213915784&s=PackSourceEnum_AWEME_DETAIL&se=false&biz_tag=aweme_images&l=202304271407140F4EB787850D910C64A3",
-                "https://p9-pc-sign.douyinpic.com/tos-cn-i-0813c001/cc3081c4104a4e10b13bce816e5e1263~tplv-dy-aweme-images:q75.webp?x-expires=1683784800&x-signature=6cEk5RbWXzlAz5ZAXo3xhYMwJyo%3D&from=3213915784&s=PackSourceEnum_AWEME_DETAIL&se=false&biz_tag=aweme_images&l=202304271407140F4EB787850D910C64A3",
-                "https://p3-pc-sign.douyinpic.com/tos-cn-i-0813c001/cc3081c4104a4e10b13bce816e5e1263~tplv-dy-aweme-images:q75.webp?x-expires=1683784800&x-signature=bmqHdcEGtSTlrbtYuVQNjSy2a7A%3D&from=3213915784&s=PackSourceEnum_AWEME_DETAIL&se=false&biz_tag=aweme_images&l=202304271407140F4EB787850D910C64A3",
-                "https://p6-pc-sign.douyinpic.com/tos-cn-i-0813c001/cc3081c4104a4e10b13bce816e5e1263~tplv-dy-aweme-images:q75.jpeg?x-expires=1683784800&x-signature=NDsghNI9lRgIRzJGVqKzsW%2BMn%2BI%3D&from=3213915784&s=PackSourceEnum_AWEME_DETAIL&se=false&biz_tag=aweme_images&l=202304271407140F4EB787850D910C64A3"
-        ));
-        return "picture/index";
+    public String picture(@RequestParam(value = "title", required = false, defaultValue = "PicturePlayer") String title, @RequestParam(value = "key", required = false, defaultValue = "") String key, Model model) {
+        String itemTitle = "PicturePlayer".equals(title) ? title : new String(Base64Utils.decodeFromUrlSafeString(title));
+        String itemKey = "".equals(key) ? "" : new String(Base64Utils.decodeFromUrlSafeString(key));
+        if (StringUtils.hasLength(itemKey)) {
+            model.addAttribute("title", itemTitle);
+            model.addAttribute("data", GsonUtil.toBean(redisService.get(itemKey), ImageDataModel.class).getData());
+            return "picture/index";
+        }
+        return formatRespData(UNAVAILABLE_DATA, null);
     }
 
 }

@@ -15,7 +15,7 @@ import java.util.Objects;
 @Service("RedisService")
 public class RedisServiceImpl implements RedisService {
 
-    private final static Long defaultExpireTime = 7 * 24 * 60 * 60L;
+    private final static Long DEFAULT_EXPIRE_TIME = 7 * 24 * 60 * 60L;
 
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
@@ -41,7 +41,7 @@ public class RedisServiceImpl implements RedisService {
 
     @Override
     public void set(String key, String value) {
-        set(key, value, defaultExpireTime);
+        set(key, value, DEFAULT_EXPIRE_TIME);
     }
 
     @Override

@@ -2,11 +2,14 @@ package com.koala.tools.factory.product;
 
 import com.koala.tools.enums.DouYinTypeEnums;
 import com.koala.tools.models.douyin.v1.PublicTiktokDataRespModel;
+import com.koala.tools.models.douyin.v1.itemInfo.ImageDataModel;
+import com.koala.tools.models.douyin.v1.itemInfo.ImageItemDataModel;
 import com.koala.tools.models.douyin.v1.itemInfo.ItemInfoRespModel;
 import com.koala.tools.models.douyin.v1.musicInfo.MusicInfoRespModel;
 import com.koala.tools.models.douyin.v1.roomInfo.RoomInfoRespModel;
 import com.koala.tools.models.douyin.v1.roomInfoData.RoomInfoDataRespModel;
 import com.koala.tools.models.xbogus.XbogusDataModel;
+import com.koala.tools.redis.service.RedisService;
 import com.koala.tools.utils.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,9 +17,11 @@ import org.springframework.util.Base64Utils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
+import javax.annotation.Resource;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -30,6 +35,7 @@ import static com.koala.tools.enums.DouYinTypeEnums.LIVE_TYPE_1;
  */
 public class DouYinApiProduct {
     private static final Logger logger = LoggerFactory.getLogger(DouYinApiProduct.class);
+    private final static Long EXPIRE_TIME = 12 * 60 * 60L;
     private Integer version = 3;
     private String url;
     private String host;
@@ -40,6 +46,7 @@ public class DouYinApiProduct {
     private ItemInfoRespModel itemInfo = null;
     private MusicInfoRespModel musicItemInfo = null;
     private RoomInfoDataRespModel roomInfoData = null;
+    private RedisService redisService;
 
     public void setUrl(String url) {
         this.url = url;
@@ -169,7 +176,19 @@ public class DouYinApiProduct {
                     }
                 }
                 case NOTE_TYPE -> {
-
+                    if (!Objects.isNull(this.itemInfo.getAwemeDetailModel().getImages())) {
+                        String key = ShortKeyGenerator.getKey(null);
+                        String title = "";
+                        ArrayList<String> urlList = new ArrayList<>();
+                        for (Object image : GsonUtil.toBean(GsonUtil.toString(this.itemInfo.getAwemeDetailModel().getImages()), ArrayList.class)) {
+                            ImageItemDataModel imageItem = GsonUtil.toBean(GsonUtil.toString(image), ImageItemDataModel.class);
+                            if (!Objects.isNull(imageItem.getUrlList())) {
+                                urlList.add(imageItem.getUrlList().get(0));
+                            }
+                        }
+                        redisService.set(key, GsonUtil.toString(new ImageDataModel(urlList)), EXPIRE_TIME);
+                        this.itemInfo.getAwemeDetailModel().setMockPreviewPicturePath(host + "tools/DouYin/pro/player/picture?" + (StringUtils.hasLength(title) ? "title=" + Base64Utils.encodeToUrlSafeString(title.getBytes(StandardCharsets.UTF_8)) + "&" : "") + "key=" + Base64Utils.encodeToUrlSafeString(key.getBytes(StandardCharsets.UTF_8)));
+                    }
                 }
                 case LIVE_TYPE_1, LIVE_TYPE_2 -> {
                     if (!Objects.isNull(this.roomInfoData.getData().getData().get(0).getStreamUrl())) {
@@ -235,5 +254,9 @@ public class DouYinApiProduct {
     public void setVersion(Integer version) {
         this.version = version;
         logger.info("[DouYinApiProduct]({}, {}) setting version success: {}", id, itemId, version);
+    }
+
+    public void setRedis(RedisService redisService) {
+        this.redisService = redisService;
     }
 }

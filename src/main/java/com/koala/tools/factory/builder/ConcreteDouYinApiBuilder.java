@@ -1,5 +1,7 @@
 package com.koala.tools.factory.builder;
 
+import com.koala.tools.redis.service.RedisService;
+
 import java.io.IOException;
 import java.net.URISyntaxException;
 
@@ -61,5 +63,11 @@ public class ConcreteDouYinApiBuilder extends DouYinApiBuilder {
     @Override
     public void printParams() {
         product.printParams();
+    }
+
+    @Override
+    public DouYinApiBuilder redis(RedisService redisService) {
+        product.setRedis(redisService);
+        return this;
     }
 }
