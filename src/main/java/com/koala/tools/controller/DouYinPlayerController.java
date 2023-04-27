@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
 
+import java.util.Arrays;
+
 import static com.koala.tools.enums.DouYinResponseEnums.UNAVAILABLE_PLAYER;
 import static com.koala.tools.utils.RespUtil.formatRespData;
 
@@ -64,6 +66,12 @@ public class DouYinPlayerController {
 
     @GetMapping("picture")
     public String picture(Model model) {
+        model.addAttribute("data", Arrays.asList(
+                "https://p6-pc-sign.douyinpic.com/tos-cn-i-0813c001/cc3081c4104a4e10b13bce816e5e1263~tplv-dy-aweme-images:q75.webp?x-expires=1683784800&x-signature=ZAlRRBk%2BE0fl0%2FKICpRPVczyJXQ%3D&from=3213915784&s=PackSourceEnum_AWEME_DETAIL&se=false&biz_tag=aweme_images&l=202304271407140F4EB787850D910C64A3",
+                "https://p9-pc-sign.douyinpic.com/tos-cn-i-0813c001/cc3081c4104a4e10b13bce816e5e1263~tplv-dy-aweme-images:q75.webp?x-expires=1683784800&x-signature=6cEk5RbWXzlAz5ZAXo3xhYMwJyo%3D&from=3213915784&s=PackSourceEnum_AWEME_DETAIL&se=false&biz_tag=aweme_images&l=202304271407140F4EB787850D910C64A3",
+                "https://p3-pc-sign.douyinpic.com/tos-cn-i-0813c001/cc3081c4104a4e10b13bce816e5e1263~tplv-dy-aweme-images:q75.webp?x-expires=1683784800&x-signature=bmqHdcEGtSTlrbtYuVQNjSy2a7A%3D&from=3213915784&s=PackSourceEnum_AWEME_DETAIL&se=false&biz_tag=aweme_images&l=202304271407140F4EB787850D910C64A3",
+                "https://p6-pc-sign.douyinpic.com/tos-cn-i-0813c001/cc3081c4104a4e10b13bce816e5e1263~tplv-dy-aweme-images:q75.jpeg?x-expires=1683784800&x-signature=NDsghNI9lRgIRzJGVqKzsW%2BMn%2BI%3D&from=3213915784&s=PackSourceEnum_AWEME_DETAIL&se=false&biz_tag=aweme_images&l=202304271407140F4EB787850D910C64A3"
+        ));
         return "picture/index";
     }
 

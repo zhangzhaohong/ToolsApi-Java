@@ -11,13 +11,10 @@
 <body class="custom-picture-container">
 <div class="swiper" id="swiper">
     <div class="swiper-wrapper">
-        <div class="swiper-slide">
+        <div class="swiper-slide" th:if="${data != null}" th:each="url: ${data}">
             <div class="swiper-item-container">
-
+                <img src="" th:src="${url}" alt="">
             </div>
-        </div>
-        <div class="swiper-slide">
-            <div>222</div>
         </div>
     </div>
     <!-- 如果需要分页器 -->
