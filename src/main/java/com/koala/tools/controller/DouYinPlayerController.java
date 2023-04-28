@@ -79,7 +79,7 @@ public class DouYinPlayerController {
         logger.info("[picturePlayer] itemTitle: {}, Sec-Fetch-Dest: {}", itemKey, request.getHeader("Sec-Fetch-Dest"));
         if (StringUtils.hasLength(itemKey)) {
             ShortImageDataModel tmp = GsonUtil.toBean(redisService.get(itemKey), ShortImageDataModel.class);
-            model.addAttribute("title", Optional.ofNullable(tmp.getTitle()).orElse("PicturePlayer"));
+            model.addAttribute("title", StringUtils.hasLength(tmp.getTitle()) ? tmp.getTitle() : "PicturePlayer");
             model.addAttribute("data", tmp.getData());
             return "picture/index";
         }
