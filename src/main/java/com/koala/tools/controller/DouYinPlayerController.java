@@ -51,7 +51,7 @@ public class DouYinPlayerController {
         } else if ("1".equals(version)) {
             return "video/video.js/index";
         }
-        return formatRespData(UNAVAILABLE_PLAYER, null);
+        return "404/index";
     }
 
     @GetMapping("/video/short")
@@ -67,14 +67,12 @@ public class DouYinPlayerController {
                     return "video/plyr/index";
                 } else if ("1".equals(version)) {
                     return "video/video.js/index";
-                } else {
-                    return formatRespData(UNAVAILABLE_PLAYER, null);
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return formatRespData(UNAVAILABLE_DATA, null);
+        return "404/index";
     }
 
     @GetMapping("/live")
@@ -101,7 +99,7 @@ public class DouYinPlayerController {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return formatRespData(UNAVAILABLE_DATA, null);
+        return "404/index";
     }
 
     @GetMapping("/music")
@@ -128,7 +126,7 @@ public class DouYinPlayerController {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return formatRespData(UNAVAILABLE_DATA, null);
+        return "404/index";
     }
 
     @GetMapping("picture/short")
@@ -145,7 +143,7 @@ public class DouYinPlayerController {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return formatRespData(UNAVAILABLE_DATA, null);
+        return "404/index";
     }
 
 }
