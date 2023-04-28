@@ -186,4 +186,6 @@ public class AwemeDetailModel<Object extends Serializable> implements Serializab
     private List<String> videoText;
     @SerializedName("voice_modify_id_list")
     private String voiceModifyIdList;
+    @SerializedName("mock_preview_picture_path")
+    private String mockPreviewPicturePath = null;
 }

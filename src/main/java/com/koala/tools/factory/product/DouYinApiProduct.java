@@ -2,11 +2,15 @@ package com.koala.tools.factory.product;
 
 import com.koala.tools.enums.DouYinTypeEnums;
 import com.koala.tools.models.douyin.v1.PublicTiktokDataRespModel;
+import com.koala.tools.models.shortUrl.ShortDouYinItemDataModel;
+import com.koala.tools.models.shortUrl.ShortImageDataModel;
+import com.koala.tools.models.douyin.v1.itemInfo.ImageItemDataModel;
 import com.koala.tools.models.douyin.v1.itemInfo.ItemInfoRespModel;
 import com.koala.tools.models.douyin.v1.musicInfo.MusicInfoRespModel;
 import com.koala.tools.models.douyin.v1.roomInfo.RoomInfoRespModel;
 import com.koala.tools.models.douyin.v1.roomInfoData.RoomInfoDataRespModel;
 import com.koala.tools.models.xbogus.XbogusDataModel;
+import com.koala.tools.redis.service.RedisService;
 import com.koala.tools.utils.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +21,7 @@ import org.springframework.util.StringUtils;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -30,7 +35,8 @@ import static com.koala.tools.enums.DouYinTypeEnums.LIVE_TYPE_1;
  */
 public class DouYinApiProduct {
     private static final Logger logger = LoggerFactory.getLogger(DouYinApiProduct.class);
-    private Integer version = 3;
+    private final static Long EXPIRE_TIME = 12 * 60 * 60L;
+    private Integer version = 4;
     private String url;
     private String host;
     private String directUrl;
@@ -40,6 +46,7 @@ public class DouYinApiProduct {
     private ItemInfoRespModel itemInfo = null;
     private MusicInfoRespModel musicItemInfo = null;
     private RoomInfoDataRespModel roomInfoData = null;
+    private RedisService redisService;
 
     public void setUrl(String url) {
         this.url = url;
@@ -160,26 +167,53 @@ public class DouYinApiProduct {
             switch (Objects.requireNonNull(DouYinTypeEnums.getEnumsByCode(this.itemTypeId))) {
                 case MUSIC_TYPE -> {
                     if (!Objects.isNull(this.musicItemInfo.getAwemeMusicDetail().get(0).getMusic())) {
-                        if (this.version.equals(3)) {
-                            String link = this.musicItemInfo.getAwemeMusicDetail().get(0).getMusic().getPlayUrl().getUri();
+                        if (this.version.equals(4)) {
+                            String key = ShortKeyGenerator.getKey(null);
                             String title = this.musicItemInfo.getAwemeMusicDetail().get(0).getMusic().getTitle();
+                            String link = this.musicItemInfo.getAwemeMusicDetail().get(0).getMusic().getPlayUrl().getUri();
+                            redisService.set(key, GsonUtil.toString(new ShortDouYinItemDataModel(title, link)), EXPIRE_TIME);
+                            this.musicItemInfo.getAwemeMusicDetail().get(0).getMusic().setMockPreviewMusicPath(host + "tools/DouYin/pro/player/music/short?key=" + Base64Utils.encodeToUrlSafeString(key.getBytes(StandardCharsets.UTF_8)));
+                            this.musicItemInfo.getAwemeMusicDetail().get(0).getMusic().setMockDownloadMusicPath(host + "tools/DouYin/download/music?path=" + Base64Utils.encodeToUrlSafeString(link.getBytes(StandardCharsets.UTF_8)));
+                        } else if (this.version.equals(3)) {
+                            String title = this.musicItemInfo.getAwemeMusicDetail().get(0).getMusic().getTitle();
+                            String link = this.musicItemInfo.getAwemeMusicDetail().get(0).getMusic().getPlayUrl().getUri();
                             this.musicItemInfo.getAwemeMusicDetail().get(0).getMusic().setMockPreviewMusicPath(host + "tools/DouYin/pro/player/music?" + (StringUtils.hasLength(title) ? "title=" + Base64Utils.encodeToUrlSafeString(title.getBytes(StandardCharsets.UTF_8)) + "&" : "") + "path=" + Base64Utils.encodeToUrlSafeString(link.getBytes(StandardCharsets.UTF_8)));
                             this.musicItemInfo.getAwemeMusicDetail().get(0).getMusic().setMockDownloadMusicPath(host + "tools/DouYin/download/music?path=" + Base64Utils.encodeToUrlSafeString(link.getBytes(StandardCharsets.UTF_8)));
                         }
                     }
                 }
                 case NOTE_TYPE -> {
-
+                    if (!Objects.isNull(this.itemInfo.getAwemeDetailModel().getImages())) {
+                        if (this.version.equals(4)) {
+                            String key = ShortKeyGenerator.getKey(null);
+                            String title = this.itemInfo.getAwemeDetailModel().getDesc();
+                            ArrayList<String> urlList = new ArrayList<>();
+                            for (Object image : GsonUtil.toBean(GsonUtil.toString(this.itemInfo.getAwemeDetailModel().getImages()), ArrayList.class)) {
+                                ImageItemDataModel imageItem = GsonUtil.toBean(GsonUtil.toString(image), ImageItemDataModel.class);
+                                if (!Objects.isNull(imageItem.getUrlList())) {
+                                    urlList.add(imageItem.getUrlList().get(0));
+                                }
+                            }
+                            redisService.set(key, GsonUtil.toString(new ShortImageDataModel(title, urlList)), EXPIRE_TIME);
+                            this.itemInfo.getAwemeDetailModel().setMockPreviewPicturePath(host + "tools/DouYin/pro/player/picture/short?key=" + Base64Utils.encodeToUrlSafeString(key.getBytes(StandardCharsets.UTF_8)));
+                        }
+                    }
                 }
                 case LIVE_TYPE_1, LIVE_TYPE_2 -> {
                     if (!Objects.isNull(this.roomInfoData.getData().getData().get(0).getStreamUrl())) {
-                        if (this.version.equals(3)) {
-                            String link = this.roomInfoData.getData().getData().get(0).getStreamUrl().getFlvPullUrl().getFullHd1().replaceFirst("http://", "https://");
+                        if (this.version.equals(4)) {
+                            String key = ShortKeyGenerator.getKey(null);
                             String title = this.roomInfoData.getData().getData().get(0).getOwner().getNickname() + "的直播间";
-                            this.roomInfoData.getData().getData().get(0).getStreamUrl().setMockPreviewVidPath(host + "tools/DouYin/pro/player/live?" + (StringUtils.hasLength(title) && !"的直播间".equals(title) ? "title=" + Base64Utils.encodeToUrlSafeString(title.getBytes(StandardCharsets.UTF_8)) + "&" : "") + "path=" + Base64Utils.encodeToUrlSafeString(link.getBytes(StandardCharsets.UTF_8)));
+                            String link = this.roomInfoData.getData().getData().get(0).getStreamUrl().getFlvPullUrl().getFullHd1().replaceFirst("http://", "https://");
+                            redisService.set(key, GsonUtil.toString(new ShortDouYinItemDataModel(title, link)), EXPIRE_TIME);
+                            this.roomInfoData.getData().getData().get(0).getStreamUrl().setMockPreviewLivePath(host + "tools/DouYin/pro/player/live/short?key=" + Base64Utils.encodeToUrlSafeString(key.getBytes(StandardCharsets.UTF_8)));
+                        } else if (this.version.equals(3)) {
+                            String title = this.roomInfoData.getData().getData().get(0).getOwner().getNickname() + "的直播间";
+                            String link = this.roomInfoData.getData().getData().get(0).getStreamUrl().getFlvPullUrl().getFullHd1().replaceFirst("http://", "https://");
+                            this.roomInfoData.getData().getData().get(0).getStreamUrl().setMockPreviewLivePath(host + "tools/DouYin/pro/player/live?" + (StringUtils.hasLength(title) && !"的直播间".equals(title) ? "title=" + Base64Utils.encodeToUrlSafeString(title.getBytes(StandardCharsets.UTF_8)) + "&" : "") + "path=" + Base64Utils.encodeToUrlSafeString(link.getBytes(StandardCharsets.UTF_8)));
                         } else if (this.version.equals(2)) {
                             String link = this.roomInfoData.getData().getData().get(0).getStreamUrl().getFlvPullUrl().getFullHd1().replaceFirst("http://", "https://");
-                            this.roomInfoData.getData().getData().get(0).getStreamUrl().setMockPreviewVidPath(host + "tools/DouYin/preview/liveStream?path=" + Base64Utils.encodeToUrlSafeString(link.getBytes(StandardCharsets.UTF_8)));
+                            this.roomInfoData.getData().getData().get(0).getStreamUrl().setMockPreviewLivePath(host + "tools/DouYin/preview/liveStream?path=" + Base64Utils.encodeToUrlSafeString(link.getBytes(StandardCharsets.UTF_8)));
                         }
                     }
                 }
@@ -190,9 +224,18 @@ public class DouYinApiProduct {
                         ratio = "540p";
                     }
                     if (!ObjectUtils.isEmpty(vid)) {
-                        if (this.version.equals(3)) {
-                            String link = this.itemInfo.getAwemeDetailModel().getVideo().getPlayAddrInfoModel().getUrlList().get(0);
+                        if (this.version.equals(4)) {
+                            String key = ShortKeyGenerator.getKey(null);
                             String title = this.itemInfo.getAwemeDetailModel().getDesc();
+                            String link = this.itemInfo.getAwemeDetailModel().getVideo().getPlayAddrInfoModel().getUrlList().get(0);
+                            String previewPath = host + "tools/DouYin/preview/video?path=" + Base64Utils.encodeToUrlSafeString(link.getBytes(StandardCharsets.UTF_8));
+                            redisService.set(key, GsonUtil.toString(new ShortDouYinItemDataModel(title, previewPath)), EXPIRE_TIME);
+                            this.itemInfo.getAwemeDetailModel().getVideo().setRealPath(link);
+                            this.itemInfo.getAwemeDetailModel().getVideo().setMockPreviewVidPath(host + "tools/DouYin/pro/player/video/short?key=" + Base64Utils.encodeToUrlSafeString(key.getBytes(StandardCharsets.UTF_8)));
+                            this.itemInfo.getAwemeDetailModel().getVideo().setMockDownloadVidPath(host + "tools/DouYin/preview/video?path=" + Base64Utils.encodeToUrlSafeString(link.getBytes(StandardCharsets.UTF_8)) + "&isDownload=true");
+                        } else if (this.version.equals(3)) {
+                            String title = this.itemInfo.getAwemeDetailModel().getDesc();
+                            String link = this.itemInfo.getAwemeDetailModel().getVideo().getPlayAddrInfoModel().getUrlList().get(0);
                             String previewPath = host + "tools/DouYin/preview/video?path=" + Base64Utils.encodeToUrlSafeString(link.getBytes(StandardCharsets.UTF_8));
                             this.itemInfo.getAwemeDetailModel().getVideo().setRealPath(link);
                             this.itemInfo.getAwemeDetailModel().getVideo().setMockPreviewVidPath(host + "tools/DouYin/pro/player/video?" + (StringUtils.hasLength(title) ? "title=" + Base64Utils.encodeToUrlSafeString(title.getBytes(StandardCharsets.UTF_8)) + "&" : "") + "path=" + Base64Utils.encodeToUrlSafeString(previewPath.getBytes(StandardCharsets.UTF_8)));
@@ -235,5 +278,9 @@ public class DouYinApiProduct {
     public void setVersion(Integer version) {
         this.version = version;
         logger.info("[DouYinApiProduct]({}, {}) setting version success: {}", id, itemId, version);
+    }
+
+    public void setRedis(RedisService redisService) {
+        this.redisService = redisService;
     }
 }

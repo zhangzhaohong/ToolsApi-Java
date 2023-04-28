@@ -44,7 +44,7 @@ app.post("/", async (req, res) => {
 
 app.get("/", (req, res) => {
   res.status(200).send(`
-    <html>
+    <html lang="en">
       <head>
         <title>Tiktok_Signature</title>
         <style>

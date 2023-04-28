@@ -1,6 +1,7 @@
 package com.koala.tools.factory.builder;
 
 import com.koala.tools.factory.product.DouYinApiProduct;
+import com.koala.tools.redis.service.RedisService;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -54,4 +55,6 @@ public abstract class DouYinApiBuilder {
     public DouYinApiProduct getProduct() {
         return product;
     }
+
+    public abstract DouYinApiBuilder redis(RedisService redisService);
 }

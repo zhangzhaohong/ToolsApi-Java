@@ -2,7 +2,9 @@ package com.koala.tools.factory.director;
 
 import com.koala.tools.factory.builder.DouYinApiBuilder;
 import com.koala.tools.factory.product.DouYinApiProduct;
+import com.koala.tools.redis.service.RedisService;
 
+import javax.annotation.Resource;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
@@ -19,8 +21,8 @@ public class DouYinApiManager {
         this.builder = builder;
     }
 
-    public DouYinApiProduct construct(String host, String url, Integer version) throws IOException, URISyntaxException {
-        builder.host(host).url(url).getIdByUrl().getRedirectUrl().getItemTypeByDirectUrl().getItemIdByDirectUrl().getItemInfo();
+    public DouYinApiProduct construct(RedisService redisService, String host, String url, Integer version) throws IOException, URISyntaxException {
+        builder.redis(redisService).host(host).url(url).getIdByUrl().getRedirectUrl().getItemTypeByDirectUrl().getItemIdByDirectUrl().getItemInfo();
         builder.version(version);
         builder.printParams();
         return builder.getProduct();
