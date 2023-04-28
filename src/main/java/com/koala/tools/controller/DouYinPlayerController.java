@@ -64,6 +64,19 @@ public class DouYinPlayerController {
         return "live/index";
     }
 
+    @GetMapping("/live/short")
+    public String liveWithShortKey(@RequestParam(value = "key", required = false, defaultValue = "") String key, Model model, HttpServletRequest request) {
+        String itemKey = "".equals(key) ? "" : new String(Base64Utils.decodeFromUrlSafeString(key));
+        logger.info("[livePlayer] itemKey: {}, Sec-Fetch-Dest: {}", itemKey, request.getHeader("Sec-Fetch-Dest"));
+        if (StringUtils.hasLength(itemKey)) {
+            ShortDouYinItemDataModel tmp = GsonUtil.toBean(redisService.get(itemKey), ShortDouYinItemDataModel.class);
+            model.addAttribute("title", StringUtils.hasLength(tmp.getTitle()) ? tmp.getTitle() : "LivePlayer");
+            model.addAttribute("path", tmp.getPath());
+            return "live/index";
+        }
+        return formatRespData(UNAVAILABLE_DATA, null);
+    }
+
     @GetMapping("/music")
     public String music(@RequestParam(value = "title", required = false, defaultValue = "MusicPlayer") String title, @RequestParam(value = "path", required = false, defaultValue = "") String path, Model model, HttpServletRequest request) {
         String itemTitle = "MusicPlayer".equals(title) ? title : new String(Base64Utils.decodeFromUrlSafeString(title));
@@ -77,7 +90,7 @@ public class DouYinPlayerController {
     @GetMapping("/music/short")
     public String musicWithShortKey(@RequestParam(value = "key", required = false, defaultValue = "") String key, Model model, HttpServletRequest request) {
         String itemKey = "".equals(key) ? "" : new String(Base64Utils.decodeFromUrlSafeString(key));
-        logger.info("[musicPlayer] itemTitle: {}, Sec-Fetch-Dest: {}", itemKey, request.getHeader("Sec-Fetch-Dest"));
+        logger.info("[musicPlayer] itemKey: {}, Sec-Fetch-Dest: {}", itemKey, request.getHeader("Sec-Fetch-Dest"));
         if (StringUtils.hasLength(itemKey)) {
             ShortDouYinItemDataModel tmp = GsonUtil.toBean(redisService.get(itemKey), ShortDouYinItemDataModel.class);
             model.addAttribute("title", StringUtils.hasLength(tmp.getTitle()) ? tmp.getTitle() : "MusicPlayer");
@@ -90,7 +103,7 @@ public class DouYinPlayerController {
     @GetMapping("picture/short")
     public String pictureWithShortKey(@RequestParam(value = "key", required = false, defaultValue = "") String key, Model model, HttpServletRequest request) {
         String itemKey = "".equals(key) ? "" : new String(Base64Utils.decodeFromUrlSafeString(key));
-        logger.info("[picturePlayer] itemTitle: {}, Sec-Fetch-Dest: {}", itemKey, request.getHeader("Sec-Fetch-Dest"));
+        logger.info("[picturePlayer] itemKey: {}, Sec-Fetch-Dest: {}", itemKey, request.getHeader("Sec-Fetch-Dest"));
         if (StringUtils.hasLength(itemKey)) {
             ShortImageDataModel tmp = GsonUtil.toBean(redisService.get(itemKey), ShortImageDataModel.class);
             model.addAttribute("title", StringUtils.hasLength(tmp.getTitle()) ? tmp.getTitle() : "PicturePlayer");

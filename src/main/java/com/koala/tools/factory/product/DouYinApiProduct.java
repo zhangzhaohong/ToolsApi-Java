@@ -201,7 +201,13 @@ public class DouYinApiProduct {
                 }
                 case LIVE_TYPE_1, LIVE_TYPE_2 -> {
                     if (!Objects.isNull(this.roomInfoData.getData().getData().get(0).getStreamUrl())) {
-                        if (this.version.equals(3)) {
+                        if (this.version.equals(4)) {
+                            String key = ShortKeyGenerator.getKey(null);
+                            String title = this.roomInfoData.getData().getData().get(0).getOwner().getNickname() + "的直播间";
+                            String link = this.roomInfoData.getData().getData().get(0).getStreamUrl().getFlvPullUrl().getFullHd1().replaceFirst("http://", "https://");
+                            redisService.set(key, GsonUtil.toString(new ShortDouYinItemDataModel(title, link)), EXPIRE_TIME);
+                            this.roomInfoData.getData().getData().get(0).getStreamUrl().setMockPreviewLivePath(host + "tools/DouYin/pro/player/live/short?key=" + Base64Utils.encodeToUrlSafeString(key.getBytes(StandardCharsets.UTF_8)));
+                        } else if (this.version.equals(3)) {
                             String link = this.roomInfoData.getData().getData().get(0).getStreamUrl().getFlvPullUrl().getFullHd1().replaceFirst("http://", "https://");
                             String title = this.roomInfoData.getData().getData().get(0).getOwner().getNickname() + "的直播间";
                             this.roomInfoData.getData().getData().get(0).getStreamUrl().setMockPreviewLivePath(host + "tools/DouYin/pro/player/live?" + (StringUtils.hasLength(title) && !"的直播间".equals(title) ? "title=" + Base64Utils.encodeToUrlSafeString(title.getBytes(StandardCharsets.UTF_8)) + "&" : "") + "path=" + Base64Utils.encodeToUrlSafeString(link.getBytes(StandardCharsets.UTF_8)));
