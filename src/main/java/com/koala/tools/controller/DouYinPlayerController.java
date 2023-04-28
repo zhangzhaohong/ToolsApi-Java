@@ -56,19 +56,23 @@ public class DouYinPlayerController {
 
     @GetMapping("/video/short")
     public String videoWithShortKey(@RequestParam(value = "key", required = false, defaultValue = "") String key, @RequestParam(value = "version", required = false, defaultValue = "2") String version, Model model, HttpServletRequest request) {
-        String itemKey = "".equals(key) ? "" : new String(Base64Utils.decodeFromUrlSafeString(key));
-        logger.info("[videoPlayer] itemKey: {}, Sec-Fetch-Dest: {}", itemKey, request.getHeader("Sec-Fetch-Dest"));
-        if (StringUtils.hasLength(itemKey)) {
-            ShortDouYinItemDataModel tmp = GsonUtil.toBean(redisService.get(itemKey), ShortDouYinItemDataModel.class);
-            model.addAttribute("title", StringUtils.hasLength(tmp.getTitle()) ? tmp.getTitle() : "VideoPlayer");
-            model.addAttribute("path", tmp.getPath());
-            if ("2".equals(version)) {
-                return "video/plyr/index";
-            } else if ("1".equals(version)) {
-                return "video/video.js/index";
-            } else {
-                return formatRespData(UNAVAILABLE_PLAYER, null);
+        try {
+            String itemKey = "".equals(key) ? "" : new String(Base64Utils.decodeFromUrlSafeString(key));
+            logger.info("[videoPlayer] itemKey: {}, Sec-Fetch-Dest: {}", itemKey, request.getHeader("Sec-Fetch-Dest"));
+            if (StringUtils.hasLength(itemKey)) {
+                ShortDouYinItemDataModel tmp = GsonUtil.toBean(redisService.get(itemKey), ShortDouYinItemDataModel.class);
+                model.addAttribute("title", StringUtils.hasLength(tmp.getTitle()) ? tmp.getTitle() : "VideoPlayer");
+                model.addAttribute("path", tmp.getPath());
+                if ("2".equals(version)) {
+                    return "video/plyr/index";
+                } else if ("1".equals(version)) {
+                    return "video/video.js/index";
+                } else {
+                    return formatRespData(UNAVAILABLE_PLAYER, null);
+                }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return formatRespData(UNAVAILABLE_DATA, null);
     }
@@ -85,13 +89,17 @@ public class DouYinPlayerController {
 
     @GetMapping("/live/short")
     public String liveWithShortKey(@RequestParam(value = "key", required = false, defaultValue = "") String key, Model model, HttpServletRequest request) {
-        String itemKey = "".equals(key) ? "" : new String(Base64Utils.decodeFromUrlSafeString(key));
-        logger.info("[livePlayer] itemKey: {}, Sec-Fetch-Dest: {}", itemKey, request.getHeader("Sec-Fetch-Dest"));
-        if (StringUtils.hasLength(itemKey)) {
-            ShortDouYinItemDataModel tmp = GsonUtil.toBean(redisService.get(itemKey), ShortDouYinItemDataModel.class);
-            model.addAttribute("title", StringUtils.hasLength(tmp.getTitle()) ? tmp.getTitle() : "LivePlayer");
-            model.addAttribute("path", tmp.getPath());
-            return "live/index";
+        try {
+            String itemKey = "".equals(key) ? "" : new String(Base64Utils.decodeFromUrlSafeString(key));
+            logger.info("[livePlayer] itemKey: {}, Sec-Fetch-Dest: {}", itemKey, request.getHeader("Sec-Fetch-Dest"));
+            if (StringUtils.hasLength(itemKey)) {
+                ShortDouYinItemDataModel tmp = GsonUtil.toBean(redisService.get(itemKey), ShortDouYinItemDataModel.class);
+                model.addAttribute("title", StringUtils.hasLength(tmp.getTitle()) ? tmp.getTitle() : "LivePlayer");
+                model.addAttribute("path", tmp.getPath());
+                return "live/index";
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return formatRespData(UNAVAILABLE_DATA, null);
     }
@@ -108,26 +116,34 @@ public class DouYinPlayerController {
 
     @GetMapping("/music/short")
     public String musicWithShortKey(@RequestParam(value = "key", required = false, defaultValue = "") String key, Model model, HttpServletRequest request) {
-        String itemKey = "".equals(key) ? "" : new String(Base64Utils.decodeFromUrlSafeString(key));
-        logger.info("[musicPlayer] itemKey: {}, Sec-Fetch-Dest: {}", itemKey, request.getHeader("Sec-Fetch-Dest"));
-        if (StringUtils.hasLength(itemKey)) {
-            ShortDouYinItemDataModel tmp = GsonUtil.toBean(redisService.get(itemKey), ShortDouYinItemDataModel.class);
-            model.addAttribute("title", StringUtils.hasLength(tmp.getTitle()) ? tmp.getTitle() : "MusicPlayer");
-            model.addAttribute("path", tmp.getPath());
-            return "music/plyr/index";
+        try {
+            String itemKey = "".equals(key) ? "" : new String(Base64Utils.decodeFromUrlSafeString(key));
+            logger.info("[musicPlayer] itemKey: {}, Sec-Fetch-Dest: {}", itemKey, request.getHeader("Sec-Fetch-Dest"));
+            if (StringUtils.hasLength(itemKey)) {
+                ShortDouYinItemDataModel tmp = GsonUtil.toBean(redisService.get(itemKey), ShortDouYinItemDataModel.class);
+                model.addAttribute("title", StringUtils.hasLength(tmp.getTitle()) ? tmp.getTitle() : "MusicPlayer");
+                model.addAttribute("path", tmp.getPath());
+                return "music/plyr/index";
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return formatRespData(UNAVAILABLE_DATA, null);
     }
 
     @GetMapping("picture/short")
     public String pictureWithShortKey(@RequestParam(value = "key", required = false, defaultValue = "") String key, Model model, HttpServletRequest request) {
-        String itemKey = "".equals(key) ? "" : new String(Base64Utils.decodeFromUrlSafeString(key));
-        logger.info("[picturePlayer] itemKey: {}, Sec-Fetch-Dest: {}", itemKey, request.getHeader("Sec-Fetch-Dest"));
-        if (StringUtils.hasLength(itemKey)) {
-            ShortImageDataModel tmp = GsonUtil.toBean(redisService.get(itemKey), ShortImageDataModel.class);
-            model.addAttribute("title", StringUtils.hasLength(tmp.getTitle()) ? tmp.getTitle() : "PicturePlayer");
-            model.addAttribute("data", tmp.getData());
-            return "picture/index";
+        try {
+            String itemKey = "".equals(key) ? "" : new String(Base64Utils.decodeFromUrlSafeString(key));
+            logger.info("[picturePlayer] itemKey: {}, Sec-Fetch-Dest: {}", itemKey, request.getHeader("Sec-Fetch-Dest"));
+            if (StringUtils.hasLength(itemKey)) {
+                ShortImageDataModel tmp = GsonUtil.toBean(redisService.get(itemKey), ShortImageDataModel.class);
+                model.addAttribute("title", StringUtils.hasLength(tmp.getTitle()) ? tmp.getTitle() : "PicturePlayer");
+                model.addAttribute("data", tmp.getData());
+                return "picture/index";
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return formatRespData(UNAVAILABLE_DATA, null);
     }
