@@ -2,6 +2,7 @@ package com.koala.tools.factory.product;
 
 import com.koala.tools.enums.DouYinTypeEnums;
 import com.koala.tools.models.douyin.v1.PublicTiktokDataRespModel;
+import com.koala.tools.models.shortUrl.ShortDouYinItemDataModel;
 import com.koala.tools.models.shortUrl.ShortImageDataModel;
 import com.koala.tools.models.douyin.v1.itemInfo.ImageItemDataModel;
 import com.koala.tools.models.douyin.v1.itemInfo.ItemInfoRespModel;
@@ -166,7 +167,14 @@ public class DouYinApiProduct {
             switch (Objects.requireNonNull(DouYinTypeEnums.getEnumsByCode(this.itemTypeId))) {
                 case MUSIC_TYPE -> {
                     if (!Objects.isNull(this.musicItemInfo.getAwemeMusicDetail().get(0).getMusic())) {
-                        if (this.version.equals(3)) {
+                        if (this.version.equals(4)) {
+                            String key = ShortKeyGenerator.getKey(null);
+                            String title = this.musicItemInfo.getAwemeMusicDetail().get(0).getMusic().getTitle();
+                            String link = this.musicItemInfo.getAwemeMusicDetail().get(0).getMusic().getPlayUrl().getUri();
+                            redisService.set(key, GsonUtil.toString(new ShortDouYinItemDataModel(title, link)), EXPIRE_TIME);
+                            this.musicItemInfo.getAwemeMusicDetail().get(0).getMusic().setMockPreviewMusicPath(host + "tools/DouYin/pro/player/music/short?key=" + Base64Utils.encodeToUrlSafeString(key.getBytes(StandardCharsets.UTF_8)));
+                            this.musicItemInfo.getAwemeMusicDetail().get(0).getMusic().setMockDownloadMusicPath(host + "tools/DouYin/download/music?path=" + Base64Utils.encodeToUrlSafeString(link.getBytes(StandardCharsets.UTF_8)));
+                        } else if (this.version.equals(3)) {
                             String link = this.musicItemInfo.getAwemeMusicDetail().get(0).getMusic().getPlayUrl().getUri();
                             String title = this.musicItemInfo.getAwemeMusicDetail().get(0).getMusic().getTitle();
                             this.musicItemInfo.getAwemeMusicDetail().get(0).getMusic().setMockPreviewMusicPath(host + "tools/DouYin/pro/player/music?" + (StringUtils.hasLength(title) ? "title=" + Base64Utils.encodeToUrlSafeString(title.getBytes(StandardCharsets.UTF_8)) + "&" : "") + "path=" + Base64Utils.encodeToUrlSafeString(link.getBytes(StandardCharsets.UTF_8)));

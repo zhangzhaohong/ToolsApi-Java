@@ -1,5 +1,6 @@
 package com.koala.tools.controller;
 
+import com.koala.tools.models.shortUrl.ShortDouYinItemDataModel;
 import com.koala.tools.models.shortUrl.ShortImageDataModel;
 import com.koala.tools.redis.service.RedisService;
 import com.koala.tools.utils.GsonUtil;
@@ -71,6 +72,19 @@ public class DouYinPlayerController {
         model.addAttribute("title", itemTitle);
         model.addAttribute("path", url);
         return "music/plyr/index";
+    }
+
+    @GetMapping("/music/short")
+    public String musicWithShortKey(@RequestParam(value = "key", required = false, defaultValue = "") String key, Model model, HttpServletRequest request) {
+        String itemKey = "".equals(key) ? "" : new String(Base64Utils.decodeFromUrlSafeString(key));
+        logger.info("[musicPlayer] itemTitle: {}, Sec-Fetch-Dest: {}", itemKey, request.getHeader("Sec-Fetch-Dest"));
+        if (StringUtils.hasLength(itemKey)) {
+            ShortDouYinItemDataModel tmp = GsonUtil.toBean(redisService.get(itemKey), ShortDouYinItemDataModel.class);
+            model.addAttribute("title", StringUtils.hasLength(tmp.getTitle()) ? tmp.getTitle() : "MusicPlayer");
+            model.addAttribute("path", tmp.getPath());
+            return "music/plyr/index";
+        }
+        return formatRespData(UNAVAILABLE_DATA, null);
     }
 
     @GetMapping("picture/short")
