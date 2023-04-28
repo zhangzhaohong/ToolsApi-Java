@@ -13,7 +13,7 @@
     <div class="swiper-wrapper">
         <div class="swiper-slide" th:if="${data != null}" th:each="url: ${data}">
             <div class="swiper-item-container">
-                <img src="" th:src="${url}" alt="">
+                <img src="" th:src="${url}" alt="" class="swiper-img-style">
             </div>
         </div>
     </div>
@@ -25,7 +25,7 @@
     <div class="swiper-button-next"></div>
 
     <!-- 如果需要滚动条 -->
-    <div class="swiper-scrollbar"></div>
+    <!-- <div class="swiper-scrollbar"></div> -->
 </div>
 </body>
 <script type="text/javascript">
@@ -53,9 +53,9 @@
         },
 
         // 如果需要滚动条
-        scrollbar: {
-            el: '.swiper-scrollbar',
-        },
+        // scrollbar: {
+        //     el: '.swiper-scrollbar',
+        // },
         observer: true,
         observeParents: true
     });
