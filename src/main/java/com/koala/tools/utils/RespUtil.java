@@ -2,6 +2,7 @@ package com.koala.tools.utils;
 
 import com.koala.tools.enums.DouYinResponseEnums;
 import com.koala.tools.enums.LanZouResponseEnums;
+import com.koala.tools.enums.PublicResponseEnums;
 import com.koala.tools.models.RespModel;
 
 import java.util.Objects;
@@ -15,6 +16,14 @@ import java.util.Objects;
 public class RespUtil {
 
     private RespUtil() {}
+
+    public static String formatRespData(PublicResponseEnums enums, Object data) {
+        if (!Objects.isNull(enums)) {
+            return GsonUtil.toString(new RespModel(enums.getCode(), enums.getMessage(), data));
+        }
+        return GsonUtil.toString(new RespModel(PublicResponseEnums.FAILURE.getCode(), PublicResponseEnums.FAILURE.getMessage(), data));
+    }
+
 
     public static String formatRespData(DouYinResponseEnums enums, Object data) {
         if (!Objects.isNull(enums)) {

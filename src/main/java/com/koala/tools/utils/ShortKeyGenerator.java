@@ -1,10 +1,18 @@
 package com.koala.tools.utils;
 
+import com.koala.tools.models.shortUrl.ShortUrlInfoModel;
+import com.koala.tools.redis.service.RedisService;
+import org.springframework.util.Base64Utils;
+
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+
+import static com.koala.tools.enums.PublicResponseEnums.GET_DATA_SUCCESS;
+import static com.koala.tools.utils.RespUtil.formatRespData;
 
 /**
  * @author koala
@@ -13,6 +21,13 @@ import java.util.UUID;
  * @description
  */
 public class ShortKeyGenerator {
+    private final static Long EXPIRE_TIME = 3 * 24 * 60 * 60L;
+
+    public static ShortUrlInfoModel generateShortUrl(String url, Long expire, String host, RedisService redisService) {
+        String key = ShortKeyGenerator.getKey(url);
+        redisService.set(key, url, Optional.ofNullable(expire).orElse(EXPIRE_TIME));
+        return new ShortUrlInfoModel(host + "short?key=" + Base64Utils.encodeToUrlSafeString(key.getBytes(StandardCharsets.UTF_8)), Optional.ofNullable(expire).orElse(EXPIRE_TIME));
+    }
 
     public static String getKey(String url) {
         String content = Objects.isNull(url) ? UUID.randomUUID().toString() : url;
@@ -122,5 +137,5 @@ class CMyEncrypt {
         int d2 = n % 16;
         return HEX_DIGITS[d1] + HEX_DIGITS[d2];
     }
-    
+
 }

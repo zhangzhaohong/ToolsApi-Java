@@ -17,12 +17,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
-import java.util.Optional;
-
-import static com.koala.tools.enums.DouYinResponseEnums.UNAVAILABLE_DATA;
-import static com.koala.tools.enums.DouYinResponseEnums.UNAVAILABLE_PLAYER;
-import static com.koala.tools.utils.RespUtil.formatRespData;
-
 /**
  * @author koala
  * @version 1.0
@@ -51,7 +45,7 @@ public class DouYinPlayerController {
         } else if ("1".equals(version)) {
             return "video/video.js/index";
         }
-        return formatRespData(UNAVAILABLE_PLAYER, null);
+        return "404/index";
     }
 
     @GetMapping("/video/short")
@@ -67,14 +61,12 @@ public class DouYinPlayerController {
                     return "video/plyr/index";
                 } else if ("1".equals(version)) {
                     return "video/video.js/index";
-                } else {
-                    return formatRespData(UNAVAILABLE_PLAYER, null);
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return formatRespData(UNAVAILABLE_DATA, null);
+        return "404/index";
     }
 
     @GetMapping("/live")
@@ -101,7 +93,7 @@ public class DouYinPlayerController {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return formatRespData(UNAVAILABLE_DATA, null);
+        return "404/index";
     }
 
     @GetMapping("/music")
@@ -128,7 +120,7 @@ public class DouYinPlayerController {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return formatRespData(UNAVAILABLE_DATA, null);
+        return "404/index";
     }
 
     @GetMapping("picture/short")
@@ -145,7 +137,7 @@ public class DouYinPlayerController {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return formatRespData(UNAVAILABLE_DATA, null);
+        return "404/index";
     }
 
 }
