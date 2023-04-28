@@ -29,10 +29,7 @@ import static com.koala.tools.utils.RespUtil.formatRespData;
  */
 @Controller
 public class ShortUrlController {
-    private static final Logger logger = LoggerFactory.getLogger(DouYinToolsController.class);
-
-    private final static Long EXPIRE_TIME = 3 * 24 * 60 * 60L;
-
+    private static final Logger logger = LoggerFactory.getLogger(ShortUrlController.class);
     @Resource(name = "getHost")
     private String host;
 
