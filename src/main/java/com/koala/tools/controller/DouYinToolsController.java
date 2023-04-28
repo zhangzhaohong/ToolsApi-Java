@@ -104,7 +104,7 @@ public class DouYinToolsController {
     }
 
     @GetMapping(value = "api", produces = {"application/json;charset=utf-8"})
-    public Object getDouYinInfos(@MixedHttpRequest(required = false) String link, @RequestParam(value = "type", required = false, defaultValue = "info") String type, @RequestParam(value = "version", required = false, defaultValue = "3") Integer version, HttpServletRequest request, HttpServletResponse response) {
+    public Object getDouYinInfos(@MixedHttpRequest(required = false) String link, @RequestParam(value = "type", required = false, defaultValue = "info") String type, @RequestParam(value = "version", required = false, defaultValue = "4") Integer version, HttpServletRequest request, HttpServletResponse response) {
         if (ObjectUtils.isEmpty(link)) {
             return formatRespData(INVALID_LINK, null);
         }

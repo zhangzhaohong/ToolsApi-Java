@@ -73,8 +73,8 @@ public class DouYinPlayerController {
         return "music/plyr/index";
     }
 
-    @GetMapping("picture")
-    public String picture(@RequestParam(value = "key", required = false, defaultValue = "") String key, Model model) {
+    @GetMapping("picture/short")
+    public String pictureWithShortKey(@RequestParam(value = "key", required = false, defaultValue = "") String key, Model model) {
         String itemKey = "".equals(key) ? "" : new String(Base64Utils.decodeFromUrlSafeString(key));
         if (StringUtils.hasLength(itemKey)) {
             ShortImageDataModel tmp = GsonUtil.toBean(redisService.get(itemKey), ShortImageDataModel.class);

@@ -35,7 +35,7 @@ import static com.koala.tools.enums.DouYinTypeEnums.LIVE_TYPE_1;
 public class DouYinApiProduct {
     private static final Logger logger = LoggerFactory.getLogger(DouYinApiProduct.class);
     private final static Long EXPIRE_TIME = 12 * 60 * 60L;
-    private Integer version = 3;
+    private Integer version = 4;
     private String url;
     private String host;
     private String directUrl;
@@ -176,17 +176,19 @@ public class DouYinApiProduct {
                 }
                 case NOTE_TYPE -> {
                     if (!Objects.isNull(this.itemInfo.getAwemeDetailModel().getImages())) {
-                        String key = ShortKeyGenerator.getKey(null);
-                        String title = this.itemInfo.getAwemeDetailModel().getDesc();
-                        ArrayList<String> urlList = new ArrayList<>();
-                        for (Object image : GsonUtil.toBean(GsonUtil.toString(this.itemInfo.getAwemeDetailModel().getImages()), ArrayList.class)) {
-                            ImageItemDataModel imageItem = GsonUtil.toBean(GsonUtil.toString(image), ImageItemDataModel.class);
-                            if (!Objects.isNull(imageItem.getUrlList())) {
-                                urlList.add(imageItem.getUrlList().get(0));
+                        if (this.version.equals(4)) {
+                            String key = ShortKeyGenerator.getKey(null);
+                            String title = this.itemInfo.getAwemeDetailModel().getDesc();
+                            ArrayList<String> urlList = new ArrayList<>();
+                            for (Object image : GsonUtil.toBean(GsonUtil.toString(this.itemInfo.getAwemeDetailModel().getImages()), ArrayList.class)) {
+                                ImageItemDataModel imageItem = GsonUtil.toBean(GsonUtil.toString(image), ImageItemDataModel.class);
+                                if (!Objects.isNull(imageItem.getUrlList())) {
+                                    urlList.add(imageItem.getUrlList().get(0));
+                                }
                             }
+                            redisService.set(key, GsonUtil.toString(new ShortImageDataModel(title, urlList)), EXPIRE_TIME);
+                            this.itemInfo.getAwemeDetailModel().setMockPreviewPicturePath(host + "tools/DouYin/pro/player/picture/short?key=" + Base64Utils.encodeToUrlSafeString(key.getBytes(StandardCharsets.UTF_8)));
                         }
-                        redisService.set(key, GsonUtil.toString(new ShortImageDataModel(title, urlList)), EXPIRE_TIME);
-                        this.itemInfo.getAwemeDetailModel().setMockPreviewPicturePath(host + "tools/DouYin/pro/player/picture?key=" + Base64Utils.encodeToUrlSafeString(key.getBytes(StandardCharsets.UTF_8)));
                     }
                 }
                 case LIVE_TYPE_1, LIVE_TYPE_2 -> {
