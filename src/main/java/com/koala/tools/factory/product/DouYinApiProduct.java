@@ -178,7 +178,7 @@ public class DouYinApiProduct {
                 case NOTE_TYPE -> {
                     if (!Objects.isNull(this.itemInfo.getAwemeDetailModel().getImages())) {
                         String key = ShortKeyGenerator.getKey(null);
-                        String title = "";
+                        String title = this.itemInfo.getAwemeDetailModel().getDesc();
                         ArrayList<String> urlList = new ArrayList<>();
                         for (Object image : GsonUtil.toBean(GsonUtil.toString(this.itemInfo.getAwemeDetailModel().getImages()), ArrayList.class)) {
                             ImageItemDataModel imageItem = GsonUtil.toBean(GsonUtil.toString(image), ImageItemDataModel.class);
