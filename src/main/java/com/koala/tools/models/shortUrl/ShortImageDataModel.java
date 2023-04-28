@@ -1,4 +1,4 @@
-package com.koala.tools.models.douyin.v1.itemInfo;
+package com.koala.tools.models.shortUrl;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,6 +14,7 @@ import java.util.List;
  */
 @Data
 @AllArgsConstructor
-public class ImageDataModel implements Serializable {
+public class ShortImageDataModel implements Serializable {
+    private String title;
     private List<String> data;
 }

@@ -2,7 +2,7 @@ package com.koala.tools.factory.product;
 
 import com.koala.tools.enums.DouYinTypeEnums;
 import com.koala.tools.models.douyin.v1.PublicTiktokDataRespModel;
-import com.koala.tools.models.douyin.v1.itemInfo.ImageDataModel;
+import com.koala.tools.models.shortUrl.ShortImageDataModel;
 import com.koala.tools.models.douyin.v1.itemInfo.ImageItemDataModel;
 import com.koala.tools.models.douyin.v1.itemInfo.ItemInfoRespModel;
 import com.koala.tools.models.douyin.v1.musicInfo.MusicInfoRespModel;
@@ -17,7 +17,6 @@ import org.springframework.util.Base64Utils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
-import javax.annotation.Resource;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
@@ -186,8 +185,8 @@ public class DouYinApiProduct {
                                 urlList.add(imageItem.getUrlList().get(0));
                             }
                         }
-                        redisService.set(key, GsonUtil.toString(new ImageDataModel(urlList)), EXPIRE_TIME);
-                        this.itemInfo.getAwemeDetailModel().setMockPreviewPicturePath(host + "tools/DouYin/pro/player/picture?" + (StringUtils.hasLength(title) ? "title=" + Base64Utils.encodeToUrlSafeString(title.getBytes(StandardCharsets.UTF_8)) + "&" : "") + "key=" + Base64Utils.encodeToUrlSafeString(key.getBytes(StandardCharsets.UTF_8)));
+                        redisService.set(key, GsonUtil.toString(new ShortImageDataModel(title, urlList)), EXPIRE_TIME);
+                        this.itemInfo.getAwemeDetailModel().setMockPreviewPicturePath(host + "tools/DouYin/pro/player/picture?key=" + Base64Utils.encodeToUrlSafeString(key.getBytes(StandardCharsets.UTF_8)));
                     }
                 }
                 case LIVE_TYPE_1, LIVE_TYPE_2 -> {

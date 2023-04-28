@@ -1,6 +1,6 @@
 package com.koala.tools.controller;
 
-import com.koala.tools.models.douyin.v1.itemInfo.ImageDataModel;
+import com.koala.tools.models.shortUrl.ShortImageDataModel;
 import com.koala.tools.redis.service.RedisService;
 import com.koala.tools.utils.GsonUtil;
 import org.slf4j.Logger;
@@ -16,8 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
-import java.util.Arrays;
-import java.util.Objects;
+import java.util.Optional;
 
 import static com.koala.tools.enums.DouYinResponseEnums.UNAVAILABLE_DATA;
 import static com.koala.tools.enums.DouYinResponseEnums.UNAVAILABLE_PLAYER;
@@ -75,12 +74,12 @@ public class DouYinPlayerController {
     }
 
     @GetMapping("picture")
-    public String picture(@RequestParam(value = "title", required = false, defaultValue = "PicturePlayer") String title, @RequestParam(value = "key", required = false, defaultValue = "") String key, Model model) {
-        String itemTitle = "PicturePlayer".equals(title) ? title : new String(Base64Utils.decodeFromUrlSafeString(title));
+    public String picture(@RequestParam(value = "key", required = false, defaultValue = "") String key, Model model) {
         String itemKey = "".equals(key) ? "" : new String(Base64Utils.decodeFromUrlSafeString(key));
         if (StringUtils.hasLength(itemKey)) {
-            model.addAttribute("title", itemTitle);
-            model.addAttribute("data", GsonUtil.toBean(redisService.get(itemKey), ImageDataModel.class).getData());
+            ShortImageDataModel tmp = GsonUtil.toBean(redisService.get(itemKey), ShortImageDataModel.class);
+            model.addAttribute("title", Optional.ofNullable(tmp.getTitle()).orElse("PicturePlayer"));
+            model.addAttribute("data", tmp.getData());
             return "picture/index";
         }
         return formatRespData(UNAVAILABLE_DATA, null);
