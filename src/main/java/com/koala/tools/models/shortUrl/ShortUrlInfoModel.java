@@ -16,6 +16,9 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class ShortUrlInfoModel implements Serializable {
     private String url;
+    private Long expire;
+    @SerializedName("create_time")
+    private String createTime;
     @SerializedName("expire_time")
-    private Long expireTime;
+    private String expireTime;
 }
