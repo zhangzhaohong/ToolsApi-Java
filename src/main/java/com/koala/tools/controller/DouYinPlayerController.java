@@ -54,6 +54,25 @@ public class DouYinPlayerController {
         return formatRespData(UNAVAILABLE_PLAYER, null);
     }
 
+    @GetMapping("/video/short")
+    public String videoWithShortKey(@RequestParam(value = "key", required = false, defaultValue = "") String key, @RequestParam(value = "version", required = false, defaultValue = "2") String version, Model model, HttpServletRequest request) {
+        String itemKey = "".equals(key) ? "" : new String(Base64Utils.decodeFromUrlSafeString(key));
+        logger.info("[videoPlayer] itemKey: {}, Sec-Fetch-Dest: {}", itemKey, request.getHeader("Sec-Fetch-Dest"));
+        if (StringUtils.hasLength(itemKey)) {
+            ShortDouYinItemDataModel tmp = GsonUtil.toBean(redisService.get(itemKey), ShortDouYinItemDataModel.class);
+            model.addAttribute("title", StringUtils.hasLength(tmp.getTitle()) ? tmp.getTitle() : "VideoPlayer");
+            model.addAttribute("path", tmp.getPath());
+            if ("2".equals(version)) {
+                return "video/plyr/index";
+            } else if ("1".equals(version)) {
+                return "video/video.js/index";
+            } else {
+                return formatRespData(UNAVAILABLE_PLAYER, null);
+            }
+        }
+        return formatRespData(UNAVAILABLE_DATA, null);
+    }
+
     @GetMapping("/live")
     public String live(@RequestParam(value = "title", required = false, defaultValue = "LivePlayer") String title, @RequestParam(value = "path", required = false, defaultValue = "") String path, Model model, HttpServletRequest request) {
         String itemTitle = "LivePlayer".equals(title) ? title : new String(Base64Utils.decodeFromUrlSafeString(title));
