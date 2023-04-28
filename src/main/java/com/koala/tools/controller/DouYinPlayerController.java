@@ -74,8 +74,9 @@ public class DouYinPlayerController {
     }
 
     @GetMapping("picture/short")
-    public String pictureWithShortKey(@RequestParam(value = "key", required = false, defaultValue = "") String key, Model model) {
+    public String pictureWithShortKey(@RequestParam(value = "key", required = false, defaultValue = "") String key, Model model, HttpServletRequest request) {
         String itemKey = "".equals(key) ? "" : new String(Base64Utils.decodeFromUrlSafeString(key));
+        logger.info("[picturePlayer] itemTitle: {}, Sec-Fetch-Dest: {}", itemKey, request.getHeader("Sec-Fetch-Dest"));
         if (StringUtils.hasLength(itemKey)) {
             ShortImageDataModel tmp = GsonUtil.toBean(redisService.get(itemKey), ShortImageDataModel.class);
             model.addAttribute("title", Optional.ofNullable(tmp.getTitle()).orElse("PicturePlayer"));
