@@ -17,12 +17,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
-import java.util.Optional;
-
-import static com.koala.tools.enums.DouYinResponseEnums.UNAVAILABLE_DATA;
-import static com.koala.tools.enums.DouYinResponseEnums.UNAVAILABLE_PLAYER;
-import static com.koala.tools.utils.RespUtil.formatRespData;
-
 /**
  * @author koala
  * @version 1.0
