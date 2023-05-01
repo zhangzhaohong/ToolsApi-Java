@@ -119,6 +119,17 @@ public class HeaderUtil {
         return header;
     }
 
+    public static Map<String, String> getDouYinWebRequestSpecialHeader(String ticket) {
+        HashMap<String, String> header = new HashMap<>(0);
+        header.put("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36");
+        header.put("Accept-Encoding", "None");
+        header.put("referer", "https://www.douyin.com/");
+        header.put("Cookie", "ttwid=" + ticket + "; __ac_nonce=0644f93010042b1aedcae; __ac_signature=_02B4Z6wo00f01hyw.YAAAIDD4vyBsOcQreYckPkAAONx9e; __ac_referer=__ac_blank;");
+        header.put("X-FORWARDED-FOR", getRandomIpAddress());
+        header.put("CLIENT-IP", getRandomIpAddress());
+        return header;
+    }
+
     public static Map<String, String> getDouYinTicketGeneratorHeader() {
         HashMap<String, String> header = new HashMap<>(0);
         header.put("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36");
