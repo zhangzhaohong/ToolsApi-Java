@@ -2,16 +2,17 @@ package com.koala.tools.factory.product;
 
 import com.koala.tools.enums.DouYinTypeEnums;
 import com.koala.tools.models.douyin.v1.PublicTiktokDataRespModel;
-import com.koala.tools.models.shortUrl.ShortDouYinItemDataModel;
-import com.koala.tools.models.shortUrl.ShortImageDataModel;
 import com.koala.tools.models.douyin.v1.itemInfo.ImageItemDataModel;
 import com.koala.tools.models.douyin.v1.itemInfo.ItemInfoRespModel;
 import com.koala.tools.models.douyin.v1.musicInfo.MusicInfoRespModel;
 import com.koala.tools.models.douyin.v1.roomInfo.RoomInfoRespModel;
 import com.koala.tools.models.douyin.v1.roomInfoData.RoomInfoDataRespModel;
+import com.koala.tools.models.shortUrl.ShortDouYinItemDataModel;
+import com.koala.tools.models.shortUrl.ShortImageDataModel;
 import com.koala.tools.models.xbogus.XbogusDataModel;
 import com.koala.tools.redis.service.RedisService;
 import com.koala.tools.utils.*;
+import org.apache.http.cookie.Cookie;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Base64Utils;
@@ -21,9 +22,8 @@ import org.springframework.util.StringUtils;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Objects;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static com.koala.tools.enums.DouYinTypeEnums.LIVE_TYPE_1;
 
@@ -36,6 +36,8 @@ import static com.koala.tools.enums.DouYinTypeEnums.LIVE_TYPE_1;
 public class DouYinApiProduct {
     private static final Logger logger = LoggerFactory.getLogger(DouYinApiProduct.class);
     private final static Long EXPIRE_TIME = 12 * 60 * 60L;
+    private final static String WEB_FROM = "web_code_link";
+    private static final String TICKET_REGISTER_BODY = "{\"region\":\"cn\",\"aid\":1768,\"needFid\":false,\"service\":\"www.ixigua.com\",\"migrate_info\":{\"ticket\":\"\",\"source\":\"node\"},\"cbUrlProtocol\":\"https\",\"union\":true}";
     private Integer version = 4;
     private String url;
     private String host;
@@ -68,8 +70,15 @@ public class DouYinApiProduct {
             switch (Objects.requireNonNull(douYinTypeEnum)) {
                 case MUSIC_TYPE ->
                         this.itemId = PatternUtil.matchData(douYinTypeEnum.getPrefix() + "(.*?)\\?", this.directUrl);
-                case NOTE_TYPE, VIDEO_TYPE ->
+                case NOTE_TYPE, VIDEO_TYPE -> {
+                    if (this.directUrl.startsWith("https://www.iesdouyin.com")) {
                         this.itemId = PatternUtil.matchData(douYinTypeEnum.getPrefix() + "(.*?)/", this.directUrl);
+                    } else if (this.directUrl.startsWith("https://www.douyin.com")) {
+                        this.itemId = PatternUtil.matchData(douYinTypeEnum.getPrefix() + "(.*?)\\?", this.directUrl);
+                    } else {
+                        logger.info("[DouYinApiProduct]({}, {}) getItemIdError, directUrl: {}", id, itemId, this.directUrl);
+                    }
+                }
                 case LIVE_TYPE_1 ->
                         this.itemId = this.directUrl.replaceFirst("https://" + douYinTypeEnum.getPrefix() + "/", "");
                 case LIVE_TYPE_2 -> {
@@ -106,6 +115,13 @@ public class DouYinApiProduct {
                 this.directUrl = this.url;
             } else {
                 this.directUrl = HttpClientUtil.doGetRedirectLocation(this.url, null, HeaderUtil.getDouYinDownloadHeader());
+                if (Objects.equals(WEB_FROM, HttpClientUtil.getParam(this.directUrl, "from"))) {
+                    String ticket = getTicket();
+                    String webDirectUrl = HttpClientUtil.doGetRedirectLocation(this.directUrl, HeaderUtil.getDouYinWebRequestSpecialHeader(ticket), HeaderUtil.getDouYinDownloadHeader());
+                    if (StringUtils.hasLength(webDirectUrl)) {
+                        this.directUrl = webDirectUrl;
+                    }
+                }
             }
         }
     }
@@ -282,5 +298,13 @@ public class DouYinApiProduct {
 
     public void setRedis(RedisService redisService) {
         this.redisService = redisService;
+    }
+
+    private String getTicket() throws IOException {
+        AtomicReference<String> ticket = new AtomicReference<>(null);
+        List<Cookie> cookieData = HttpClientUtil.doPostJsonAndReturnCookie("https://ttwid.bytedance.com/ttwid/union/register/", TICKET_REGISTER_BODY);
+        Optional<Cookie> ticketData = cookieData.stream().filter(item -> "ttwid".equals(item.getName())).findFirst();
+        ticketData.ifPresent(cookie -> ticket.set(cookie.getValue()));
+        return ticket.get();
     }
 }

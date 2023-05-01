@@ -1,5 +1,6 @@
 package com.koala.tools.utils;
 
+import com.google.common.base.Splitter;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
@@ -426,5 +427,12 @@ public class HttpClientUtil {
                 httpClient.close();
             }
         }
+    }
+
+    @SuppressWarnings("UnstableApiUsage")
+    public static String getParam(String url, String name) {
+        String params = url.substring(url.indexOf("?") + 1);
+        Map<String, String> split = Splitter.on("&").withKeyValueSeparator("=").split(params);
+        return split.get(name);
     }
 }

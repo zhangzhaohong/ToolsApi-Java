@@ -86,8 +86,7 @@ public class RequestLoggingFilter implements Filter {
         if (line != null) {
             map.put("Context", new String[]{line});
         }
-        if (requestWrapper instanceof CustomHttpServletRequestWrapper) {
-            CustomHttpServletRequestWrapper customWrapper = (CustomHttpServletRequestWrapper) requestWrapper;
+        if (requestWrapper instanceof CustomHttpServletRequestWrapper customWrapper) {
             // 获取body
             try {
                 String body = customWrapper.getBody();
