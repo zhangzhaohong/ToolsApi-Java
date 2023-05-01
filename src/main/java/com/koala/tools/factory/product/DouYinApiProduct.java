@@ -302,7 +302,7 @@ public class DouYinApiProduct {
 
     private String getTicket() throws IOException {
         AtomicReference<String> ticket = new AtomicReference<>(null);
-        List<Cookie> cookieData = HttpClientUtil.doPostJsonAndReturnCookie("https://ttwid.bytedance.com/ttwid/union/register/", TICKET_REGISTER_BODY);
+        List<Cookie> cookieData = HttpClientUtil.doPostJsonAndReturnCookie("https://ttwid.bytedance.com/ttwid/union/register/", HeaderUtil.getDouYinTicketGeneratorHeader(),TICKET_REGISTER_BODY);
         Optional<Cookie> ticketData = cookieData.stream().filter(item -> "ttwid".equals(item.getName())).findFirst();
         ticketData.ifPresent(cookie -> ticket.set(cookie.getValue()));
         return ticket.get();
