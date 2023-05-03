@@ -57,8 +57,6 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="Maven: org.springframework.security:spring-security-web:5.8.3" level="project" />
-    <orderEntry type="library" name="Maven: org.springframework.security:spring-security-core:5.7.8" level="project" />
-    <orderEntry type="library" name="Maven: org.springframework.security:spring-security-crypto:5.7.8" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-core:5.3.27" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-jcl:5.3.27" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-aop:5.3.27" level="project" />
@@ -106,6 +104,10 @@
     <orderEntry type="library" name="Maven: io.micrometer:micrometer-core:1.9.10" level="project" />
     <orderEntry type="library" name="Maven: org.hdrhistogram:HdrHistogram:2.1.12" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: org.latencyutils:LatencyUtils:2.0.3" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-starter-security:2.7.11" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework.security:spring-security-config:5.7.8" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework.security:spring-security-core:5.8.3" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework.security:spring-security-crypto:5.7.8" level="project" />
     <orderEntry type="library" name="Maven: org.apache.rocketmq:rocketmq-spring-boot-starter:2.2.3" level="project" />
     <orderEntry type="library" name="Maven: org.apache.rocketmq:rocketmq-spring-boot:2.2.3" level="project" />
     <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.7.36" level="project" />
