@@ -96,14 +96,15 @@
     <orderEntry type="library" name="Maven: org.jetbrains:annotations:13.0" level="project" />
     <orderEntry type="library" name="Maven: org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.7.22" level="project" />
     <orderEntry type="library" name="Maven: org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.7.22" level="project" />
-    <orderEntry type="library" name="Maven: de.codecentric:spring-boot-admin-starter-client:2.7.10" level="project" />
-    <orderEntry type="library" name="Maven: de.codecentric:spring-boot-admin-client:2.7.10" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-starter-actuator:2.7.11" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-actuator-autoconfigure:2.7.11" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-actuator:2.7.11" level="project" />
+    <orderEntry type="library" name="Maven: com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.5" level="project" />
     <orderEntry type="library" name="Maven: io.micrometer:micrometer-core:1.9.10" level="project" />
     <orderEntry type="library" name="Maven: org.hdrhistogram:HdrHistogram:2.1.12" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: org.latencyutils:LatencyUtils:2.0.3" level="project" />
+    <orderEntry type="library" name="Maven: de.codecentric:spring-boot-admin-starter-client:2.7.10" level="project" />
+    <orderEntry type="library" name="Maven: de.codecentric:spring-boot-admin-client:2.7.10" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-starter-security:3.0.6" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.security:spring-security-config:5.7.8" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.security:spring-security-core:6.0.3" level="project" />
@@ -161,7 +162,6 @@
     <orderEntry type="library" name="Maven: com.google.protobuf:protobuf-java-util:3.20.1" level="project" />
     <orderEntry type="library" name="Maven: com.google.protobuf:protobuf-java:3.20.1" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-messaging:5.3.27" level="project" />
-    <orderEntry type="library" name="Maven: com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.5" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-starter-validation:2.7.11" level="project" />
     <orderEntry type="library" name="Maven: org.hibernate.validator:hibernate-validator:6.2.5.Final" level="project" />
     <orderEntry type="library" name="Maven: jakarta.validation:jakarta.validation-api:2.0.2" level="project" />
