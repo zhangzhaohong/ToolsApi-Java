@@ -34,14 +34,22 @@ public class ToolsApplication {
         String ip = InetAddress.getLocalHost().getHostAddress();
         String port = env.getProperty("server.port");
         String property = env.getProperty("server.servlet.context-path");
+        String adminManagementUrl = env.getProperty("spring.boot.admin.client.url");
+        String adminUser = env.getProperty("spring.boot.admin.client.username");
+        String adminPassword = env.getProperty("spring.boot.admin.client.password");
         String path = property == null ? "" : property;
         log.info(
                 "\n\t" +
-                        "----------------------------------------------------------\n\t" +
+                        "------------------------------------------------------------\n\t" +
                         "Application Tools is running! Access URLs:\n\t" +
-                        "Local: \t\thttp://localhost:" + port + path + "/\n\t" +
-                        "External: \thttp://" + ip + ":" + port + path + "/\n\t" +
-                        "TmpPath: \t" + folderDir + "\n\t" +
+                        "Local: \t\t\thttp://localhost:" + port + path + "/\n\t" +
+                        "External: \t\thttp://" + ip + ":" + port + path + "/\n\t" +
+                        "ServiceData: \t" + folderDir + "\n\t" +
+                        "------------------------------------------------------------\n\t" +
+                        "AdminManagementSystem:\n\t" +
+                        "Local: \t\t" + adminManagementUrl + "/\n\t" +
+                        "User: \t\t" + adminUser + "\n\t" +
+                        "Password: \t" + adminPassword + "\n\t" +
                         "------------------------------------------------------------");
     }
 

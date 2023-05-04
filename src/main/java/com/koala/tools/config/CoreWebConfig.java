@@ -131,9 +131,9 @@ public class CoreWebConfig implements WebMvcConfigurer {
     }
 
     @Bean
-    public static String getTmpPath() {
+    public static String getServiceDataPath() {
         String dir = System.getProperty("user.dir");
-        String folderDir = String.format("%s/ToolsTmp", dir);
+        String folderDir = String.format("%s/ServiceData", dir);
         File folder = new File(folderDir);
         if (!folder.exists() && !folder.isDirectory()) {
             folder.mkdirs();
