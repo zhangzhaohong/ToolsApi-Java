@@ -23,7 +23,7 @@ public class ToolsApplication {
 
     public static void main(String[] args) throws UnknownHostException {
         String dir = System.getProperty("user.dir");
-        String folderDir = String.format("%s/ToolsTmp", dir);
+        String folderDir = String.format("%s/ServiceData", dir);
         File folder = new File(folderDir);
         if (!folder.exists() && !folder.isDirectory()) {
             boolean status = folder.mkdirs();
