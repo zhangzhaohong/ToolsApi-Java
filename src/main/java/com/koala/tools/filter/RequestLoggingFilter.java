@@ -39,6 +39,11 @@ public class RequestLoggingFilter implements Filter {
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         Object requestWrapper = null;
         if (servletRequest instanceof HttpServletRequest) {
+            // 直接放过actuator
+            if (((HttpServletRequest) servletRequest).getRequestURI().startsWith("/actuator")) {
+                filterChain.doFilter(servletRequest, servletResponse);
+                return;
+            }
             if (!Objects.isNull(servletRequest.getContentType()) && servletRequest.getContentType().contains(MediaType.APPLICATION_FORM_URLENCODED_VALUE)) {
                 requestWrapper = servletRequest;
             } else {
