@@ -1,23 +1,24 @@
 package com.koala.tools.interceptor;
 
-import com.koala.tools.BeanContext;
+import com.koala.tools.data.dataModel.apiData.ApiDataTable;
+import com.koala.tools.models.statistics.StatisticsData;
 import com.koala.tools.redis.RedisLockUtil;
 import com.koala.tools.rocketmq.RocketMqHelper;
+import com.koala.tools.rocketmq.data.TopicData;
+import com.koala.tools.rocketmq.producer.MessageProducer;
+import com.koala.tools.utils.GsonUtil;
 import com.koala.tools.utils.RemoteIpUtils;
-
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Arrays;
-import java.util.Objects;
 
 import static com.koala.tools.utils.RespUtil.formatRespDataWithCustomMsg;
 
@@ -52,10 +53,12 @@ public class FirewallInterceptor implements HandlerInterceptor {
         final String ip = RemoteIpUtils.getRemoteIpByServletRequest(request, true);
         log.info("request请求地址uri={},ip={}", request.getRequestURI(), ip);
         if (Arrays.asList(WHITE_LIST_HOST).contains(ip)) {
+            doRecord(request, ip);
             log.info("白名单IP，自动放过={}", ip);
             return true;
         }
         if (!redisLockUtil.getRedisStatus()) {
+            doRecord(request, ip);
             log.info("redis连接异常，自动放过={}", ip);
             return true;
         }
@@ -69,6 +72,7 @@ public class FirewallInterceptor implements HandlerInterceptor {
             returnJson(response, 403, formatRespDataWithCustomMsg(403, "非法访问，请1小时后重试", null));
             return false;
         }
+        doRecord(request, ip);
         return true;
     }
 
@@ -90,7 +94,7 @@ public class FirewallInterceptor implements HandlerInterceptor {
         return true;
     }
 
-    private void returnJson(HttpServletResponse response, Integer code, String json) throws Exception {
+    private void returnJson(HttpServletResponse response, Integer code, String json) {
         response.setStatus(code);
         response.setCharacterEncoding("UTF-8");
         response.setContentType("text/json; charset=utf-8");
@@ -99,6 +103,10 @@ public class FirewallInterceptor implements HandlerInterceptor {
         } catch (IOException e) {
             log.error("FirewallInterceptor response error ---> {}", e.getMessage(), e);
         }
+    }
+
+    private void doRecord(HttpServletRequest request, String ip) {
+        MessageProducer.asyncSend(rocketMqHelper, TopicData.STATISTICS, TopicData.STATISTICS_CHANNEL_1, new ApiDataTable(request.getRequestURI(), GsonUtil.toString(new StatisticsData(ip))));
     }
 
 }
