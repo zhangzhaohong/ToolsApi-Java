@@ -2,13 +2,16 @@ package com.koala.tools.interceptor;
 
 import com.koala.tools.BeanContext;
 import com.koala.tools.redis.RedisLockUtil;
+import com.koala.tools.rocketmq.RocketMqHelper;
 import com.koala.tools.utils.RemoteIpUtils;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import java.io.IOException;
@@ -25,6 +28,7 @@ import static com.koala.tools.utils.RespUtil.formatRespDataWithCustomMsg;
  * @description
  */
 @Slf4j
+@Component
 public class FirewallInterceptor implements HandlerInterceptor {
 
     private static final String LOCK_IP_URL_KEY = "lock_ip_";
@@ -37,9 +41,11 @@ public class FirewallInterceptor implements HandlerInterceptor {
 
     private static final String[] WHITE_LIST_HOST = new String[]{"127.0.0.1", "0:0:0:0:0:0:0:1"};
 
-    private RedisLockUtil getRedisLockUtil() {
-        return BeanContext.getBean(RedisLockUtil.class);
-    }
+    @Resource
+    private RedisLockUtil redisLockUtil;
+
+    @Resource
+    private RocketMqHelper rocketMqHelper;
 
     @Override
     public boolean preHandle(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler) throws Exception {
@@ -49,7 +55,6 @@ public class FirewallInterceptor implements HandlerInterceptor {
             log.info("白名单IP，自动放过={}", ip);
             return true;
         }
-        RedisLockUtil redisLockUtil = getRedisLockUtil();
         if (!redisLockUtil.getRedisStatus()) {
             log.info("redis连接异常，自动放过={}", ip);
             return true;
