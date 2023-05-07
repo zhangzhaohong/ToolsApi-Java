@@ -5,6 +5,7 @@ import com.koala.tools.models.demo.TestModel;
 import com.koala.tools.redis.service.RedisService;
 import com.koala.tools.rocketmq.data.TopicData;
 import com.koala.tools.rocketmq.model.DemoModel;
+import com.koala.tools.rocketmq.producer.MessageProducer;
 import com.koala.tools.utils.GsonUtil;
 import com.koala.tools.rocketmq.RocketMqHelper;
 import lombok.NonNull;
@@ -97,13 +98,13 @@ public class DefaultController {
 
     @GetMapping("mq/test/c1")
     public String pushMqC1() {
-        rocketMqHelper.asyncSend(TopicData.DEMO + ":" + TopicData.DEMO_CHANNEL_1, MessageBuilder.withPayload(new DemoModel(System.currentTimeMillis(), "Hello world")).build());
+        MessageProducer.asyncSend(rocketMqHelper, TopicData.DEMO, TopicData.DEMO_CHANNEL_1, new DemoModel(System.currentTimeMillis(), "Hello world"));
         return "ok";
     }
 
     @GetMapping("mq/test/c2")
     public String pushMqC2() {
-        rocketMqHelper.asyncSend(TopicData.DEMO + ":" + TopicData.DEMO_CHANNEL_2, MessageBuilder.withPayload(new DemoModel(System.currentTimeMillis(), "Hello world")).build());
+        MessageProducer.asyncSend(rocketMqHelper, TopicData.DEMO, TopicData.DEMO_CHANNEL_2, new DemoModel(System.currentTimeMillis(), "Hello world"));
         return "ok";
     }
 
