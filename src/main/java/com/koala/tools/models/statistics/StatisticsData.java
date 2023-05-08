@@ -1,9 +1,11 @@
 package com.koala.tools.models.statistics;
 
+import com.google.gson.annotations.SerializedName;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 /**
  * @author koala
@@ -12,7 +14,11 @@ import java.io.Serializable;
  * @description
  */
 @Data
-@AllArgsConstructor
 public class StatisticsData implements Serializable {
     private String ip;
+    private String uuid = UUID.randomUUID().toString().replace("-", "");
+
+    public StatisticsData(String ip) {
+        this.ip = ip;
+    }
 }

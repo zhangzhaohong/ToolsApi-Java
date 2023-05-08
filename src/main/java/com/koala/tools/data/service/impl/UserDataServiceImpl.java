@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
  */
 @Service("UserDataService")
 public class UserDataServiceImpl implements UserDataService {
-
     @Resource
     private UserDataMapper userDataMapper;
 

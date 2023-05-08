@@ -1,7 +1,9 @@
 package com.koala.tools.data.dataModel.apiData;
 
 import com.baomidou.mybatisplus.annotation.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.util.Calendar;
@@ -14,6 +16,8 @@ import java.util.Date;
  * @description
  */
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 @TableName("api_data")
 public class ApiDataTable implements Serializable {
     @TableId(type = IdType.AUTO)

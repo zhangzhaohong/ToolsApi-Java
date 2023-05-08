@@ -106,7 +106,14 @@ public class FirewallInterceptor implements HandlerInterceptor {
     }
 
     private void doRecord(HttpServletRequest request, String ip) {
-        MessageProducer.asyncSend(rocketMqHelper, TopicData.STATISTICS, TopicData.STATISTICS_CHANNEL_1, new ApiDataTable(request.getRequestURI(), GsonUtil.toString(new StatisticsData(ip))));
+        MessageProducer.asyncSend(
+                rocketMqHelper,
+                TopicData.STATISTICS,
+                TopicData.STATISTICS_CHANNEL_1,
+                new ApiDataTable(
+                        request.getRequestURI(),
+                        GsonUtil.toString(new StatisticsData(ip))
+                ));
     }
 
 }
