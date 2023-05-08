@@ -28,7 +28,7 @@ public class RequestLoggingFilter implements Filter {
 
     private MultipartResolver multipartResolver = null;
 
-    private static final String[] WHITE_LIST_PATH = new String[]{"/assets/", "/actuator"};
+    private static final String[] WHITE_LIST_PATH = new String[]{"/assets/", "/actuator", "/favicon.ico"};
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
