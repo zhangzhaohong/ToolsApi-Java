@@ -12,5 +12,5 @@ public class TopicData {
     public static final String DEMO_CHANNEL_1 = "channel_1";
     public static final String DEMO_CHANNEL_2 = "channel_2";
     public static final String STATISTICS = "statistics";
-    public static final String STATISTICS_CHANNEL_1 = "statistics_filter_solver";
+    public static final String STATISTICS_CHANNEL_1 = "filter_solver";
 }
