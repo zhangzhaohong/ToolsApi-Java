@@ -27,7 +27,8 @@ import javax.annotation.Resource;
         selectorExpression = TopicData.STATISTICS_CHANNEL_1,
         consumeThreadNumber = 1,
         maxReconsumeTimes = 3,
-        instanceName = TopicData.STATISTICS + "_" + TopicData.STATISTICS_CHANNEL_1
+        instanceName = TopicData.STATISTICS + "_" + TopicData.STATISTICS_CHANNEL_1,
+        messageModel = MessageModel.BROADCASTING
 )
 public class StatisticsRocketMqListener implements RocketMQListener<ApiDataTable> {
     @Resource

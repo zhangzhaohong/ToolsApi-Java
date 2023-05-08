@@ -3,7 +3,6 @@ package com.koala.tools.rocketmq.consumer;
 import com.koala.tools.rocketmq.data.TopicData;
 import com.koala.tools.rocketmq.model.DemoModel;
 import com.koala.tools.utils.GsonUtil;
-import org.apache.rocketmq.spring.annotation.MessageModel;
 import org.apache.rocketmq.spring.annotation.RocketMQMessageListener;
 import org.apache.rocketmq.spring.core.RocketMQListener;
 import org.slf4j.Logger;
