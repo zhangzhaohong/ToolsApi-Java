@@ -4,7 +4,6 @@ import com.koala.tools.data.dataModel.apiData.ApiDataTable;
 import com.koala.tools.data.service.ApiDataService;
 import com.koala.tools.rocketmq.data.TopicData;
 import com.koala.tools.utils.GsonUtil;
-import org.apache.rocketmq.spring.annotation.MessageModel;
 import org.apache.rocketmq.spring.annotation.RocketMQMessageListener;
 import org.apache.rocketmq.spring.core.RocketMQListener;
 import org.slf4j.Logger;
@@ -22,13 +21,12 @@ import javax.annotation.Resource;
  */
 @Component
 @RocketMQMessageListener(
-        consumerGroup = "${rocketmq.consumer.group}",
+        consumerGroup = TopicData.STATISTICS_GROUP,
         topic = TopicData.STATISTICS,
         selectorExpression = TopicData.STATISTICS_CHANNEL_1,
         consumeThreadNumber = 1,
         maxReconsumeTimes = 3,
-        instanceName = TopicData.STATISTICS + "_" + TopicData.STATISTICS_CHANNEL_1,
-        messageModel = MessageModel.BROADCASTING
+        instanceName = TopicData.STATISTICS + "_" + TopicData.STATISTICS_CHANNEL_1
 )
 public class StatisticsRocketMqListener implements RocketMQListener<ApiDataTable> {
     @Resource
