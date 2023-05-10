@@ -34,6 +34,7 @@ public class ToolsApplication {
         String ip = InetAddress.getLocalHost().getHostAddress();
         String port = env.getProperty("server.port");
         String property = env.getProperty("server.servlet.context-path");
+        String rocketmqAdminServerUrl = env.getProperty("rocketmq.admin-server");
         String adminManagementUrl = env.getProperty("spring.boot.admin.client.url");
         String adminUser = env.getProperty("spring.boot.admin.client.username");
         String adminPassword = env.getProperty("spring.boot.admin.client.password");
@@ -45,6 +46,9 @@ public class ToolsApplication {
                         "Local: \t\t\thttp://localhost:" + port + path + "/\n\t" +
                         "External: \t\thttp://" + ip + ":" + port + path + "/\n\t" +
                         "ServiceData: \t" + folderDir + "\n\t" +
+                        "------------------------------------------------------------\n\t" +
+                        "RocketMqAdminManagementSystem:\n\t" +
+                        "Local: \t\thttp://" + rocketmqAdminServerUrl + "/\n\t" +
                         "------------------------------------------------------------\n\t" +
                         "AdminManagementSystem:\n\t" +
                         "Local: \t\t" + adminManagementUrl + "/\n\t" +
