@@ -6,6 +6,7 @@ services:
     container_name: rocketmq-192.168.2.250
     ports:
       - 55002:9876
+    restart: always
     environment:
       - JAVA_OPT_EXT=-server -Xms256m -Xmx256m -Xmn256m
     volumes:
@@ -24,6 +25,7 @@ services:
       - 10909:10909
       - 10911:10911
       - 10912:10912
+    restart: always
     environment:
       - NAMESRV_ADDR=192.168.2.250:55002
       - JAVA_OPT_EXT=-server -Xms512m -Xmx512m -Xmn256m
@@ -43,5 +45,6 @@ services:
       - 192.168.2.250
     depends_on:
       - 192.168.2.250
+    restart: always
     environment:
       - NAMESRV_ADDR=192.168.2.250:55002
