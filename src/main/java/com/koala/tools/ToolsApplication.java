@@ -35,6 +35,9 @@ public class ToolsApplication {
         String port = env.getProperty("server.port");
         String property = env.getProperty("server.servlet.context-path");
         String rocketmqAdminServerUrl = env.getProperty("rocketmq.admin-server");
+        String esAnalyticsServerUrl = env.getProperty("spring.elasticsearch.kibana.uris");
+        String esAdminUser = env.getProperty("spring.elasticsearch.username");
+        String esAdminPassword = env.getProperty("spring.elasticsearch.password");
         String adminManagementUrl = env.getProperty("spring.boot.admin.client.url");
         String adminUser = env.getProperty("spring.boot.admin.client.username");
         String adminPassword = env.getProperty("spring.boot.admin.client.password");
@@ -49,6 +52,11 @@ public class ToolsApplication {
                         "------------------------------------------------------------\n\t" +
                         "RocketMqAdminManagementSystem:\n\t" +
                         "Local: \t\thttp://" + rocketmqAdminServerUrl + "/\n\t" +
+                        "------------------------------------------------------------\n\t" +
+                        "ElasticsearchAndAnalyticsSystem:\n\t" +
+                        "Local: \t\t" + esAnalyticsServerUrl + "/\n\t" +
+                        "User: \t\t" + esAdminUser + "\n\t" +
+                        "Password: \t" + esAdminPassword + "\n\t" +
                         "------------------------------------------------------------\n\t" +
                         "AdminManagementSystem:\n\t" +
                         "Local: \t\t" + adminManagementUrl + "/\n\t" +
