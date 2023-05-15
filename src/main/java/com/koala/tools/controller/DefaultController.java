@@ -1,6 +1,8 @@
 package com.koala.tools.controller;
 
 import com.koala.tools.http.annotation.MixedHttpRequest;
+import com.koala.tools.kafka.model.MessageModel;
+import com.koala.tools.kafka.service.KafkaService;
 import com.koala.tools.models.demo.TestModel;
 import com.koala.tools.redis.service.RedisService;
 import com.koala.tools.rocketmq.data.TopicData;
@@ -36,6 +38,9 @@ public class DefaultController {
 
     @Resource(name = "RedisService")
     private RedisService redisService;
+
+    @Resource(name = "KafkaService")
+    private KafkaService kafkaService;
 
     @GetMapping("hello")
     public String hello() {
@@ -105,6 +110,12 @@ public class DefaultController {
     @GetMapping("mq/test/c2")
     public String pushMqC2() {
         MessageProducer.asyncSend(rocketMqHelper, TopicData.DEMO, TopicData.DEMO_CHANNEL_2, new DemoModel(System.currentTimeMillis(), "Hello world"));
+        return "ok";
+    }
+
+    @GetMapping("kafka/test")
+    public String sendKafka() {
+        kafkaService.send(new MessageModel<>(null, null));
         return "ok";
     }
 
