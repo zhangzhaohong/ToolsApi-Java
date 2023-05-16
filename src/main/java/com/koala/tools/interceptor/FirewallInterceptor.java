@@ -49,9 +49,6 @@ public class FirewallInterceptor implements HandlerInterceptor {
     @Resource
     private RedisLockUtil redisLockUtil;
 
-    @Resource
-    private RocketMqHelper rocketMqHelper;
-
     @Resource(name = "KafkaService")
     private KafkaService kafkaService;
 
@@ -122,12 +119,6 @@ public class FirewallInterceptor implements HandlerInterceptor {
                 GsonUtil.toString(new StatisticsData(ip))
         );
         kafkaService.send(new MessageModel<>(null, apiData));
-        MessageProducer.asyncSend(
-                rocketMqHelper,
-                TopicData.STATISTICS,
-                TopicData.STATISTICS_CHANNEL_1,
-                apiData
-        );
     }
 
 }
