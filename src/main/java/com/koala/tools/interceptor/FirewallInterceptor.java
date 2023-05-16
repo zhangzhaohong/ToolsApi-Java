@@ -44,7 +44,7 @@ public class FirewallInterceptor implements HandlerInterceptor {
 
     private static final String[] WHITE_LIST_HOST = new String[]{"127.0.0.1", "0:0:0:0:0:0:0:1"};
 
-    private static final String FAVICON_PATH = "/favicon.ico";
+    private static final String[] WHITE_LIST_PATH = new String[]{"/assets/", "/actuator", "/favicon.ico"};
 
     @Resource
     private RedisLockUtil redisLockUtil;
@@ -56,9 +56,11 @@ public class FirewallInterceptor implements HandlerInterceptor {
     public boolean preHandle(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler) throws Exception {
         final String ip = RemoteIpUtils.getRemoteIpByServletRequest(request, true);
         log.info("request请求地址uri={},ip={}", request.getRequestURI(), ip);
-        if (request.getRequestURI().equals(FAVICON_PATH)) {
-            log.info("favicon.ico图标，自动放过={}", ip);
-            return true;
+        for (String path : WHITE_LIST_PATH) {
+            if (request.getRequestURI().startsWith(path)) {
+                log.info("白名单请求，自动放过={}", ip);
+                return true;
+            }
         }
         if (Arrays.asList(WHITE_LIST_HOST).contains(ip)) {
             doRecord(request, ip);
