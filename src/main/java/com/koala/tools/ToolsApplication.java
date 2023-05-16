@@ -39,6 +39,7 @@ public class ToolsApplication {
         String esAdminUser = env.getProperty("spring.elasticsearch.username");
         String esAdminPassword = env.getProperty("spring.elasticsearch.password");
         String adminManagementUrl = env.getProperty("spring.boot.admin.client.url");
+        String kafkaManagementUrl = env.getProperty("spring.kafka.management-server");
         String adminUser = env.getProperty("spring.boot.admin.client.username");
         String adminPassword = env.getProperty("spring.boot.admin.client.password");
         String path = property == null ? "" : property;
@@ -52,6 +53,9 @@ public class ToolsApplication {
                         "------------------------------------------------------------\n\t" +
                         "RocketMqAdminManagementSystem:\n\t" +
                         "Local: \t\thttp://" + rocketmqAdminServerUrl + "/\n\t" +
+                        "------------------------------------------------------------\n\t" +
+                        "KafkaManagementSystem:\n\t" +
+                        "Local: \t\t" + kafkaManagementUrl + "/\n\t" +
                         "------------------------------------------------------------\n\t" +
                         "ElasticsearchAndAnalyticsSystem:\n\t" +
                         "Local: \t\t" + esAnalyticsServerUrl + "/\n\t" +
