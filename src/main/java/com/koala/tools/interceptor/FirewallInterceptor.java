@@ -1,6 +1,8 @@
 package com.koala.tools.interceptor;
 
 import com.koala.tools.data.dataModel.apiData.ApiDataTable;
+import com.koala.tools.kafka.model.MessageModel;
+import com.koala.tools.kafka.service.KafkaService;
 import com.koala.tools.models.statistics.StatisticsData;
 import com.koala.tools.redis.RedisLockUtil;
 import com.koala.tools.rocketmq.RocketMqHelper;
@@ -49,6 +51,9 @@ public class FirewallInterceptor implements HandlerInterceptor {
 
     @Resource
     private RocketMqHelper rocketMqHelper;
+
+    @Resource(name = "KafkaService")
+    private KafkaService kafkaService;
 
     @Override
     public boolean preHandle(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler) throws Exception {
@@ -112,14 +117,17 @@ public class FirewallInterceptor implements HandlerInterceptor {
     }
 
     private void doRecord(HttpServletRequest request, String ip) {
+        ApiDataTable apiData = new ApiDataTable(
+                request.getRequestURI(),
+                GsonUtil.toString(new StatisticsData(ip))
+        );
+        kafkaService.send(new MessageModel<>(null, apiData));
         MessageProducer.asyncSend(
                 rocketMqHelper,
                 TopicData.STATISTICS,
                 TopicData.STATISTICS_CHANNEL_1,
-                new ApiDataTable(
-                        request.getRequestURI(),
-                        GsonUtil.toString(new StatisticsData(ip))
-                ));
+                apiData
+        );
     }
 
 }
