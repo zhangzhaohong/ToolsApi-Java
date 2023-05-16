@@ -2,7 +2,12 @@ version: '3'
 services:
   #Service for nameserver
   192.168.2.250:
-    image: apache/rocketmq:5.1.0
+    image: apache/rocketmq:4.9.4
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
     container_name: rocketmq-192.168.2.250
     ports:
       - 55002:9876
@@ -15,7 +20,12 @@ services:
 
   #Service for broker
   broker:
-    image: apache/rocketmq:5.1.0
+    image: apache/rocketmq:4.9.4
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
     container_name: rocketmq-broker
     links:
       - 192.168.2.250
@@ -38,6 +48,11 @@ services:
   #Service for rocketmq-dashboard
   dashboard:
     image: apacherocketmq/rocketmq-dashboard:1.0.0
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
     container_name: rocketmq-dashboard
     ports:
       - 55003:8080
