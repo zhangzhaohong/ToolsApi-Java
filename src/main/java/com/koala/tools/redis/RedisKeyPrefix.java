@@ -9,4 +9,5 @@ package com.koala.tools.redis;
 public class RedisKeyPrefix {
     public static final String SHORT_KEY_PREFIX = "SHORT:";
     public static final String TIKTOK_DIRECT_KEY_PREFIX = "TIKTOK:DIRECT:";
+    public static final String TIKTOK_DATA_KEY_PREFIX = "TIKTOK:DATA:";
 }

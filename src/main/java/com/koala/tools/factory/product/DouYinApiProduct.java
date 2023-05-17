@@ -26,6 +26,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static com.koala.tools.enums.DouYinTypeEnums.LIVE_TYPE_1;
+import static com.koala.tools.redis.RedisKeyPrefix.TIKTOK_DATA_KEY_PREFIX;
 import static com.koala.tools.redis.RedisKeyPrefix.TIKTOK_DIRECT_KEY_PREFIX;
 
 /**
@@ -197,7 +198,7 @@ public class DouYinApiProduct {
                 case MUSIC_TYPE -> {
                     if (!Objects.isNull(this.musicItemInfo.getAwemeMusicDetail().get(0).getMusic())) {
                         if (this.version.equals(4)) {
-                            String key = ShortKeyGenerator.getKey(null);
+                            String key = TIKTOK_DATA_KEY_PREFIX + ShortKeyGenerator.getKey(null);
                             String title = this.musicItemInfo.getAwemeMusicDetail().get(0).getMusic().getTitle();
                             String link = this.musicItemInfo.getAwemeMusicDetail().get(0).getMusic().getPlayUrl().getUri();
                             redisService.set(key, GsonUtil.toString(new ShortDouYinItemDataModel(title, link)), EXPIRE_TIME);
@@ -214,7 +215,7 @@ public class DouYinApiProduct {
                 case NOTE_TYPE -> {
                     if (!Objects.isNull(this.itemInfo.getAwemeDetailModel().getImages())) {
                         if (this.version.equals(4)) {
-                            String key = ShortKeyGenerator.getKey(null);
+                            String key = TIKTOK_DATA_KEY_PREFIX + ShortKeyGenerator.getKey(null);
                             String title = this.itemInfo.getAwemeDetailModel().getDesc();
                             ArrayList<String> urlList = new ArrayList<>();
                             for (Object image : GsonUtil.toBean(GsonUtil.toString(this.itemInfo.getAwemeDetailModel().getImages()), ArrayList.class)) {
@@ -231,7 +232,7 @@ public class DouYinApiProduct {
                 case LIVE_TYPE_1, LIVE_TYPE_2 -> {
                     if (!Objects.isNull(this.roomInfoData.getData().getData().get(0).getStreamUrl())) {
                         if (this.version.equals(4)) {
-                            String key = ShortKeyGenerator.getKey(null);
+                            String key = TIKTOK_DATA_KEY_PREFIX + ShortKeyGenerator.getKey(null);
                             String title = this.roomInfoData.getData().getData().get(0).getOwner().getNickname() + "的直播间";
                             String link = this.roomInfoData.getData().getData().get(0).getStreamUrl().getFlvPullUrl().getFullHd1().replaceFirst("http://", "https://");
                             redisService.set(key, GsonUtil.toString(new ShortDouYinItemDataModel(title, link)), EXPIRE_TIME);
@@ -254,7 +255,7 @@ public class DouYinApiProduct {
                     }
                     if (!ObjectUtils.isEmpty(vid)) {
                         if (this.version.equals(4)) {
-                            String key = ShortKeyGenerator.getKey(null);
+                            String key = TIKTOK_DATA_KEY_PREFIX + ShortKeyGenerator.getKey(null);
                             String title = this.itemInfo.getAwemeDetailModel().getDesc();
                             String link = this.itemInfo.getAwemeDetailModel().getVideo().getPlayAddrInfoModel().getUrlList().get(0);
                             String previewPath = host + "tools/DouYin/preview/video?path=" + Base64Utils.encodeToUrlSafeString(link.getBytes(StandardCharsets.UTF_8));
