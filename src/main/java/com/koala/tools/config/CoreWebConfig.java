@@ -142,7 +142,7 @@ public class CoreWebConfig implements WebMvcConfigurer {
     @Bean
     public String getHost() {
         Environment env = applicationContext.getEnvironment();
-        String ip = env.getProperty("server.address");
+        String ip = env.getProperty("server.real.address");
         String port = env.getProperty("server.port");
         String property = env.getProperty("server.servlet.context-path");
         String path = property == null ? "" : property;
