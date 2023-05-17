@@ -22,6 +22,7 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-aop</artifactId>
+            <version>2.7.11</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.security</groupId>
@@ -77,7 +78,7 @@
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-core</artifactId>
-            <version>6.0.3</version>
+            <version>6.1.0</version>
         </dependency>
         <!-- rocket mq -->
         <dependency>
@@ -103,7 +104,7 @@
         <dependency>
             <groupId>org.springframework.kafka</groupId>
             <artifactId>spring-kafka</artifactId>
-            <version>2.9.8</version>
+            <version>2.9.9</version>
         </dependency>
         <!-- elasticsearch -->
         <dependency>
@@ -209,17 +210,17 @@
         <dependency>
             <groupId>com.alibaba.fastjson2</groupId>
             <artifactId>fastjson2</artifactId>
-            <version>2.0.29</version>
+            <version>2.0.32</version>
         </dependency>
         <dependency>
             <groupId>com.alibaba.fastjson2</groupId>
             <artifactId>fastjson2-extension</artifactId>
-            <version>2.0.29</version>
+            <version>2.0.32</version>
         </dependency>
         <dependency>
             <groupId>com.alibaba.fastjson2</groupId>
             <artifactId>fastjson2-extension-spring6</artifactId>
-            <version>2.0.29</version>
+            <version>2.0.32</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
