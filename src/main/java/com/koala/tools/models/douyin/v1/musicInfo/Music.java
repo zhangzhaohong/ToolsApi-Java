@@ -117,7 +117,7 @@ public class Music implements Serializable {
     @SerializedName("preview_end_time")
     private Integer previewEndTime;
     @SerializedName("preview_start_time")
-    private Integer previewStartTime;
+    private Float previewStartTime;
     @SerializedName("reason_type")
     private Integer reasonType;
     private Boolean redirect;
