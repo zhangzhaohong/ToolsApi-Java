@@ -26,6 +26,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static com.koala.tools.enums.DouYinTypeEnums.LIVE_TYPE_1;
+import static com.koala.tools.redis.RedisKeyPrefix.TIKTOK_DIRECT_KEY_PREFIX;
 
 /**
  * @author koala
@@ -112,7 +113,7 @@ public class DouYinApiProduct {
 
     public void getRedirectUrl() throws IOException, URISyntaxException {
         if (!Objects.isNull(this.url)) {
-            String key = "DIRECT:" + ShortKeyGenerator.getKey(this.url);
+            String key = TIKTOK_DIRECT_KEY_PREFIX + ShortKeyGenerator.getKey(this.url);
             String tmp = redisService.get(key);
             if (StringUtils.hasLength(tmp)) {
                 this.directUrl = tmp;

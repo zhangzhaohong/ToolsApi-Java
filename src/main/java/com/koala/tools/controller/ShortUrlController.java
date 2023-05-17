@@ -19,6 +19,7 @@ import java.net.URISyntaxException;
 import java.util.Objects;
 
 import static com.koala.tools.enums.PublicResponseEnums.*;
+import static com.koala.tools.redis.RedisKeyPrefix.SHORT_KEY_PREFIX;
 import static com.koala.tools.utils.RespUtil.formatRespData;
 
 /**
@@ -41,7 +42,7 @@ public class ShortUrlController {
         try {
             String itemKey = new String(Base64Utils.decodeFromUrlSafeString(key));
             if (StringUtils.hasLength(itemKey)) {
-                String url = redisService.get(itemKey);
+                String url = redisService.get(SHORT_KEY_PREFIX + itemKey);
                 if (Objects.isNull(url)) {
                     return "404/index";
                 }
