@@ -42,7 +42,7 @@ public class FirewallInterceptor implements HandlerInterceptor {
 
     private static final Integer IP_LOCK_TIME = 60 * 60;
 
-    private static final String[] WHITE_LIST_HOST = new String[]{"127.0.0.1", "0:0:0:0:0:0:0:1"};
+    private static final String[] WHITE_LIST_HOST = new String[]{"127.0.0.1", "0:0:0:0:0:0:0:1", "192.168.2.250"};
 
     private static final String[] WHITE_LIST_PATH = new String[]{"/assets/", "/actuator", "/favicon.ico"};
 
