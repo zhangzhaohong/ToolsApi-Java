@@ -36,6 +36,7 @@ import static com.koala.tools.enums.DouYinTypeEnums.LIVE_TYPE_1;
 public class DouYinApiProduct {
     private static final Logger logger = LoggerFactory.getLogger(DouYinApiProduct.class);
     private final static Long EXPIRE_TIME = 12 * 60 * 60L;
+    private final static Long DIRECT_EXPIRE_TIME = 3 * 24 * 60 * 60L;
     private final static String WEB_FROM = "web_code_link";
     private static final String TICKET_REGISTER_BODY = "{\"region\":\"cn\",\"aid\":1768,\"needFid\":false,\"service\":\"www.ixigua.com\",\"migrate_info\":{\"ticket\":\"\",\"source\":\"node\"},\"cbUrlProtocol\":\"https\",\"union\":true}";
     private Integer version = 4;
@@ -111,6 +112,13 @@ public class DouYinApiProduct {
 
     public void getRedirectUrl() throws IOException, URISyntaxException {
         if (!Objects.isNull(this.url)) {
+            String key = "DIRECT:" + ShortKeyGenerator.getKey(this.url);
+            String tmp = redisService.get(key);
+            if (StringUtils.hasLength(tmp)) {
+                this.directUrl = tmp;
+                logger.info("[DouYinApiProduct]({}, {}) get direct url from redis, directUrl: {}", id, itemId, this.directUrl);
+                return;
+            }
             if (this.url.contains(LIVE_TYPE_1.getPrefix())) {
                 this.directUrl = this.url;
             } else {
@@ -123,6 +131,10 @@ public class DouYinApiProduct {
                     }
                 }
             }
+            if (StringUtils.hasLength(this.directUrl)) {
+                redisService.set(key, this.directUrl, DIRECT_EXPIRE_TIME);
+            }
+            logger.info("[DouYinApiProduct]({}, {}) get direct url success, directUrl: {}", id, itemId, this.directUrl);
         }
     }
 
