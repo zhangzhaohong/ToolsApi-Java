@@ -42,7 +42,6 @@ public class DouYinApiProduct {
     private final static String WEB_FROM = "web_code_link";
     private static final String TICKET_REGISTER_BODY = "{\"region\":\"cn\",\"aid\":1768,\"needFid\":false,\"service\":\"www.ixigua.com\",\"migrate_info\":{\"ticket\":\"\",\"source\":\"node\"},\"cbUrlProtocol\":\"https\",\"union\":true}";
     private static final Integer MAX_RETRY_TIMES = 10;
-    private static final String[] TIKTOK_REQUEST_HOST_LIST = {"https://www.douyin.com", "https://aweme.snssdk.com"};
     private Integer version = 4;
     private String url;
     private String host;
@@ -306,15 +305,13 @@ public class DouYinApiProduct {
         logger.info("[DouYinApiProduct]({}, {}) encryptResult: {}", id, itemId, xbogusDataModel);
         int retryTime = 0;
         String response;
-        String requestHost;
         while (retryTime < MAX_RETRY_TIMES) {
-            requestHost = TIKTOK_REQUEST_HOST_LIST[retryTime % 2];
-            response = HttpClientUtil.doGet(xbogusDataModel.getUrl().replace("https://www.douyin.com", requestHost), HeaderUtil.getDouYinSpecialHeader(xbogusDataModel.getMstoken(), xbogusDataModel.getTtwid()), null);
+            response = HttpClientUtil.doGet(xbogusDataModel.getUrl(), HeaderUtil.getDouYinSpecialHeader(xbogusDataModel.getMstoken(), xbogusDataModel.getTtwid()), null);
             if (StringUtils.hasLength(response)) {
                 return response;
             }
             retryTime++;
-            logger.info("[DouYinApiProduct]({}, {}) Get data error, retry time: {}, request host: {}", id, itemId, retryTime, requestHost);
+            logger.info("[DouYinApiProduct]({}, {}) Get data error, retry time: {}", id, itemId, retryTime);
         }
         throw new NullPointerException();
     }
