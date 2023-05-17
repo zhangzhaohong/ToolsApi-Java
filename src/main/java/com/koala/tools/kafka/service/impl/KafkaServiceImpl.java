@@ -33,7 +33,7 @@ public class KafkaServiceImpl implements KafkaService {
     @Override
     public void send(MessageModel<?> message) {
         String obj2String = GsonUtil.toString(message);
-        log.info("准备发送消息为：{}", obj2String);
+        log.info("[Kafka] on prepare message：{}", obj2String);
         //发送消息
         ListenableFuture<SendResult<String, Object>> future = kafkaTemplate.send(TOPIC_STR, message);
         future.addCallback(new ListenableFutureCallback<>() {
