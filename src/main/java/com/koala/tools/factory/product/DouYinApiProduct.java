@@ -41,6 +41,7 @@ public class DouYinApiProduct {
     private final static Long DIRECT_EXPIRE_TIME = 3 * 24 * 60 * 60L;
     private final static String WEB_FROM = "web_code_link";
     private static final String TICKET_REGISTER_BODY = "{\"region\":\"cn\",\"aid\":1768,\"needFid\":false,\"service\":\"www.ixigua.com\",\"migrate_info\":{\"ticket\":\"\",\"source\":\"node\"},\"cbUrlProtocol\":\"https\",\"union\":true}";
+    private static final Integer MAX_RETRY_TIMES = 10;
     private Integer version = 4;
     private String url;
     private String host;
@@ -302,7 +303,16 @@ public class DouYinApiProduct {
             throw new NullPointerException("encrypt error");
         }
         logger.info("[DouYinApiProduct]({}, {}) encryptResult: {}", id, itemId, xbogusDataModel);
-        return HttpClientUtil.doGet(xbogusDataModel.getUrl(), HeaderUtil.getDouYinSpecialHeader(xbogusDataModel.getMstoken(), xbogusDataModel.getTtwid()), null);
+        int retryTime = 0;
+        String response;
+        while (retryTime < MAX_RETRY_TIMES) {
+            response = HttpClientUtil.doGet(xbogusDataModel.getUrl(), HeaderUtil.getDouYinSpecialHeader(xbogusDataModel.getMstoken(), xbogusDataModel.getTtwid()), null);
+            if (StringUtils.hasLength(response)) {
+                return response;
+            }
+            retryTime++;
+        }
+        throw new NullPointerException();
     }
 
     public void setVersion(Integer version) {
