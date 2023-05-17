@@ -1,5 +1,6 @@
 package com.koala.tools.controller;
 
+import com.koala.tools.http.annotation.HttpRequestRecorder;
 import com.koala.tools.models.shortUrl.ShortDouYinItemDataModel;
 import com.koala.tools.models.shortUrl.ShortImageDataModel;
 import com.koala.tools.redis.service.RedisService;
@@ -35,6 +36,7 @@ public class DouYinPlayerController {
     @Resource(name = "RedisService")
     private RedisService redisService;
 
+    @HttpRequestRecorder
     @GetMapping("/video")
     public String video(@RequestParam(value = "title", required = false, defaultValue = "VideoPlayer") String title, @RequestParam(value = "path", required = false, defaultValue = "") String path, @RequestParam(value = "version", required = false, defaultValue = "2") String version, Model model, HttpServletRequest request) {
         String itemTitle = "VideoPlayer".equals(title) ? title : new String(Base64Utils.decodeFromUrlSafeString(title));
@@ -50,6 +52,7 @@ public class DouYinPlayerController {
         return "404/index";
     }
 
+    @HttpRequestRecorder
     @GetMapping("/video/short")
     public String videoWithShortKey(@RequestParam(value = "key", required = false, defaultValue = "") String key, @RequestParam(value = "version", required = false, defaultValue = "2") String version, Model model, HttpServletRequest request) {
         try {
@@ -71,6 +74,7 @@ public class DouYinPlayerController {
         return "404/index";
     }
 
+    @HttpRequestRecorder
     @GetMapping("/live")
     public String live(@RequestParam(value = "title", required = false, defaultValue = "LivePlayer") String title, @RequestParam(value = "path", required = false, defaultValue = "") String path, Model model, HttpServletRequest request) {
         String itemTitle = "LivePlayer".equals(title) ? title : new String(Base64Utils.decodeFromUrlSafeString(title));
@@ -81,6 +85,7 @@ public class DouYinPlayerController {
         return "live/index";
     }
 
+    @HttpRequestRecorder
     @GetMapping("/live/short")
     public String liveWithShortKey(@RequestParam(value = "key", required = false, defaultValue = "") String key, Model model, HttpServletRequest request) {
         try {
@@ -98,6 +103,7 @@ public class DouYinPlayerController {
         return "404/index";
     }
 
+    @HttpRequestRecorder
     @GetMapping("/music")
     public String music(@RequestParam(value = "title", required = false, defaultValue = "MusicPlayer") String title, @RequestParam(value = "path", required = false, defaultValue = "") String path, Model model, HttpServletRequest request) {
         String itemTitle = "MusicPlayer".equals(title) ? title : new String(Base64Utils.decodeFromUrlSafeString(title));
@@ -108,6 +114,7 @@ public class DouYinPlayerController {
         return "music/plyr/index";
     }
 
+    @HttpRequestRecorder
     @GetMapping("/music/short")
     public String musicWithShortKey(@RequestParam(value = "key", required = false, defaultValue = "") String key, Model model, HttpServletRequest request) {
         try {
@@ -125,6 +132,7 @@ public class DouYinPlayerController {
         return "404/index";
     }
 
+    @HttpRequestRecorder
     @GetMapping("picture/short")
     public String pictureWithShortKey(@RequestParam(value = "key", required = false, defaultValue = "") String key, Model model, HttpServletRequest request) {
         try {

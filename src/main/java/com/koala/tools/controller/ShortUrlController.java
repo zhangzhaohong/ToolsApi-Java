@@ -1,5 +1,6 @@
 package com.koala.tools.controller;
 
+import com.koala.tools.http.annotation.HttpRequestRecorder;
 import com.koala.tools.redis.service.RedisService;
 import com.koala.tools.utils.ShortKeyGenerator;
 import org.slf4j.Logger;
@@ -37,6 +38,7 @@ public class ShortUrlController {
     @Resource(name = "RedisService")
     private RedisService redisService;
 
+    @HttpRequestRecorder
     @GetMapping("/short")
     public String shortUrl(@RequestParam(value = "key", required = false, defaultValue = "") String key, HttpServletRequest request, HttpServletResponse response) throws IOException, URISyntaxException {
         try {
@@ -56,6 +58,7 @@ public class ShortUrlController {
         return "404/index";
     }
 
+    @HttpRequestRecorder
     @GetMapping("/generator/short")
     @ResponseBody
     public String generateShortUrl(@RequestParam(value = "url", required = false, defaultValue = "") String url, @RequestParam(value = "expire", required = false) Long expire) {

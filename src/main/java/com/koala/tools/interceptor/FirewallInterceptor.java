@@ -1,14 +1,6 @@
 package com.koala.tools.interceptor;
 
-import com.koala.tools.data.dataModel.apiData.ApiDataTable;
-import com.koala.tools.kafka.model.MessageModel;
-import com.koala.tools.kafka.service.KafkaService;
-import com.koala.tools.models.statistics.StatisticsData;
 import com.koala.tools.redis.RedisLockUtil;
-import com.koala.tools.rocketmq.RocketMqHelper;
-import com.koala.tools.rocketmq.data.TopicData;
-import com.koala.tools.rocketmq.producer.MessageProducer;
-import com.koala.tools.utils.GsonUtil;
 import com.koala.tools.utils.RemoteIpUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -49,9 +41,6 @@ public class FirewallInterceptor implements HandlerInterceptor {
     @Resource
     private RedisLockUtil redisLockUtil;
 
-    @Resource(name = "KafkaService")
-    private KafkaService kafkaService;
-
     @Override
     public boolean preHandle(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler) throws Exception {
         final String ip = RemoteIpUtils.getRemoteIpByServletRequest(request, true);
@@ -63,12 +52,10 @@ public class FirewallInterceptor implements HandlerInterceptor {
             }
         }
         if (Arrays.asList(WHITE_LIST_HOST).contains(ip)) {
-            doRecord(request, ip);
             log.info("白名单IP，自动放过={}", ip);
             return true;
         }
         if (!redisLockUtil.getRedisStatus()) {
-            doRecord(request, ip);
             log.info("redis连接异常，自动放过={}", ip);
             return true;
         }
@@ -82,7 +69,6 @@ public class FirewallInterceptor implements HandlerInterceptor {
             returnJson(response, 403, formatRespDataWithCustomMsg(403, "非法访问，请1小时后重试", null));
             return false;
         }
-        doRecord(request, ip);
         return true;
     }
 
@@ -113,14 +99,6 @@ public class FirewallInterceptor implements HandlerInterceptor {
         } catch (IOException e) {
             log.error("FirewallInterceptor response error ---> {}", e.getMessage(), e);
         }
-    }
-
-    private void doRecord(HttpServletRequest request, String ip) {
-        ApiDataTable apiData = new ApiDataTable(
-                request.getRequestURI(),
-                GsonUtil.toString(new StatisticsData(ip))
-        );
-        kafkaService.send(new MessageModel<>(null, apiData));
     }
 
 }

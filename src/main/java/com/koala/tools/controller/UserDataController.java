@@ -5,6 +5,7 @@ import com.koala.tools.data.service.UserDataService;
 
 import javax.annotation.Resource;
 
+import com.koala.tools.http.annotation.HttpRequestRecorder;
 import com.koala.tools.http.annotation.MixedHttpRequest;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -29,6 +30,7 @@ public class UserDataController {
     @Qualifier("UserDataService")
     private UserDataService userDataService;
 
+    @HttpRequestRecorder
     @GetMapping("/user/register")
     public Long register(@MixedHttpRequest String nickName, @NonNull @MixedHttpRequest String password, @MixedHttpRequest Integer roleType, @MixedHttpRequest String specialRoles, @MixedHttpRequest String email) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");

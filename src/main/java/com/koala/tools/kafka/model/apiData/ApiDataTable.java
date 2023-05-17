@@ -1,4 +1,4 @@
-package com.koala.tools.data.dataModel.apiData;
+package com.koala.tools.kafka.model.apiData;
 
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.AllArgsConstructor;
@@ -18,11 +18,11 @@ import java.util.Date;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@TableName("api_data")
 public class ApiDataTable implements Serializable {
-    @TableId(type = IdType.AUTO)
-    private Long uniqueId = null;
+    private Integer code;
     private String path;
+    private String method;
+    private Long cost;
     private String data;
     private Integer year;
     private Integer month;
@@ -30,12 +30,15 @@ public class ApiDataTable implements Serializable {
     private Integer hour;
     private Long created;
 
-    public ApiDataTable(String path, String data) {
+    public ApiDataTable(Integer code, String path, String method, Long cost, String data) {
         long timestamp = System.currentTimeMillis();
         Date date = new Date(timestamp);
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
+        this.code = code;
         this.path = path;
+        this.method = method;
+        this.cost = cost;
         this.data = data;
         this.year = calendar.get(Calendar.YEAR);
         this.month = calendar.get(Calendar.MONTH) + 1;
