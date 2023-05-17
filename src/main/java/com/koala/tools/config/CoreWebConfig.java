@@ -25,8 +25,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 
 import java.io.File;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -142,9 +140,9 @@ public class CoreWebConfig implements WebMvcConfigurer {
     }
 
     @Bean
-    public String getHost() throws UnknownHostException {
+    public String getHost() {
         Environment env = applicationContext.getEnvironment();
-        String ip = InetAddress.getLocalHost().getHostAddress();
+        String ip = env.getProperty("server.address");
         String port = env.getProperty("server.port");
         String property = env.getProperty("server.servlet.context-path");
         String path = property == null ? "" : property;

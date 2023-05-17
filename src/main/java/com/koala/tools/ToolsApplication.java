@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.File;
-import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 /**
@@ -31,7 +30,7 @@ public class ToolsApplication {
         }
         ConfigurableApplicationContext application = SpringApplication.run(ToolsApplication.class, args);
         Environment env = application.getEnvironment();
-        String ip = InetAddress.getLocalHost().getHostAddress();
+        String ip = env.getProperty("server.address");
         String port = env.getProperty("server.port");
         String property = env.getProperty("server.servlet.context-path");
         String rocketmqAdminServerUrl = env.getProperty("rocketmq.admin-server");
