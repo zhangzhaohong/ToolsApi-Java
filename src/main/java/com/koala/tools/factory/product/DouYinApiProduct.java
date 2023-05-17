@@ -311,6 +311,7 @@ public class DouYinApiProduct {
                 return response;
             }
             retryTime++;
+            logger.info("[DouYinApiProduct]({}, {}) Get data error, retry time: {}", id, itemId, retryTime);
         }
         throw new NullPointerException();
     }
