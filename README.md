@@ -15,3 +15,6 @@ https://github.com/zhangzhaohong/SpringBootAdminServer
 
 ## ES DOCKER
 https://github.com/zhangzhaohong/es-server-docker
+
+## KAFKA DOCKER
+https://github.com/zhangzhaohong/kafka-docker
