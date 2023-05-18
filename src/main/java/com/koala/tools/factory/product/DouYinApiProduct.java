@@ -40,6 +40,7 @@ public class DouYinApiProduct {
     private final static Long EXPIRE_TIME = 12 * 60 * 60L;
     private final static Long DIRECT_EXPIRE_TIME = 3 * 24 * 60 * 60L;
     private final static String WEB_FROM = "web_code_link";
+    private final static String AWEME_HOTSOON_APP = "aweme_hotsoon";
     private static final String TICKET_REGISTER_BODY = "{\"region\":\"cn\",\"aid\":1768,\"needFid\":false,\"service\":\"www.ixigua.com\",\"migrate_info\":{\"ticket\":\"\",\"source\":\"node\"},\"cbUrlProtocol\":\"https\",\"union\":true}";
     private static final Integer MAX_RETRY_TIMES = 10;
     private Integer version = 4;
@@ -126,7 +127,7 @@ public class DouYinApiProduct {
                 this.directUrl = this.url;
             } else {
                 this.directUrl = HttpClientUtil.doGetRedirectLocation(this.url, null, HeaderUtil.getDouYinDownloadHeader());
-                if (Objects.equals(WEB_FROM, HttpClientUtil.getParam(this.directUrl, "from"))) {
+                if (Objects.equals(WEB_FROM, HttpClientUtil.getParam(this.directUrl, "from")) || Objects.equals(AWEME_HOTSOON_APP, HttpClientUtil.getParam(this.directUrl, "app"))) {
                     String ticket = getTicket();
                     String webDirectUrl = HttpClientUtil.doGetRedirectLocation(this.directUrl, HeaderUtil.getDouYinWebRequestSpecialHeader(ticket), HeaderUtil.getDouYinDownloadHeader());
                     if (StringUtils.hasLength(webDirectUrl)) {
