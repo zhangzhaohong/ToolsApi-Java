@@ -44,28 +44,28 @@ public class FirewallInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler) throws Exception {
         final String ip = RemoteIpUtils.getRemoteIpByServletRequest(request, true);
-        log.info("request请求地址uri={},ip={}", request.getRequestURI(), ip);
+        log.info("[FirewallInterceptor] request请求地址uri={},ip={}", request.getRequestURI(), ip);
         for (String path : WHITE_LIST_PATH) {
             if (request.getRequestURI().startsWith(path)) {
-                log.info("白名单请求，自动放过={}", ip);
+                log.info("[FirewallInterceptor] 白名单请求，自动放过={}", ip);
                 return true;
             }
         }
         if (Arrays.asList(WHITE_LIST_HOST).contains(ip)) {
-            log.info("白名单IP，自动放过={}", ip);
+            log.info("[FirewallInterceptor] 白名单IP，自动放过={}", ip);
             return true;
         }
         if (!redisLockUtil.getRedisStatus()) {
-            log.info("redis连接异常，自动放过={}", ip);
+            log.info("[FirewallInterceptor] redis连接异常，自动放过={}", ip);
             return true;
         }
         if (checkIpIsLock(ip, redisLockUtil)) {
-            log.info("ip访问被禁止={}", ip);
+            log.info("[FirewallInterceptor] ip访问被禁止={}", ip);
             returnJson(response, 403, formatRespDataWithCustomMsg(403, "非法访问，请1小时后重试", null));
             return false;
         }
         if (!addRequestTime(ip, request.getRequestURI(), redisLockUtil)) {
-            log.info("ip访问被禁止={}", ip);
+            log.info("[FirewallInterceptor] ip访问被禁止={}", ip);
             returnJson(response, 403, formatRespDataWithCustomMsg(403, "非法访问，请1小时后重试", null));
             return false;
         }
