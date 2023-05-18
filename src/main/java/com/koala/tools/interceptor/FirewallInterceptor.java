@@ -6,14 +6,18 @@ import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ClassUtils;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.Arrays;
+import java.util.Objects;
 
 import static com.koala.tools.utils.RespUtil.formatRespDataWithCustomMsg;
 
@@ -26,6 +30,7 @@ import static com.koala.tools.utils.RespUtil.formatRespDataWithCustomMsg;
 @Slf4j
 @Component
 public class FirewallInterceptor implements HandlerInterceptor {
+    private static final ClassLoader classLoader = ClassUtils.getDefaultClassLoader();
 
     private static final String LOCK_IP_URL_KEY = "lock_ip_";
 
@@ -62,12 +67,12 @@ public class FirewallInterceptor implements HandlerInterceptor {
         }
         if (checkIpIsLock(ip, redisLockUtil)) {
             log.info("[FirewallInterceptor] ip访问被禁止={}", ip);
-            returnJson(response, HttpStatus.FORBIDDEN.value(), formatRespDataWithCustomMsg(403, "非法访问，请1小时后重试", null));
+            returnErrorPage(response, HttpStatus.FORBIDDEN.value(), formatRespDataWithCustomMsg(403, "非法访问，请1小时后重试", null), "非法访问，请1小时后重试");
             return false;
         }
         if (!addRequestTime(ip, request.getRequestURI(), redisLockUtil)) {
             log.info("[FirewallInterceptor] ip访问被禁止={}", ip);
-            returnJson(response, HttpStatus.FORBIDDEN.value(), formatRespDataWithCustomMsg(403, "非法访问，请1小时后重试", null));
+            returnErrorPage(response, HttpStatus.FORBIDDEN.value(), formatRespDataWithCustomMsg(403, "非法访问，请1小时后重试", null), "非法访问，请1小时后重试");
             return false;
         }
         return true;
@@ -98,7 +103,34 @@ public class FirewallInterceptor implements HandlerInterceptor {
         try (PrintWriter writer = response.getWriter()) {
             writer.print(json);
         } catch (IOException e) {
-            log.error("FirewallInterceptor response error ---> {}", e.getMessage(), e);
+            log.error("[FirewallInterceptor] response error ---> {}", e.getMessage(), e);
+        }
+    }
+
+    private void returnErrorPage(HttpServletResponse response, Integer code, String json, String notice) {
+        InputStreamReader streamReader;
+        String filePath = "templates/403/index.html";
+        if (Objects.isNull(classLoader)) {
+            returnJson(response, code, json);
+            return;
+        }
+        try (InputStream inputStream = classLoader.getResourceAsStream(filePath)) {
+            if (Objects.isNull(inputStream)) {
+                returnJson(response, code, json);
+                return;
+            }
+            streamReader = new InputStreamReader(inputStream);
+            response.setStatus(code);
+            response.setContentType("text/html; charset=utf-8");
+            try (PrintWriter writer = response.getWriter()) {
+                int readChar;
+                while ((readChar = streamReader.read()) != -1) {
+                    writer.write(readChar);
+                }
+            }
+        } catch (Exception e) {
+            log.error("[FirewallInterceptor] response error ---> {}", e.getMessage(), e);
+            returnJson(response, code, json);
         }
     }
 
