@@ -48,6 +48,7 @@ public class ShortUrlController {
                 if (StringUtils.hasLength(itemKey)) {
                     String url = redisService.get(SHORT_KEY_PREFIX + itemKey);
                     if (Objects.isNull(url)) {
+                        response.setStatus(HttpStatus.SC_NOT_FOUND);
                         return "404/index";
                     }
                     logger.info("[shortUrl] itemKey: {}, url: {}, Sec-Fetch-Dest: {}", itemKey, url, request.getHeader("Sec-Fetch-Dest"));
