@@ -2,10 +2,8 @@ package com.koala.tools.controller;
 
 import com.koala.tools.http.annotation.HttpRequestRecorder;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * @author koala
@@ -19,8 +17,7 @@ public class ErrorController {
 
     @HttpRequestRecorder
     @GetMapping("403")
-    public String pageForbidden(@RequestParam(value = "notice", required = false) String notice, Model model) {
-        model.addAttribute("notice", notice);
+    public String pageForbidden() {
         return "403/index";
     }
 
