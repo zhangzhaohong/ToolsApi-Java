@@ -1,13 +1,12 @@
 package com.koala.tools.http.processor;
 
-import com.koala.tools.kafka.model.apiData.ApiDataTable;
+import com.koala.tools.kafka.model.apiData.ApiData;
 import com.koala.tools.kafka.model.MessageModel;
 import com.koala.tools.kafka.service.KafkaService;
 import com.koala.tools.models.statistics.StatisticsData;
 import com.koala.tools.utils.GsonUtil;
 import com.koala.tools.utils.RemoteIpUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
@@ -69,7 +68,7 @@ public class HttpRequestRecordProcessor {
         HttpServletResponse response = attributes.getResponse();
         long startTime = (Long) request.getAttribute("_startTime");
         String ip = RemoteIpUtils.getRemoteIpByServletRequest(request, true);
-        ApiDataTable apiData = new ApiDataTable(
+        ApiData apiData = new ApiData(
                 Objects.isNull(response) ? -1 : response.getStatus(),
                 request.getServletPath(),
                 request.getMethod(),

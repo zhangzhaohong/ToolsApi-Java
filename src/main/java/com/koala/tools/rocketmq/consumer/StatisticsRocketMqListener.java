@@ -1,6 +1,6 @@
 package com.koala.tools.rocketmq.consumer;
 
-import com.koala.tools.kafka.model.apiData.ApiDataTable;
+import com.koala.tools.kafka.model.apiData.ApiData;
 import com.koala.tools.rocketmq.data.TopicData;
 import com.koala.tools.utils.GsonUtil;
 import org.apache.rocketmq.spring.annotation.RocketMQMessageListener;
@@ -17,13 +17,13 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @RocketMQMessageListener(consumerGroup = TopicData.STATISTICS_GROUP, topic = TopicData.STATISTICS, selectorExpression = TopicData.STATISTICS_CHANNEL_1, consumeThreadNumber = 1, maxReconsumeTimes = 3, instanceName = TopicData.STATISTICS + "_" + TopicData.STATISTICS_CHANNEL_1)
-public class StatisticsRocketMqListener implements RocketMQListener<ApiDataTable> {
+public class StatisticsRocketMqListener implements RocketMQListener<ApiData> {
 
     private static final Logger LOG = LoggerFactory.getLogger(StatisticsRocketMqListener.class);
 
     @Override
-    public void onMessage(ApiDataTable apiDataTable) {
+    public void onMessage(ApiData apiData) {
         Long current = System.currentTimeMillis();
-        LOG.info("on message[{}] - [cost: {}]: {}", current, (current - apiDataTable.getCreated()) + "ms", GsonUtil.toString(apiDataTable));
+        LOG.info("on message[{}] - [cost: {}]: {}", current, (current - apiData.getCreated()) + "ms", GsonUtil.toString(apiData));
     }
 }
