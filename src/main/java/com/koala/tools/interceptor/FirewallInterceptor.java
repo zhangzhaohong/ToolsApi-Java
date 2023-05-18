@@ -4,6 +4,7 @@ import com.koala.tools.redis.RedisLockUtil;
 import com.koala.tools.utils.RemoteIpUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
@@ -61,12 +62,12 @@ public class FirewallInterceptor implements HandlerInterceptor {
         }
         if (checkIpIsLock(ip, redisLockUtil)) {
             log.info("[FirewallInterceptor] ip访问被禁止={}", ip);
-            returnJson(response, 403, formatRespDataWithCustomMsg(403, "非法访问，请1小时后重试", null));
+            returnJson(response, HttpStatus.FORBIDDEN.value(), formatRespDataWithCustomMsg(403, "非法访问，请1小时后重试", null));
             return false;
         }
         if (!addRequestTime(ip, request.getRequestURI(), redisLockUtil)) {
             log.info("[FirewallInterceptor] ip访问被禁止={}", ip);
-            returnJson(response, 403, formatRespDataWithCustomMsg(403, "非法访问，请1小时后重试", null));
+            returnJson(response, HttpStatus.FORBIDDEN.value(), formatRespDataWithCustomMsg(403, "非法访问，请1小时后重试", null));
             return false;
         }
         return true;
