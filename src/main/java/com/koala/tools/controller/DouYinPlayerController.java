@@ -51,8 +51,8 @@ public class DouYinPlayerController {
         } else if ("1".equals(version)) {
             return "video/video.js/index";
         }
-        response.setStatus(HttpStatus.SC_NOT_FOUND);
-        return "404/index";
+        response.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
+        return "500/index";
     }
 
     @HttpRequestRecorder
