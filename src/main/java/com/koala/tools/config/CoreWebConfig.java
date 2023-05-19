@@ -17,6 +17,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.http.CacheControl;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.util.StringUtils;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.support.StandardServletMultipartResolver;
@@ -150,6 +151,6 @@ public class CoreWebConfig implements WebMvcConfigurer {
         String port = Objects.equals("docker", active) ? env.getProperty("server.real.port") : env.getProperty("server.port");
         String property = env.getProperty("server.servlet.context-path");
         String path = property == null ? "" : property;
-        return "http://" + ip + ":" + port + path + "/";
+        return "http://" + ip + (StringUtils.hasLength(port) ? ":" + port : "") + path + "/";
     }
 }
