@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.koala</groupId>
     <artifactId>tools</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.6.5-PROD</version>
     <name>tools</name>
     <description>Stock-Tools</description>
     <properties>
