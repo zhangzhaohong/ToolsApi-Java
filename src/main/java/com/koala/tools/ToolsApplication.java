@@ -30,6 +30,8 @@ public class ToolsApplication {
         }
         ConfigurableApplicationContext application = SpringApplication.run(ToolsApplication.class, args);
         Environment env = application.getEnvironment();
+        String version = env.getProperty("spring.application.version");
+        String buildTime = env.getProperty("spring.application.build.time");
         String ip = env.getProperty("server.real.address");
         String port = env.getProperty("server.port");
         String property = env.getProperty("server.servlet.context-path");
@@ -46,6 +48,8 @@ public class ToolsApplication {
                 "\n\t" +
                         "------------------------------------------------------------\n\t" +
                         "Application Tools is running! Access URLs:\n\t" +
+                        "Version: \t\t" + version + "\n\t" +
+                        "BuildTime: \t\t" + buildTime + "\n\t" +
                         "Local: \t\t\thttp://localhost:" + port + path + "/\n\t" +
                         "External: \t\thttp://" + ip + ":" + port + path + "/\n\t" +
                         "ServiceData: \t" + folderDir + "\n\t" +
