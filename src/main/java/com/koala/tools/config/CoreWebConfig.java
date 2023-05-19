@@ -6,7 +6,9 @@ import com.alibaba.fastjson2.support.spring6.http.converter.FastJsonHttpMessageC
 import com.koala.tools.http.converter.CustomMessageConverter;
 import com.koala.tools.http.processor.MixedHttpRequestProcessor;
 import com.koala.tools.interceptor.FirewallInterceptor;
+
 import javax.annotation.Resource;
+
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,6 +29,7 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -142,8 +145,9 @@ public class CoreWebConfig implements WebMvcConfigurer {
     @Bean
     public String getHost() {
         Environment env = applicationContext.getEnvironment();
+        String active = env.getProperty("spring.profiles.active");
         String ip = env.getProperty("server.real.address");
-        String port = env.getProperty("server.port");
+        String port = Objects.equals("docker", active) ? env.getProperty("server.real.port") : env.getProperty("server.port");
         String property = env.getProperty("server.servlet.context-path");
         String path = property == null ? "" : property;
         return "http://" + ip + ":" + port + path + "/";
