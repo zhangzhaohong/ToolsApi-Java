@@ -1,11 +1,7 @@
-FROM ubuntu:23.10
+FROM openjdk:17
 MAINTAINER owen000814@outlook.com
-RUN apt-get update && apt-get install -y nginx
-ADD nginx/nginx.conf /etc/nginx/nginx.conf
-CMD ["nginx", "-g", "daemon off;" ]
-RUN apt-get update && apt-get install -y openjdk-17-jdk openjdk-17-jre
 WORKDIR /
 ADD target/*.jar app.jar
+EXPOSE 8080
 ENTRYPOINT ["java", "-jar"]
 CMD ["app.jar"]
-EXPOSE 80
