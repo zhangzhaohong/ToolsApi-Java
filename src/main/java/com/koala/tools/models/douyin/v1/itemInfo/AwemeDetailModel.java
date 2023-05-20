@@ -35,7 +35,7 @@ public class AwemeDetailModel<Object extends Serializable> implements Serializab
     @SerializedName("challenge_position")
     private String challengePosition;
     @SerializedName("chapter_list")
-    private String chapterList;
+    private Object chapterList;
     @SerializedName("collect_stat")
     private Integer collectStat;
     @SerializedName("collection_corner_mark")
