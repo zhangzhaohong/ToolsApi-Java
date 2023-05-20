@@ -13,7 +13,7 @@ import java.util.List;
  * @description
  */
 @Data
-public class AwemeMusicDetailModel implements Serializable {
+public class AwemeMusicDetailModel<Object extends Serializable> implements Serializable {
     @SerializedName("anchor_info")
     private AnchorInfoModel anchorInfo;
     @SerializedName("authentication_token")
@@ -32,7 +32,7 @@ public class AwemeMusicDetailModel implements Serializable {
     @SerializedName("book_bar")
     private BookBarModel bookBar;
     @SerializedName("chapter_list")
-    private String chapterList;
+    private Object chapterList;
     @SerializedName("collect_stat")
     private Integer collectStat;
     @SerializedName("collection_corner_mark")
