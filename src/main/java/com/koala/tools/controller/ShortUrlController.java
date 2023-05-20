@@ -1,7 +1,9 @@
 package com.koala.tools.controller;
 
+import com.koala.tools.http.annotation.HttpRequestRecorder;
 import com.koala.tools.redis.service.RedisService;
 import com.koala.tools.utils.ShortKeyGenerator;
+import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -19,6 +21,7 @@ import java.net.URISyntaxException;
 import java.util.Objects;
 
 import static com.koala.tools.enums.PublicResponseEnums.*;
+import static com.koala.tools.redis.RedisKeyPrefix.SHORT_KEY_PREFIX;
 import static com.koala.tools.utils.RespUtil.formatRespData;
 
 /**
@@ -36,25 +39,31 @@ public class ShortUrlController {
     @Resource(name = "RedisService")
     private RedisService redisService;
 
+    @HttpRequestRecorder
     @GetMapping("/short")
     public String shortUrl(@RequestParam(value = "key", required = false, defaultValue = "") String key, HttpServletRequest request, HttpServletResponse response) throws IOException, URISyntaxException {
-        try {
-            String itemKey = new String(Base64Utils.decodeFromUrlSafeString(key));
-            if (StringUtils.hasLength(itemKey)) {
-                String url = redisService.get(itemKey);
-                if (Objects.isNull(url)) {
-                    return "404/index";
+        if (StringUtils.hasLength(key)) {
+            try {
+                String itemKey = new String(Base64Utils.decodeFromUrlSafeString(key));
+                if (StringUtils.hasLength(itemKey)) {
+                    String url = redisService.get(SHORT_KEY_PREFIX + itemKey);
+                    if (Objects.isNull(url)) {
+                        response.setStatus(HttpStatus.SC_NOT_FOUND);
+                        return "404/index";
+                    }
+                    logger.info("[shortUrl] itemKey: {}, url: {}, Sec-Fetch-Dest: {}", itemKey, url, request.getHeader("Sec-Fetch-Dest"));
+                    response.sendRedirect(url);
+                    return null;
                 }
-                logger.info("[shortUrl] itemKey: {}, url: {}, Sec-Fetch-Dest: {}", itemKey, url, request.getHeader("Sec-Fetch-Dest"));
-                response.sendRedirect(url);
-                return null;
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
+        response.setStatus(HttpStatus.SC_NOT_FOUND);
         return "404/index";
     }
 
+    @HttpRequestRecorder
     @GetMapping("/generator/short")
     @ResponseBody
     public String generateShortUrl(@RequestParam(value = "url", required = false, defaultValue = "") String url, @RequestParam(value = "expire", required = false) Long expire) {

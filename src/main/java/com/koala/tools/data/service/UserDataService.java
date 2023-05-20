@@ -12,6 +12,5 @@ import org.apache.ibatis.annotations.Param;
 public interface UserDataService {
     Long registerUser(UserDataTable entity);
     int insert(UserDataTable entity);
-
     void updateUserId(Long userId, Long uniqueId);
 }

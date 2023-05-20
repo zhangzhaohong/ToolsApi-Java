@@ -12,3 +12,9 @@ https://github.com/zhangzhaohong/SpringBootAdminServer
 ## 签名程序
 详见：https://github.com/zhangzhaohong/ToolsApi-Java/tree/master/signature_web_project
 已支持docker，也可改为在线，但国内无法访问
+
+## ES DOCKER
+https://github.com/zhangzhaohong/es-server-docker
+
+## KAFKA DOCKER
+https://github.com/zhangzhaohong/kafka-docker

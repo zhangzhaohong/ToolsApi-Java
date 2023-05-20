@@ -6,7 +6,9 @@ import com.alibaba.fastjson2.support.spring6.http.converter.FastJsonHttpMessageC
 import com.koala.tools.http.converter.CustomMessageConverter;
 import com.koala.tools.http.processor.MixedHttpRequestProcessor;
 import com.koala.tools.interceptor.FirewallInterceptor;
+
 import javax.annotation.Resource;
+
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,6 +17,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.http.CacheControl;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.util.StringUtils;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.support.StandardServletMultipartResolver;
@@ -25,10 +28,9 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 
 import java.io.File;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -142,12 +144,13 @@ public class CoreWebConfig implements WebMvcConfigurer {
     }
 
     @Bean
-    public String getHost() throws UnknownHostException {
+    public String getHost() {
         Environment env = applicationContext.getEnvironment();
-        String ip = InetAddress.getLocalHost().getHostAddress();
-        String port = env.getProperty("server.port");
+        String active = env.getProperty("spring.profiles.active");
+        String ip = env.getProperty("server.real.address");
+        String port = Objects.equals("docker", active) ? env.getProperty("server.real.port") : env.getProperty("server.port");
         String property = env.getProperty("server.servlet.context-path");
         String path = property == null ? "" : property;
-        return "http://" + ip + ":" + port + path + "/";
+        return "http://" + ip + (StringUtils.hasLength(port) ? ":" + port : "") + path + "/";
     }
 }

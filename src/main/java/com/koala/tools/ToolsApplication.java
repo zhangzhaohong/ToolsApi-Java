@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.File;
-import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 /**
@@ -31,10 +30,17 @@ public class ToolsApplication {
         }
         ConfigurableApplicationContext application = SpringApplication.run(ToolsApplication.class, args);
         Environment env = application.getEnvironment();
-        String ip = InetAddress.getLocalHost().getHostAddress();
+        String version = env.getProperty("spring.application.version");
+        String buildTime = env.getProperty("spring.application.build.time");
+        String ip = env.getProperty("server.real.address");
         String port = env.getProperty("server.port");
         String property = env.getProperty("server.servlet.context-path");
+        String rocketmqAdminServerUrl = env.getProperty("rocketmq.admin-server");
+        String esAnalyticsServerUrl = env.getProperty("spring.elasticsearch.kibana.uris");
+        String esAdminUser = env.getProperty("spring.elasticsearch.username");
+        String esAdminPassword = env.getProperty("spring.elasticsearch.password");
         String adminManagementUrl = env.getProperty("spring.boot.admin.client.url");
+        String kafkaManagementUrl = env.getProperty("spring.kafka.management-server");
         String adminUser = env.getProperty("spring.boot.admin.client.username");
         String adminPassword = env.getProperty("spring.boot.admin.client.password");
         String path = property == null ? "" : property;
@@ -42,9 +48,22 @@ public class ToolsApplication {
                 "\n\t" +
                         "------------------------------------------------------------\n\t" +
                         "Application Tools is running! Access URLs:\n\t" +
+                        "Version: \t\t" + version + "\n\t" +
+                        "BuildTime: \t\t" + buildTime + "\n\t" +
                         "Local: \t\t\thttp://localhost:" + port + path + "/\n\t" +
                         "External: \t\thttp://" + ip + ":" + port + path + "/\n\t" +
                         "ServiceData: \t" + folderDir + "\n\t" +
+                        "------------------------------------------------------------\n\t" +
+                        "RocketMqAdminManagementSystem:\n\t" +
+                        "Local: \t\thttp://" + rocketmqAdminServerUrl + "/\n\t" +
+                        "------------------------------------------------------------\n\t" +
+                        "KafkaManagementSystem:\n\t" +
+                        "Local: \t\t" + kafkaManagementUrl + "/\n\t" +
+                        "------------------------------------------------------------\n\t" +
+                        "ElasticsearchAndAnalyticsSystem:\n\t" +
+                        "Local: \t\t" + esAnalyticsServerUrl + "/\n\t" +
+                        "User: \t\t" + esAdminUser + "\n\t" +
+                        "Password: \t" + esAdminPassword + "\n\t" +
                         "------------------------------------------------------------\n\t" +
                         "AdminManagementSystem:\n\t" +
                         "Local: \t\t" + adminManagementUrl + "/\n\t" +

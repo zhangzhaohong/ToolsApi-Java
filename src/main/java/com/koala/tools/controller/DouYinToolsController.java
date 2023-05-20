@@ -6,6 +6,7 @@ import com.koala.tools.factory.builder.ConcreteDouYinApiBuilder;
 import com.koala.tools.factory.builder.DouYinApiBuilder;
 import com.koala.tools.factory.director.DouYinApiManager;
 import com.koala.tools.factory.product.DouYinApiProduct;
+import com.koala.tools.http.annotation.HttpRequestRecorder;
 import com.koala.tools.http.annotation.MixedHttpRequest;
 import com.koala.tools.models.douyin.v1.PublicTiktokDataRespModel;
 import com.koala.tools.models.douyin.v1.itemInfo.ItemInfoRespModel;
@@ -60,6 +61,7 @@ public class DouYinToolsController {
     @Resource(name = "RedisService")
     private RedisService redisService;
 
+    @HttpRequestRecorder
     @GetMapping("player/video")
     public Object getVideo(@RequestParam(value = "vid", required = false) String vid, @RequestParam(value = "ratio", required = false, defaultValue = "540p") String ratio, @RequestParam(value = "isDownload", required = false, defaultValue = "0") String isDownload, HttpServletRequest request, HttpServletResponse response) throws IOException, URISyntaxException {
         if (ObjectUtils.isEmpty(vid)) {
@@ -82,6 +84,7 @@ public class DouYinToolsController {
         return formatRespData(FAILURE, null);
     }
 
+    @HttpRequestRecorder
     @GetMapping("preview/video")
     public void previewVideo(@RequestParam String path, @RequestParam(value = "isDownload", required = false, defaultValue = "false") Boolean isDownload, HttpServletRequest request, HttpServletResponse response) throws IOException, URISyntaxException {
         String url = new String(Base64Utils.decodeFromUrlSafeString(path));
@@ -89,6 +92,7 @@ public class DouYinToolsController {
         HttpClientUtil.doRelay(url, HeaderUtil.getDouYinDownloadHeader(), null, 206, HeaderUtil.getMockVideoHeader(isDownload), request, response);
     }
 
+    @HttpRequestRecorder
     @GetMapping("preview/liveStream")
     public void previewLiveStream(@RequestParam String path, HttpServletRequest request, HttpServletResponse response) throws IOException, URISyntaxException {
         String url = new String(Base64Utils.decodeFromUrlSafeString(path));
@@ -96,6 +100,7 @@ public class DouYinToolsController {
         HttpClientUtil.doRelay(url, HeaderUtil.getDouYinDownloadHeader(), null, 206, HeaderUtil.getMockLiveStreamHeader(), request, response);
     }
 
+    @HttpRequestRecorder
     @GetMapping("download/music")
     public void downloadMusic(@RequestParam String path, HttpServletRequest request, HttpServletResponse response) throws IOException, URISyntaxException {
         String url = new String(Base64Utils.decodeFromUrlSafeString(path));
@@ -103,6 +108,7 @@ public class DouYinToolsController {
         HttpClientUtil.doRelay(url, HeaderUtil.getDouYinDownloadHeader(), null, 206, HeaderUtil.getMockMusicHeader(true), request, response);
     }
 
+    @HttpRequestRecorder
     @GetMapping(value = "api", produces = {"application/json;charset=utf-8"})
     public Object getDouYinInfos(@MixedHttpRequest(required = false) String link, @RequestParam(value = "type", required = false, defaultValue = "info") String type, @RequestParam(value = "version", required = false, defaultValue = "4") Integer version, HttpServletRequest request, HttpServletResponse response) {
         if (ObjectUtils.isEmpty(link)) {

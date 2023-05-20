@@ -26,6 +26,8 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static com.koala.tools.enums.DouYinTypeEnums.LIVE_TYPE_1;
+import static com.koala.tools.redis.RedisKeyPrefix.TIKTOK_DATA_KEY_PREFIX;
+import static com.koala.tools.redis.RedisKeyPrefix.TIKTOK_DIRECT_KEY_PREFIX;
 
 /**
  * @author koala
@@ -36,8 +38,11 @@ import static com.koala.tools.enums.DouYinTypeEnums.LIVE_TYPE_1;
 public class DouYinApiProduct {
     private static final Logger logger = LoggerFactory.getLogger(DouYinApiProduct.class);
     private final static Long EXPIRE_TIME = 12 * 60 * 60L;
+    private final static Long DIRECT_EXPIRE_TIME = 3 * 24 * 60 * 60L;
     private final static String WEB_FROM = "web_code_link";
+    private final static String AWEME_HOTSOON_APP = "aweme_hotsoon";
     private static final String TICKET_REGISTER_BODY = "{\"region\":\"cn\",\"aid\":1768,\"needFid\":false,\"service\":\"www.ixigua.com\",\"migrate_info\":{\"ticket\":\"\",\"source\":\"node\"},\"cbUrlProtocol\":\"https\",\"union\":true}";
+    private static final Integer MAX_RETRY_TIMES = 10;
     private Integer version = 4;
     private String url;
     private String host;
@@ -111,11 +116,18 @@ public class DouYinApiProduct {
 
     public void getRedirectUrl() throws IOException, URISyntaxException {
         if (!Objects.isNull(this.url)) {
+            String key = TIKTOK_DIRECT_KEY_PREFIX + ShortKeyGenerator.getKey(this.url);
+            String tmp = redisService.get(key);
+            if (StringUtils.hasLength(tmp)) {
+                this.directUrl = tmp;
+                logger.info("[DouYinApiProduct]({}, {}) get direct url from redis, directUrl: {}", id, itemId, this.directUrl);
+                return;
+            }
             if (this.url.contains(LIVE_TYPE_1.getPrefix())) {
                 this.directUrl = this.url;
             } else {
                 this.directUrl = HttpClientUtil.doGetRedirectLocation(this.url, null, HeaderUtil.getDouYinDownloadHeader());
-                if (Objects.equals(WEB_FROM, HttpClientUtil.getParam(this.directUrl, "from"))) {
+                if (Objects.equals(WEB_FROM, HttpClientUtil.getParam(this.directUrl, "from")) || Objects.equals(AWEME_HOTSOON_APP, HttpClientUtil.getParam(this.directUrl, "app"))) {
                     String ticket = getTicket();
                     String webDirectUrl = HttpClientUtil.doGetRedirectLocation(this.directUrl, HeaderUtil.getDouYinWebRequestSpecialHeader(ticket), HeaderUtil.getDouYinDownloadHeader());
                     if (StringUtils.hasLength(webDirectUrl)) {
@@ -123,6 +135,10 @@ public class DouYinApiProduct {
                     }
                 }
             }
+            if (StringUtils.hasLength(this.directUrl)) {
+                redisService.set(key, this.directUrl, DIRECT_EXPIRE_TIME);
+            }
+            logger.info("[DouYinApiProduct]({}, {}) get direct url success, directUrl: {}", id, itemId, this.directUrl);
         }
     }
 
@@ -132,7 +148,7 @@ public class DouYinApiProduct {
                 case MUSIC_TYPE -> {
                     int count = 1;
                     int cursor = 0;
-                    String musicInfoPath = "https://www.douyin.com/aweme/v1/web/music/aweme/?music_id=" + this.itemId + "&cursor=" + cursor + "&count=" + count + "&device_platform=webapp&aid=6383";
+                    String musicInfoPath = "https://aweme.snssdk.com/aweme/v1/web/music/aweme/?music_id=" + this.itemId + "&cursor=" + cursor + "&count=" + count + "&device_platform=webapp&aid=6383";
                     logger.info("[DouYinApiProduct]({}, {}) musicInfoPath: {}", id, itemId, musicInfoPath);
                     String musicInfoDataResponse = doGetXbogusRequest(musicInfoPath);
                     logger.info("[DouYinApiProduct]({}, {}) itemInfoResponse: {}", id, itemId, musicInfoDataResponse);
@@ -187,7 +203,7 @@ public class DouYinApiProduct {
                             String key = ShortKeyGenerator.getKey(null);
                             String title = this.musicItemInfo.getAwemeMusicDetail().get(0).getMusic().getTitle();
                             String link = this.musicItemInfo.getAwemeMusicDetail().get(0).getMusic().getPlayUrl().getUri();
-                            redisService.set(key, GsonUtil.toString(new ShortDouYinItemDataModel(title, link)), EXPIRE_TIME);
+                            redisService.set(TIKTOK_DATA_KEY_PREFIX + key, GsonUtil.toString(new ShortDouYinItemDataModel(title, link)), EXPIRE_TIME);
                             this.musicItemInfo.getAwemeMusicDetail().get(0).getMusic().setMockPreviewMusicPath(host + "tools/DouYin/pro/player/music/short?key=" + Base64Utils.encodeToUrlSafeString(key.getBytes(StandardCharsets.UTF_8)));
                             this.musicItemInfo.getAwemeMusicDetail().get(0).getMusic().setMockDownloadMusicPath(ShortKeyGenerator.generateShortUrl(host + "tools/DouYin/download/music?path=" + Base64Utils.encodeToUrlSafeString(link.getBytes(StandardCharsets.UTF_8)), EXPIRE_TIME, host, redisService).getUrl());
                         } else if (this.version.equals(3)) {
@@ -210,7 +226,7 @@ public class DouYinApiProduct {
                                     urlList.add(imageItem.getUrlList().get(0));
                                 }
                             }
-                            redisService.set(key, GsonUtil.toString(new ShortImageDataModel(title, urlList)), EXPIRE_TIME);
+                            redisService.set(TIKTOK_DATA_KEY_PREFIX + key, GsonUtil.toString(new ShortImageDataModel(title, urlList)), EXPIRE_TIME);
                             this.itemInfo.getAwemeDetailModel().setMockPreviewPicturePath(host + "tools/DouYin/pro/player/picture/short?key=" + Base64Utils.encodeToUrlSafeString(key.getBytes(StandardCharsets.UTF_8)));
                         }
                     }
@@ -221,7 +237,7 @@ public class DouYinApiProduct {
                             String key = ShortKeyGenerator.getKey(null);
                             String title = this.roomInfoData.getData().getData().get(0).getOwner().getNickname() + "的直播间";
                             String link = this.roomInfoData.getData().getData().get(0).getStreamUrl().getFlvPullUrl().getFullHd1().replaceFirst("http://", "https://");
-                            redisService.set(key, GsonUtil.toString(new ShortDouYinItemDataModel(title, link)), EXPIRE_TIME);
+                            redisService.set(TIKTOK_DATA_KEY_PREFIX + key, GsonUtil.toString(new ShortDouYinItemDataModel(title, link)), EXPIRE_TIME);
                             this.roomInfoData.getData().getData().get(0).getStreamUrl().setMockPreviewLivePath(host + "tools/DouYin/pro/player/live/short?key=" + Base64Utils.encodeToUrlSafeString(key.getBytes(StandardCharsets.UTF_8)));
                         } else if (this.version.equals(3)) {
                             String title = this.roomInfoData.getData().getData().get(0).getOwner().getNickname() + "的直播间";
@@ -245,7 +261,7 @@ public class DouYinApiProduct {
                             String title = this.itemInfo.getAwemeDetailModel().getDesc();
                             String link = this.itemInfo.getAwemeDetailModel().getVideo().getPlayAddrInfoModel().getUrlList().get(0);
                             String previewPath = host + "tools/DouYin/preview/video?path=" + Base64Utils.encodeToUrlSafeString(link.getBytes(StandardCharsets.UTF_8));
-                            redisService.set(key, GsonUtil.toString(new ShortDouYinItemDataModel(title, previewPath)), EXPIRE_TIME);
+                            redisService.set(TIKTOK_DATA_KEY_PREFIX + key, GsonUtil.toString(new ShortDouYinItemDataModel(title, previewPath)), EXPIRE_TIME);
                             this.itemInfo.getAwemeDetailModel().getVideo().setRealPath(ShortKeyGenerator.generateShortUrl(link, EXPIRE_TIME, host, redisService).getUrl());
                             this.itemInfo.getAwemeDetailModel().getVideo().setMockPreviewVidPath(host + "tools/DouYin/pro/player/video/short?key=" + Base64Utils.encodeToUrlSafeString(key.getBytes(StandardCharsets.UTF_8)));
                             this.itemInfo.getAwemeDetailModel().getVideo().setMockDownloadVidPath(ShortKeyGenerator.generateShortUrl(host + "tools/DouYin/preview/video?path=" + Base64Utils.encodeToUrlSafeString(link.getBytes(StandardCharsets.UTF_8)) + "&isDownload=true", EXPIRE_TIME, host, redisService).getUrl());
@@ -288,7 +304,17 @@ public class DouYinApiProduct {
             throw new NullPointerException("encrypt error");
         }
         logger.info("[DouYinApiProduct]({}, {}) encryptResult: {}", id, itemId, xbogusDataModel);
-        return HttpClientUtil.doGet(xbogusDataModel.getUrl(), HeaderUtil.getDouYinSpecialHeader(xbogusDataModel.getMstoken(), xbogusDataModel.getTtwid()), null);
+        int retryTime = 0;
+        String response;
+        while (retryTime < MAX_RETRY_TIMES) {
+            response = HttpClientUtil.doGet(xbogusDataModel.getUrl(), HeaderUtil.getDouYinSpecialHeader(xbogusDataModel.getMstoken(), xbogusDataModel.getTtwid()), null);
+            if (StringUtils.hasLength(response)) {
+                return response;
+            }
+            retryTime++;
+            logger.info("[DouYinApiProduct]({}, {}) Get data error, retry time: {}", id, itemId, retryTime);
+        }
+        throw new NullPointerException();
     }
 
     public void setVersion(Integer version) {

@@ -9,6 +9,7 @@ import java.security.MessageDigest;
 import java.util.*;
 
 import static com.koala.tools.enums.PublicResponseEnums.GET_DATA_SUCCESS;
+import static com.koala.tools.redis.RedisKeyPrefix.SHORT_KEY_PREFIX;
 import static com.koala.tools.utils.RespUtil.formatRespData;
 
 /**
@@ -22,7 +23,7 @@ public class ShortKeyGenerator {
 
     public static ShortUrlInfoModel generateShortUrl(String url, Long expire, String host, RedisService redisService) {
         String key = ShortKeyGenerator.getKey(url);
-        redisService.set(key, url, Optional.ofNullable(expire).orElse(EXPIRE_TIME));
+        redisService.set(SHORT_KEY_PREFIX + key, url, Optional.ofNullable(expire).orElse(EXPIRE_TIME));
         return new ShortUrlInfoModel(host + "short?key=" + Base64Utils.encodeToUrlSafeString(key.getBytes(StandardCharsets.UTF_8)), Optional.ofNullable(expire).orElse(EXPIRE_TIME), new Date().toString(), new Date(System.currentTimeMillis() + Optional.ofNullable(expire).orElse(EXPIRE_TIME) * 1000).toString());
     }
 

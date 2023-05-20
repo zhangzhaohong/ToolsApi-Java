@@ -16,7 +16,14 @@ import org.springframework.stereotype.Component;
  * @description
  */
 @Component
-@RocketMQMessageListener(consumerGroup = "${rocketmq.consumer.group}", topic = TopicData.DEMO, selectorExpression = TopicData.DEMO_CHANNEL_1, consumeThreadNumber = 32)
+@RocketMQMessageListener(
+        consumerGroup = TopicData.DEMO_GROUP,
+        topic = TopicData.DEMO,
+        selectorExpression = TopicData.DEMO_CHANNEL_1,
+        consumeThreadNumber = 32,
+        maxReconsumeTimes = 3,
+        instanceName = TopicData.DEMO + "_" + TopicData.DEMO_CHANNEL_1
+)
 public class DemoRocketMqListener implements RocketMQListener<DemoModel> {
 
     private static final Logger LOG = LoggerFactory.getLogger(DemoRocketMqListener.class);
@@ -31,4 +38,5 @@ public class DemoRocketMqListener implements RocketMQListener<DemoModel> {
         Long current = System.currentTimeMillis();
         LOG.info("on message[{}] - [cost: {}]: {}", current, (current - demoModel.getId()) + "ms", GsonUtil.toString(demoModel));
     }
+
 }

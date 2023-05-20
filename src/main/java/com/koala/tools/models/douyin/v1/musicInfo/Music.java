@@ -34,7 +34,7 @@ public class Music implements Serializable {
     @SerializedName("avatar_thumb")
     private AvatarThumbModel avatarThumb;
     @SerializedName("binded_challenge_id")
-    private Integer bindedChallengeId;
+    private Long bindedChallengeId;
     @SerializedName("can_background_play")
     private Boolean canBackgroundPlay;
     @SerializedName("collect_stat")
@@ -117,7 +117,7 @@ public class Music implements Serializable {
     @SerializedName("preview_end_time")
     private Integer previewEndTime;
     @SerializedName("preview_start_time")
-    private Integer previewStartTime;
+    private Float previewStartTime;
     @SerializedName("reason_type")
     private Integer reasonType;
     private Boolean redirect;
