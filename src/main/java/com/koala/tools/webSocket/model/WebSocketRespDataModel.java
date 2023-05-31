@@ -8,13 +8,13 @@ import java.io.Serializable;
 /**
  * @author koala
  * @version 1.0
- * @date 2023/5/31 20:29
+ * @date 2023/5/31 21:21
  * @description
  */
 @Data
 @AllArgsConstructor
-public class WebSocketDataModel<Object extends Serializable> implements Serializable {
+public class WebSocketRespDataModel<Object extends Serializable> implements Serializable {
+    private Integer code;
     private String event;
-    private String sid;
     private Object data;
 }

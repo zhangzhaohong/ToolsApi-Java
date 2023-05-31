@@ -32,9 +32,6 @@ public enum DouYinTypeEnums {
 
     public static DouYinTypeEnums getEnumsByCode(Integer code) {
         Optional<DouYinTypeEnums> optional = Arrays.stream(DouYinTypeEnums.values()).filter(item -> item.getCode().equals(code)).findFirst();
-        if (optional.isPresent()) {
-            return optional.get();
-        }
-        return null;
+        return optional.orElse(null);
     }
 }

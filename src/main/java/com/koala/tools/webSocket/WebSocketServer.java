@@ -3,6 +3,10 @@ package com.koala.tools.webSocket;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.koala.tools.utils.GsonUtil;
+import com.koala.tools.webSocket.enums.Constants;
+import com.koala.tools.webSocket.model.WebSocketDataModel;
+import com.koala.tools.webSocket.model.WebSocketRespDataModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -67,22 +71,6 @@ public class WebSocketServer {
     }
 
     /**
-     * 将object对象转成json格式字符串
-     */
-    public static String toJson(Object object) {
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.setPrettyPrinting();
-        Gson gson = gsonBuilder.create();
-        return gson.toJson(object);
-    }
-
-    private static Gson getGson() {
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES);
-        return gsonBuilder.create();
-    }
-
-    /**
      * 链接成功
      */
     @OnOpen
@@ -111,8 +99,20 @@ public class WebSocketServer {
      * @ Param message 客户端发送过来的消息
      */
     @OnMessage
-    public void onMessage(String message, Session session) {
+    public void onMessage(String message, Session session) throws IOException {
         logger.info(MessageFormat.format("[WebSocketServer] 收到来自窗口{0}的信息:{1}", sid, message.replace("'", "\"")));
+        WebSocketDataModel<?> webSocketDataModel = GsonUtil.toBean(message, WebSocketDataModel.class);
+        WebSocketRespDataModel<?> respData;
+        Constants constant = Constants.getEnumByEvent(webSocketDataModel.getEvent());
+        switch (constant) {
+            case HEARTBREAK -> {
+                respData = new WebSocketRespDataModel<>(constant.getCode(), constant.getEvent(), null);
+                sendMessage(GsonUtil.toString(respData));
+            }
+            default -> {
+                logger.info("[WebSocketServer] Unsupported event：%s".formatted(webSocketDataModel.getEvent()));
+            }
+        }
     }
 
     /**
