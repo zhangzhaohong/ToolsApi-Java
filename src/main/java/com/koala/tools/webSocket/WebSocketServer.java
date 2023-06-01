@@ -3,12 +3,17 @@ package com.koala.tools.webSocket;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.koala.tools.BeanContext;
+import com.koala.tools.kafka.model.EventTracker.EventTrackerData;
+import com.koala.tools.kafka.model.MessageModel;
+import com.koala.tools.kafka.service.KafkaService;
 import com.koala.tools.utils.GsonUtil;
 import com.koala.tools.webSocket.enums.Constants;
 import com.koala.tools.webSocket.model.WebSocketDataModel;
 import com.koala.tools.webSocket.model.WebSocketRespDataModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
 import javax.websocket.*;
@@ -16,7 +21,10 @@ import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
 import java.text.MessageFormat;
+import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArraySet;
+
+import static com.koala.tools.webSocket.enums.Constants.HEARTBREAK;
 
 /**
  * Created with IntelliJ IDEA.
@@ -26,6 +34,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
  * @Description:
  */
 //CHECKSTYLE:OFF
+@DependsOn(value = {"beanContext"})
 @ServerEndpoint("/websocket/v1/connection/{sid}")
 @Component
 public class WebSocketServer {
@@ -37,6 +46,7 @@ public class WebSocketServer {
     private Session session;
     //接受sid
     private String sid = "";
+    private final KafkaService kafkaService = (KafkaService) BeanContext.getBean("EventTrackerKafkaService");
 
     /**
      * 群发自定义消息
@@ -104,14 +114,11 @@ public class WebSocketServer {
         WebSocketDataModel<?> webSocketDataModel = GsonUtil.toBean(message, WebSocketDataModel.class);
         WebSocketRespDataModel<?> respData;
         Constants constant = Constants.getEnumByEvent(webSocketDataModel.getEvent());
-        switch (constant) {
-            case HEARTBREAK -> {
-                respData = new WebSocketRespDataModel<>(constant.getCode(), constant.getEvent(), null);
-                sendMessage(GsonUtil.toString(respData));
-            }
-            default -> {
-                logger.info("[WebSocketServer] Unsupported event：%s".formatted(webSocketDataModel.getEvent()));
-            }
+        if (Objects.equals(constant, HEARTBREAK)) {
+            respData = new WebSocketRespDataModel<>(constant.getCode(), constant.getEvent(), null);
+            sendMessage(GsonUtil.toString(respData));
+        } else {
+            kafkaService.send(new MessageModel<>(null, new EventTrackerData(webSocketDataModel.getEvent(), sid, webSocketDataModel.getData())));
         }
     }
 

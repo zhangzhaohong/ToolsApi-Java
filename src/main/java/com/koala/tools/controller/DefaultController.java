@@ -40,9 +40,6 @@ public class DefaultController {
     @Resource(name = "RedisService")
     private RedisService redisService;
 
-    @Resource(name = "KafkaService")
-    private KafkaService kafkaService;
-
     @HttpRequestRecorder
     @GetMapping("hello")
     public String hello() {
@@ -124,13 +121,6 @@ public class DefaultController {
     @GetMapping("mq/test/c2")
     public String pushMqC2() {
         MessageProducer.asyncSend(rocketMqHelper, TopicData.DEMO, TopicData.DEMO_CHANNEL_2, new DemoModel(System.currentTimeMillis(), "Hello world"));
-        return "ok";
-    }
-
-    @HttpRequestRecorder
-    @GetMapping("kafka/test")
-    public String sendKafka() {
-        kafkaService.send(new MessageModel<>(null, null));
         return "ok";
     }
 

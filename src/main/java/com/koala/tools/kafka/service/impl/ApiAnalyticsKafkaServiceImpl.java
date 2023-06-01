@@ -7,7 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
-import org.springframework.messaging.support.GenericMessage;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.concurrent.ListenableFuture;
@@ -21,9 +20,9 @@ import javax.annotation.Resource;
  * @date 2023/5/13 11:35
  * @description
  */
-@Service("KafkaService")
+@Service("ApiAnalyticsKafkaService")
 @Slf4j
-public class KafkaServiceImpl implements KafkaService {
+public class ApiAnalyticsKafkaServiceImpl implements KafkaService {
     @Resource
     private KafkaTemplate<String, Object> kafkaTemplate;
 
