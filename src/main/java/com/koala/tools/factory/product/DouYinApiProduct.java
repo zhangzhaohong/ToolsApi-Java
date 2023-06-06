@@ -260,8 +260,7 @@ public class DouYinApiProduct {
                             String key = ShortKeyGenerator.getKey(null);
                             String title = this.itemInfo.getAwemeDetailModel().getDesc();
                             String link = this.itemInfo.getAwemeDetailModel().getVideo().getPlayAddrInfoModel().getUrlList().get(0);
-                            String previewPath = host + "tools/DouYin/preview/video?path=" + Base64Utils.encodeToUrlSafeString(link.getBytes(StandardCharsets.UTF_8));
-                            redisService.set(TIKTOK_DATA_KEY_PREFIX + key, GsonUtil.toString(new ShortDouYinItemDataModel(title, previewPath)), EXPIRE_TIME);
+                            redisService.set(TIKTOK_DATA_KEY_PREFIX + key, GsonUtil.toString(new ShortDouYinItemDataModel(title, link)), EXPIRE_TIME);
                             this.itemInfo.getAwemeDetailModel().getVideo().setRealPath(ShortKeyGenerator.generateShortUrl(link, EXPIRE_TIME, host, redisService).getUrl());
                             this.itemInfo.getAwemeDetailModel().getVideo().setMockPreviewVidPath(host + "tools/DouYin/pro/player/video/short?key=" + Base64Utils.encodeToUrlSafeString(key.getBytes(StandardCharsets.UTF_8)));
                             this.itemInfo.getAwemeDetailModel().getVideo().setMockDownloadVidPath(ShortKeyGenerator.generateShortUrl(host + "tools/DouYin/preview/video?path=" + Base64Utils.encodeToUrlSafeString(link.getBytes(StandardCharsets.UTF_8)) + "&isDownload=true", EXPIRE_TIME, host, redisService).getUrl());
