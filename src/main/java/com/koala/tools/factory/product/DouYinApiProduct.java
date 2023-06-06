@@ -290,7 +290,6 @@ public class DouYinApiProduct {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            throw new NullPointerException();
         }
         publicData = new PublicTiktokDataRespModel(this.itemTypeId, this.itemInfo, this.musicItemInfo, this.roomInfoData);
         logger.info("[DouYinApiProduct]({}, {}) publicData: {}", id, itemId, publicData);
@@ -314,7 +313,7 @@ public class DouYinApiProduct {
             retryTime++;
             logger.info("[DouYinApiProduct]({}, {}) Get data error, retry time: {}", id, itemId, retryTime);
         }
-        throw new NullPointerException();
+        return null;
     }
 
     public void setVersion(Integer version) {
