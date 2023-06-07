@@ -57,7 +57,7 @@ public class DouYinPlayerController {
 
     @HttpRequestRecorder
     @GetMapping("/video/short")
-    public String videoWithShortKey(@RequestParam(value = "key", required = false, defaultValue = "") String key, @RequestParam(value = "version", required = false, defaultValue = "2") String version, Model model, HttpServletRequest request, HttpServletResponse response) {
+    public String videoWithShortKey(@RequestParam(value = "key", required = false, defaultValue = "") String key, @RequestParam(value = "version", required = false, defaultValue = "3") String version, Model model, HttpServletRequest request, HttpServletResponse response) {
         try {
             String itemKey = "".equals(key) ? "" : new String(Base64Utils.decodeFromUrlSafeString(key));
             logger.info("[videoPlayer] itemKey: {}, Sec-Fetch-Dest: {}", itemKey, request.getHeader("Sec-Fetch-Dest"));
@@ -89,7 +89,7 @@ public class DouYinPlayerController {
         logger.info("[livePlayer] itemTitle: {}, inputUrl: {}, Sec-Fetch-Dest: {}", itemTitle, url, request.getHeader("Sec-Fetch-Dest"));
         model.addAttribute("title", itemTitle);
         model.addAttribute("path", url);
-        return "live/index";
+        return "live/flvjs/index";
     }
 
     @HttpRequestRecorder
@@ -102,7 +102,7 @@ public class DouYinPlayerController {
                 ShortDouYinItemDataModel tmp = GsonUtil.toBean(redisService.get(TIKTOK_DATA_KEY_PREFIX + itemKey), ShortDouYinItemDataModel.class);
                 model.addAttribute("title", StringUtils.hasLength(tmp.getTitle()) ? tmp.getTitle() : "LivePlayer");
                 model.addAttribute("path", tmp.getPath());
-                return "live/index";
+                return "live/flvjs/index";
             }
         } catch (Exception e) {
             e.printStackTrace();
