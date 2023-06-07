@@ -240,10 +240,10 @@ public class DouYinApiProduct {
                             String title = this.roomInfoData.getData().getData().get(0).getOwner().getNickname() + "的直播间";
                             String link = ShortKeyGenerator.generateShortUrl(this.roomInfoData.getData().getData().get(0).getStreamUrl().getHlsPullUrl().replaceFirst("http://", "https://"), EXPIRE_TIME, host, redisService).getUrl();
                             MultiLiveQualityInfoModel multiQualityInfo = new MultiLiveQualityInfoModel(
-                                    ShortKeyGenerator.generateShortUrl(this.roomInfoData.getData().getData().get(0).getStreamUrl().getHlsPullUrlMap().getFullHd1().replaceFirst("http://", "https://"), EXPIRE_TIME, host, redisService).getUrl(),
-                                    ShortKeyGenerator.generateShortUrl(this.roomInfoData.getData().getData().get(0).getStreamUrl().getHlsPullUrlMap().getHd1().replaceFirst("http://", "https://"), EXPIRE_TIME, host, redisService).getUrl(),
-                                    ShortKeyGenerator.generateShortUrl(this.roomInfoData.getData().getData().get(0).getStreamUrl().getHlsPullUrlMap().getSd1().replaceFirst("http://", "https://"), EXPIRE_TIME, host, redisService).getUrl(),
-                                    ShortKeyGenerator.generateShortUrl(this.roomInfoData.getData().getData().get(0).getStreamUrl().getHlsPullUrlMap().getSd2().replaceFirst("http://", "https://"), EXPIRE_TIME, host, redisService).getUrl()
+                                    ShortKeyGenerator.generateShortUrl(getPullUrl(this.roomInfoData.getData().getData().get(0).getStreamUrl().getHlsPullUrlMap().getFullHd1()), EXPIRE_TIME, host, redisService).getUrl(),
+                                    ShortKeyGenerator.generateShortUrl(getPullUrl(this.roomInfoData.getData().getData().get(0).getStreamUrl().getHlsPullUrlMap().getHd1()), EXPIRE_TIME, host, redisService).getUrl(),
+                                    ShortKeyGenerator.generateShortUrl(getPullUrl(this.roomInfoData.getData().getData().get(0).getStreamUrl().getHlsPullUrlMap().getSd1()), EXPIRE_TIME, host, redisService).getUrl(),
+                                    ShortKeyGenerator.generateShortUrl(getPullUrl(this.roomInfoData.getData().getData().get(0).getStreamUrl().getHlsPullUrlMap().getSd2()), EXPIRE_TIME, host, redisService).getUrl()
                             );
                             redisService.set(TIKTOK_DATA_KEY_PREFIX + key, GsonUtil.toString(new ShortDouYinItemDataModel(title, link, null, multiQualityInfo)), EXPIRE_TIME);
                             this.roomInfoData.getData().getData().get(0).getStreamUrl().setMockPreviewLivePath(host + "tools/DouYin/pro/player/live/short?key=" + Base64Utils.encodeToUrlSafeString(key.getBytes(StandardCharsets.UTF_8)));
@@ -343,5 +343,12 @@ public class DouYinApiProduct {
         Optional<Cookie> ticketData = cookieData.stream().filter(item -> "ttwid".equals(item.getName())).findFirst();
         ticketData.ifPresent(cookie -> ticket.set(cookie.getValue()));
         return ticket.get();
+    }
+
+    private String getPullUrl(String input) {
+        if (StringUtils.hasLength(input)) {
+            return input.replaceFirst("http://", "https://");
+        }
+        return null;
     }
 }
