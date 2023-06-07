@@ -238,7 +238,7 @@ public class DouYinApiProduct {
                         if (this.version.equals(4)) {
                             String key = ShortKeyGenerator.getKey(null);
                             String title = this.roomInfoData.getData().getData().get(0).getOwner().getNickname() + "的直播间";
-                            String link = ShortKeyGenerator.generateShortUrl(this.roomInfoData.getData().getData().get(0).getStreamUrl().getHlsPullUrl().replaceFirst("http://", "https://"), EXPIRE_TIME, host, redisService).getUrl();
+                            String link = ShortKeyGenerator.generateShortUrl(this.roomInfoData.getData().getData().get(0).getStreamUrl().getFlvPullUrl().getFullHd1().replaceFirst("http://", "https://"), EXPIRE_TIME, host, redisService).getUrl();
                             MultiLiveQualityInfoModel multiQualityInfo = new MultiLiveQualityInfoModel(
                                     getPullUrl(this.roomInfoData.getData().getData().get(0).getStreamUrl().getHlsPullUrlMap().getFullHd1()),
                                     getPullUrl(this.roomInfoData.getData().getData().get(0).getStreamUrl().getHlsPullUrlMap().getHd1()),
