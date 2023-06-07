@@ -14,21 +14,25 @@
     const videoElement = document.getElementById('video-player');
     const vidHdPath = videoElement.getAttribute("data-hd");
     const vidSdPath = videoElement.getAttribute("data-sd");
+    const qualityList = [];
+    if (vidHdPath != null) {
+        qualityList.push({
+            name: '高清',
+            url: vidHdPath,
+            type: 'auto',
+        });
+    }
+    if (vidSdPath != null) {
+        qualityList.push({
+            name: '标清',
+            url: vidSdPath,
+            type: 'auto',
+        });
+    }
     const dp = new DPlayer({
         container: videoElement,
         video: {
-            quality: [
-                {
-                    name: '高清',
-                    url: vidHdPath,
-                    type: 'auto',
-                },
-                {
-                    name: '标清',
-                    url: vidSdPath,
-                    type: 'auto',
-                },
-            ],
+            quality: qualityList,
             defaultQuality: 0,
         },
         autoplay: true,

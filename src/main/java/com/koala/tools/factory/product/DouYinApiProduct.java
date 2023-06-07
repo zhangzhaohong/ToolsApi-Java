@@ -269,8 +269,8 @@ public class DouYinApiProduct {
                             String title = this.itemInfo.getAwemeDetailModel().getDesc();
                             String link = ShortKeyGenerator.generateShortUrl(this.itemInfo.getAwemeDetailModel().getVideo().getPlayAddrInfoModel().getUrlList().get(0), EXPIRE_TIME, host, redisService).getUrl();
                             MultiVideoQualityInfoModel multiQualityInfo = new MultiVideoQualityInfoModel(
-                                    ShortKeyGenerator.generateShortUrl(this.itemInfo.getAwemeDetailModel().getVideo().getPlayAddrH264().getUrlList().get(0), EXPIRE_TIME, host, redisService).getUrl(),
-                                    ShortKeyGenerator.generateShortUrl(this.itemInfo.getAwemeDetailModel().getVideo().getPlayAddr265().getUrlList().get(0), EXPIRE_TIME, host, redisService).getUrl()
+                                    getVideoUrl(this.itemInfo.getAwemeDetailModel().getVideo().getPlayAddrH264().getUrlList().get(0)),
+                                    getVideoUrl(this.itemInfo.getAwemeDetailModel().getVideo().getPlayAddr265().getUrlList().get(0))
                             );
                             redisService.set(TIKTOK_DATA_KEY_PREFIX + key, GsonUtil.toString(new ShortDouYinItemDataModel(title, link, multiQualityInfo, null)), EXPIRE_TIME);
                             this.itemInfo.getAwemeDetailModel().getVideo().setRealPath(ShortKeyGenerator.generateShortUrl(link, EXPIRE_TIME, host, redisService).getUrl());
@@ -343,6 +343,13 @@ public class DouYinApiProduct {
         Optional<Cookie> ticketData = cookieData.stream().filter(item -> "ttwid".equals(item.getName())).findFirst();
         ticketData.ifPresent(cookie -> ticket.set(cookie.getValue()));
         return ticket.get();
+    }
+
+    private String getVideoUrl(String input) {
+        if (StringUtils.hasLength(input)) {
+            return ShortKeyGenerator.generateShortUrl(input, EXPIRE_TIME, host, redisService).getUrl();
+        }
+        return null;
     }
 
     private String getPullUrl(String input) {
