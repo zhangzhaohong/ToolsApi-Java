@@ -1,7 +1,7 @@
 package com.koala.tools.factory.product;
 
 import com.koala.tools.enums.DouYinTypeEnums;
-import com.koala.tools.models.douyin.MultiQualityInfoModel;
+import com.koala.tools.models.douyin.MultiVideoQualityInfoModel;
 import com.koala.tools.models.douyin.v1.PublicTiktokDataRespModel;
 import com.koala.tools.models.douyin.v1.itemInfo.ImageItemDataModel;
 import com.koala.tools.models.douyin.v1.itemInfo.ItemInfoRespModel;
@@ -261,7 +261,7 @@ public class DouYinApiProduct {
                             String key = ShortKeyGenerator.getKey(null);
                             String title = this.itemInfo.getAwemeDetailModel().getDesc();
                             String link = ShortKeyGenerator.generateShortUrl(this.itemInfo.getAwemeDetailModel().getVideo().getPlayAddrInfoModel().getUrlList().get(0), EXPIRE_TIME, host, redisService).getUrl();
-                            MultiQualityInfoModel multiQualityInfo = new MultiQualityInfoModel(
+                            MultiVideoQualityInfoModel multiQualityInfo = new MultiVideoQualityInfoModel(
                                     ShortKeyGenerator.generateShortUrl(this.itemInfo.getAwemeDetailModel().getVideo().getPlayAddrH264().getUrlList().get(0), EXPIRE_TIME, host, redisService).getUrl(),
                                     ShortKeyGenerator.generateShortUrl(this.itemInfo.getAwemeDetailModel().getVideo().getPlayAddr265().getUrlList().get(0), EXPIRE_TIME, host, redisService).getUrl()
                             );

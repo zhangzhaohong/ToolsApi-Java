@@ -13,7 +13,7 @@ import java.io.Serializable;
  */
 @Data
 @AllArgsConstructor
-public class MultiQualityInfoModel implements Serializable {
+public class MultiVideoQualityInfoModel implements Serializable {
     private String hd;
     private String sd;
 }
