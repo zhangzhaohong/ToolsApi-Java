@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${title}"></title>
+    <link href="../assets/css/custom-player.css" th:href="@{/assets/css/custom-player.css}" rel="stylesheet">
+    <script src="../assets/js/DPlayer.min.js" th:src="@{/assets/js/DPlayer.min.js}"></script>
+</head>
+<body class="custom-container">
+<div id="video-player" class="dk-video-player-custom" th:data="${path}">
+    <meta name="referrer" content="never">
+</div>
+<script>
+    const videoElement = document.getElementById('video-player');
+    const vidPath = videoElement.getAttribute("data");
+    console.log(vidPath)
+    const dp = new DPlayer({
+        container: videoElement,
+        video: {
+            url: vidPath,
+        },
+        autoplay: true,
+        hotkey: true,
+        airplay: true
+    });
+</script>
+</body>

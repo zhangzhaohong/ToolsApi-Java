@@ -52,3 +52,7 @@
     position: absolute;
     transform: translate(-50%, 0);
 }
+
+.dk-video-player-custom {
+    height: 100vh;
+}
