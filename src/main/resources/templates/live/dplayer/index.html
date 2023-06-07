@@ -4,12 +4,18 @@
     <meta charset="UTF-8">
     <title th:text="${title}"></title>
     <link href="../assets/css/custom-player.css" th:href="@{/assets/css/custom-player.css}" rel="stylesheet">
-    <script src="../assets/js/hls.js" th:src="@{/assets/js/hls.js}"></script>
+    <th:block th:if="${type == 'hls'}">
+        <script src="../assets/js/hls.js" th:src="@{/assets/js/hls.js}"></script>
+    </th:block>
+    <th:block th:if="${type == 'flv'}">
+        <script src="../assets/js/flv.min.js" th:src="@{/assets/js/flv.min.js}"></script>
+    </th:block>
     <script src="../assets/js/DPlayer.min.js" th:src="@{/assets/js/DPlayer.min.js}"></script>
 </head>
 <body class="custom-container">
 <div id="video-player" class="dk-video-player-custom" th:data-full-hd-1="${multi.getFullHd1()}"
-     th:data-hd-1="${multi.getHd1()}" th:data-sd-1="${multi.getSd1()}" th:data-sd-2="${multi.getSd2()}">
+     th:data-hd-1="${multi.getHd1()}" th:data-sd-1="${multi.getSd1()}" th:data-sd-2="${multi.getSd2()}"
+     th:data-vid-type="${type}">
     <meta name="referrer" content="never">
 </div>
 <script>
@@ -18,33 +24,34 @@
     const vidHd1Path = videoElement.getAttribute("data-hd-1");
     const vidSd1Path = videoElement.getAttribute("data-sd-1");
     const vidSd2Path = videoElement.getAttribute("data-sd-2");
+    const vidType = videoElement.getAttribute("data-vid-type");
     const qualityList = [];
     if (vidHd1Path != null) {
         qualityList.push({
             name: '蓝光',
             url: vidHd1Path,
-            type: 'hls',
+            type: vidType,
         });
     }
     if (vidFullHd1Path != null) {
         qualityList.push({
             name: '超清',
             url: vidFullHd1Path,
-            type: 'hls',
+            type: vidType,
         });
     }
     if (vidSd1Path != null) {
         qualityList.push({
             name: '高清',
             url: vidSd1Path,
-            type: 'hls',
+            type: vidType,
         });
     }
     if (vidSd2Path != null) {
         qualityList.push({
             name: '标清',
             url: vidSd2Path,
-            type: 'hls',
+            type: vidType,
         });
     }
     const dp = new DPlayer({

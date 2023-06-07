@@ -30,4 +30,6 @@ public class StreamUrlModel implements Serializable {
     private PullDatasModel pullDatas;
     @SerializedName("mock_preview_live_path")
     private String mockPreviewLivePath = null;
+    @SerializedName("mock_preview_live_path_backup")
+    private String mockPreviewLivePathBackup = null;
 }
