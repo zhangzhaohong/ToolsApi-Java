@@ -8,12 +8,14 @@ import java.io.Serializable;
 /**
  * @author koala
  * @version 1.0
- * @date 2023/6/7 13:54
+ * @date 2023/6/7 20:45
  * @description
  */
 @Data
 @AllArgsConstructor
-public class MultiLiveQualityInfoModel implements Serializable {
-    private MultiLiveQualityDetailInfoModel flv;
-    private MultiLiveQualityDetailInfoModel hls;
+public class MultiLiveQualityDetailInfoModel implements Serializable {
+    private String fullHd1;
+    private String hd1;
+    private String sd1;
+    private String sd2;
 }

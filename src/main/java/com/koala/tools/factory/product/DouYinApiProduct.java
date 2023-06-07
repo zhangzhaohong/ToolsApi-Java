@@ -1,6 +1,7 @@
 package com.koala.tools.factory.product;
 
 import com.koala.tools.enums.DouYinTypeEnums;
+import com.koala.tools.models.douyin.MultiLiveQualityDetailInfoModel;
 import com.koala.tools.models.douyin.MultiLiveQualityInfoModel;
 import com.koala.tools.models.douyin.MultiVideoQualityInfoModel;
 import com.koala.tools.models.douyin.v1.PublicTiktokDataRespModel;
@@ -240,13 +241,22 @@ public class DouYinApiProduct {
                             String title = this.roomInfoData.getData().getData().get(0).getOwner().getNickname() + "的直播间";
                             String link = ShortKeyGenerator.generateShortUrl(this.roomInfoData.getData().getData().get(0).getStreamUrl().getFlvPullUrl().getFullHd1().replaceFirst("http://", "https://"), EXPIRE_TIME, host, redisService).getUrl();
                             MultiLiveQualityInfoModel multiQualityInfo = new MultiLiveQualityInfoModel(
-                                    getPullUrl(this.roomInfoData.getData().getData().get(0).getStreamUrl().getHlsPullUrlMap().getFullHd1()),
-                                    getPullUrl(this.roomInfoData.getData().getData().get(0).getStreamUrl().getHlsPullUrlMap().getHd1()),
-                                    getPullUrl(this.roomInfoData.getData().getData().get(0).getStreamUrl().getHlsPullUrlMap().getSd1()),
-                                    getPullUrl(this.roomInfoData.getData().getData().get(0).getStreamUrl().getHlsPullUrlMap().getSd2())
+                                    new MultiLiveQualityDetailInfoModel(
+                                            getPullUrl(this.roomInfoData.getData().getData().get(0).getStreamUrl().getFlvPullUrl().getFullHd1()),
+                                            getPullUrl(this.roomInfoData.getData().getData().get(0).getStreamUrl().getFlvPullUrl().getHd1()),
+                                            getPullUrl(this.roomInfoData.getData().getData().get(0).getStreamUrl().getFlvPullUrl().getSd1()),
+                                            getPullUrl(this.roomInfoData.getData().getData().get(0).getStreamUrl().getFlvPullUrl().getSd2())
+                                    ),
+                                    new MultiLiveQualityDetailInfoModel(
+                                            getPullUrl(this.roomInfoData.getData().getData().get(0).getStreamUrl().getHlsPullUrlMap().getFullHd1()),
+                                            getPullUrl(this.roomInfoData.getData().getData().get(0).getStreamUrl().getHlsPullUrlMap().getHd1()),
+                                            getPullUrl(this.roomInfoData.getData().getData().get(0).getStreamUrl().getHlsPullUrlMap().getSd1()),
+                                            getPullUrl(this.roomInfoData.getData().getData().get(0).getStreamUrl().getHlsPullUrlMap().getSd2())
+                                    )
                             );
                             redisService.set(TIKTOK_DATA_KEY_PREFIX + key, GsonUtil.toString(new ShortDouYinItemDataModel(title, link, null, multiQualityInfo)), EXPIRE_TIME);
-                            this.roomInfoData.getData().getData().get(0).getStreamUrl().setMockPreviewLivePath(host + "tools/DouYin/pro/player/live/short?key=" + Base64Utils.encodeToUrlSafeString(key.getBytes(StandardCharsets.UTF_8)));
+                            this.roomInfoData.getData().getData().get(0).getStreamUrl().setMockPreviewLivePath(host + "tools/DouYin/pro/player/live/short?key=" + Base64Utils.encodeToUrlSafeString(key.getBytes(StandardCharsets.UTF_8)) + "&type=hls");
+                            this.roomInfoData.getData().getData().get(0).getStreamUrl().setMockPreviewLivePathBackup(host + "tools/DouYin/pro/player/live/short?key=" + Base64Utils.encodeToUrlSafeString(key.getBytes(StandardCharsets.UTF_8)) + "&type=flv");
                         } else if (this.version.equals(3)) {
                             String title = this.roomInfoData.getData().getData().get(0).getOwner().getNickname() + "的直播间";
                             String link = this.roomInfoData.getData().getData().get(0).getStreamUrl().getFlvPullUrl().getFullHd1().replaceFirst("http://", "https://");
