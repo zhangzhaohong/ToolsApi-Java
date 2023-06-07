@@ -7,17 +7,29 @@
     <script src="../assets/js/DPlayer.min.js" th:src="@{/assets/js/DPlayer.min.js}"></script>
 </head>
 <body class="custom-container">
-<div id="video-player" class="dk-video-player-custom" th:data="${path}">
+<div id="video-player" class="dk-video-player-custom" th:data-hd="${multi.getHd()}" th:data-sd="${multi.getSd()}">
     <meta name="referrer" content="never">
 </div>
 <script>
     const videoElement = document.getElementById('video-player');
-    const vidPath = videoElement.getAttribute("data");
-    console.log(vidPath)
+    const vidHdPath = videoElement.getAttribute("data-hd");
+    const vidSdPath = videoElement.getAttribute("data-sd");
     const dp = new DPlayer({
         container: videoElement,
         video: {
-            url: vidPath,
+            quality: [
+                {
+                    name: 'HD',
+                    url: vidHdPath,
+                    type: 'normal',
+                },
+                {
+                    name: 'SD',
+                    url: vidSdPath,
+                    type: 'normal',
+                },
+            ],
+            defaultQuality: 0,
         },
         autoplay: true,
         hotkey: true,

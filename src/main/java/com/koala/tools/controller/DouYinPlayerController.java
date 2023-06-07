@@ -65,6 +65,7 @@ public class DouYinPlayerController {
                 ShortDouYinItemDataModel tmp = GsonUtil.toBean(redisService.get(TIKTOK_DATA_KEY_PREFIX + itemKey), ShortDouYinItemDataModel.class);
                 model.addAttribute("title", StringUtils.hasLength(tmp.getTitle()) ? tmp.getTitle() : "VideoPlayer");
                 model.addAttribute("path", tmp.getPath());
+                model.addAttribute("multi", tmp.getMultiQualityInfo());
                 if ("3".equals(version)) {
                     return "video/dplayer/index";
                 } else if ("2".equals(version)) {
