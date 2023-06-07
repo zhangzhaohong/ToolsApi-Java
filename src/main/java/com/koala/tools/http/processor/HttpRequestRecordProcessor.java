@@ -33,7 +33,7 @@ import java.util.Objects;
 @Slf4j
 public class HttpRequestRecordProcessor {
 
-    @Resource(name = "KafkaService")
+    @Resource(name = "ApiAnalyticsKafkaService")
     private KafkaService kafkaService;
 
     /**

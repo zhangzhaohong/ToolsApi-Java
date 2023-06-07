@@ -28,17 +28,11 @@ public enum DouYinRequestTypeEnums {
 
     public static int getTypeIdByType(String type) {
         Optional<DouYinRequestTypeEnums> optional = Arrays.stream(DouYinRequestTypeEnums.values()).filter(item -> item.getType().equals(type)).findFirst();
-        if (optional.isPresent()) {
-            return optional.get().getTypeId();
-        }
-        return -1;
+        return optional.map(DouYinRequestTypeEnums::getTypeId).orElse(-1);
     }
 
     public static DouYinRequestTypeEnums getEnumsByType(String type) {
         Optional<DouYinRequestTypeEnums> optional = Arrays.stream(DouYinRequestTypeEnums.values()).filter(item -> item.getType().equals(type)).findFirst();
-        if (optional.isPresent()) {
-            return optional.get();
-        }
-        return null;
+        return optional.orElse(null);
     }
 }
