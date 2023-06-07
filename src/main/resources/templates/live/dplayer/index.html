@@ -18,31 +18,39 @@
     const vidHd1Path = videoElement.getAttribute("data-hd-1");
     const vidSd1Path = videoElement.getAttribute("data-sd-1");
     const vidSd2Path = videoElement.getAttribute("data-sd-2");
+    const qualityList = [];
+    if (vidHd1Path != null) {
+        qualityList.push({
+            name: '蓝光',
+            url: vidHd1Path,
+            type: 'hls',
+        });
+    }
+    if (vidFullHd1Path != null) {
+        qualityList.push({
+            name: '超清',
+            url: vidFullHd1Path,
+            type: 'hls',
+        });
+    }
+    if (vidSd1Path != null) {
+        qualityList.push({
+            name: '高清',
+            url: vidSd1Path,
+            type: 'hls',
+        });
+    }
+    if (vidSd2Path != null) {
+        qualityList.push({
+            name: '标清',
+            url: vidSd2Path,
+            type: 'hls',
+        });
+    }
     const dp = new DPlayer({
         container: videoElement,
         video: {
-            quality: [
-                {
-                    name: '蓝光',
-                    url: vidFullHd1Path,
-                    type: 'hls',
-                },
-                {
-                    name: '超清',
-                    url: vidHd1Path,
-                    type: 'hls',
-                },
-                {
-                    name: '高清',
-                    url: vidSd1Path,
-                    type: 'hls',
-                },
-                {
-                    name: '标清',
-                    url: vidSd2Path,
-                    type: 'hls',
-                },
-            ],
+            quality: qualityList,
             defaultQuality: 0,
         },
         autoplay: true,

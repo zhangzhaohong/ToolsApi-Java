@@ -240,10 +240,10 @@ public class DouYinApiProduct {
                             String title = this.roomInfoData.getData().getData().get(0).getOwner().getNickname() + "的直播间";
                             String link = ShortKeyGenerator.generateShortUrl(this.roomInfoData.getData().getData().get(0).getStreamUrl().getHlsPullUrl().replaceFirst("http://", "https://"), EXPIRE_TIME, host, redisService).getUrl();
                             MultiLiveQualityInfoModel multiQualityInfo = new MultiLiveQualityInfoModel(
-                                    ShortKeyGenerator.generateShortUrl(getPullUrl(this.roomInfoData.getData().getData().get(0).getStreamUrl().getHlsPullUrlMap().getFullHd1()), EXPIRE_TIME, host, redisService).getUrl(),
-                                    ShortKeyGenerator.generateShortUrl(getPullUrl(this.roomInfoData.getData().getData().get(0).getStreamUrl().getHlsPullUrlMap().getHd1()), EXPIRE_TIME, host, redisService).getUrl(),
-                                    ShortKeyGenerator.generateShortUrl(getPullUrl(this.roomInfoData.getData().getData().get(0).getStreamUrl().getHlsPullUrlMap().getSd1()), EXPIRE_TIME, host, redisService).getUrl(),
-                                    ShortKeyGenerator.generateShortUrl(getPullUrl(this.roomInfoData.getData().getData().get(0).getStreamUrl().getHlsPullUrlMap().getSd2()), EXPIRE_TIME, host, redisService).getUrl()
+                                    getPullUrl(this.roomInfoData.getData().getData().get(0).getStreamUrl().getHlsPullUrlMap().getFullHd1()),
+                                    getPullUrl(this.roomInfoData.getData().getData().get(0).getStreamUrl().getHlsPullUrlMap().getHd1()),
+                                    getPullUrl(this.roomInfoData.getData().getData().get(0).getStreamUrl().getHlsPullUrlMap().getSd1()),
+                                    getPullUrl(this.roomInfoData.getData().getData().get(0).getStreamUrl().getHlsPullUrlMap().getSd2())
                             );
                             redisService.set(TIKTOK_DATA_KEY_PREFIX + key, GsonUtil.toString(new ShortDouYinItemDataModel(title, link, null, multiQualityInfo)), EXPIRE_TIME);
                             this.roomInfoData.getData().getData().get(0).getStreamUrl().setMockPreviewLivePath(host + "tools/DouYin/pro/player/live/short?key=" + Base64Utils.encodeToUrlSafeString(key.getBytes(StandardCharsets.UTF_8)));
@@ -347,7 +347,7 @@ public class DouYinApiProduct {
 
     private String getPullUrl(String input) {
         if (StringUtils.hasLength(input)) {
-            return input.replaceFirst("http://", "https://");
+            return ShortKeyGenerator.generateShortUrl(input.replaceFirst("http://", "https://"), EXPIRE_TIME, host, redisService).getUrl();
         }
         return null;
     }
