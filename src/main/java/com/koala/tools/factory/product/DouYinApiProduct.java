@@ -7,8 +7,10 @@ import com.koala.tools.models.douyin.MultiVideoQualityInfoModel;
 import com.koala.tools.models.douyin.v1.PublicTiktokDataRespModel;
 import com.koala.tools.models.douyin.v1.itemInfo.ImageItemDataModel;
 import com.koala.tools.models.douyin.v1.itemInfo.ItemInfoRespModel;
+import com.koala.tools.models.douyin.v1.itemInfo.PlayAddrInfoModel;
 import com.koala.tools.models.douyin.v1.musicInfo.MusicInfoRespModel;
 import com.koala.tools.models.douyin.v1.roomInfo.RoomInfoRespModel;
+import com.koala.tools.models.douyin.v1.roomInfoData.PullUrlModel;
 import com.koala.tools.models.douyin.v1.roomInfoData.RoomInfoDataRespModel;
 import com.koala.tools.models.shortUrl.ShortDouYinItemDataModel;
 import com.koala.tools.models.shortUrl.ShortImageDataModel;
@@ -240,18 +242,28 @@ public class DouYinApiProduct {
                             String key = ShortKeyGenerator.getKey(null);
                             String title = this.roomInfoData.getData().getData().get(0).getOwner().getNickname() + "的直播间";
                             String link = ShortKeyGenerator.generateShortUrl(this.roomInfoData.getData().getData().get(0).getStreamUrl().getFlvPullUrl().getFullHd1().replaceFirst("http://", "https://"), EXPIRE_TIME, host, redisService).getUrl();
+                            PullUrlModel flvPullUrl = null;
+                            PullUrlModel hlsPullUrl = null;
+                            try {
+                                flvPullUrl = this.roomInfoData.getData().getData().get(0).getStreamUrl().getFlvPullUrl();
+                            } catch (Exception ignored) {
+                            }
+                            try {
+                                hlsPullUrl = this.roomInfoData.getData().getData().get(0).getStreamUrl().getHlsPullUrlMap();
+                            } catch (Exception ignored) {
+                            }
                             MultiLiveQualityInfoModel multiQualityInfo = new MultiLiveQualityInfoModel(
                                     new MultiLiveQualityDetailInfoModel(
-                                            getPullUrl(this.roomInfoData.getData().getData().get(0).getStreamUrl().getFlvPullUrl().getFullHd1()),
-                                            getPullUrl(this.roomInfoData.getData().getData().get(0).getStreamUrl().getFlvPullUrl().getHd1()),
-                                            getPullUrl(this.roomInfoData.getData().getData().get(0).getStreamUrl().getFlvPullUrl().getSd1()),
-                                            getPullUrl(this.roomInfoData.getData().getData().get(0).getStreamUrl().getFlvPullUrl().getSd2())
+                                            getPullUrl(Objects.isNull(flvPullUrl) ? null : flvPullUrl.getFullHd1()),
+                                            getPullUrl(Objects.isNull(flvPullUrl) ? null : flvPullUrl.getHd1()),
+                                            getPullUrl(Objects.isNull(flvPullUrl) ? null : flvPullUrl.getSd1()),
+                                            getPullUrl(Objects.isNull(flvPullUrl) ? null : flvPullUrl.getSd2())
                                     ),
                                     new MultiLiveQualityDetailInfoModel(
-                                            getPullUrl(this.roomInfoData.getData().getData().get(0).getStreamUrl().getHlsPullUrlMap().getFullHd1()),
-                                            getPullUrl(this.roomInfoData.getData().getData().get(0).getStreamUrl().getHlsPullUrlMap().getHd1()),
-                                            getPullUrl(this.roomInfoData.getData().getData().get(0).getStreamUrl().getHlsPullUrlMap().getSd1()),
-                                            getPullUrl(this.roomInfoData.getData().getData().get(0).getStreamUrl().getHlsPullUrlMap().getSd2())
+                                            getPullUrl(Objects.isNull(hlsPullUrl) ? null : hlsPullUrl.getFullHd1()),
+                                            getPullUrl(Objects.isNull(hlsPullUrl) ? null : hlsPullUrl.getHd1()),
+                                            getPullUrl(Objects.isNull(hlsPullUrl) ? null : hlsPullUrl.getSd1()),
+                                            getPullUrl(Objects.isNull(hlsPullUrl) ? null : hlsPullUrl.getSd2())
                                     )
                             );
                             redisService.set(TIKTOK_DATA_KEY_PREFIX + key, GsonUtil.toString(new ShortDouYinItemDataModel(title, link, null, multiQualityInfo)), EXPIRE_TIME);
@@ -278,9 +290,19 @@ public class DouYinApiProduct {
                             String key = ShortKeyGenerator.getKey(null);
                             String title = this.itemInfo.getAwemeDetailModel().getDesc();
                             String link = ShortKeyGenerator.generateShortUrl(this.itemInfo.getAwemeDetailModel().getVideo().getPlayAddrInfoModel().getUrlList().get(0), EXPIRE_TIME, host, redisService).getUrl();
+                            PlayAddrInfoModel playAddrH264 = null;
+                            PlayAddrInfoModel playAddr265 = null;
+                            try {
+                                playAddrH264 = this.itemInfo.getAwemeDetailModel().getVideo().getPlayAddrH264();
+                            } catch (Exception ignored) {
+                            }
+                            try {
+                                playAddr265 = this.itemInfo.getAwemeDetailModel().getVideo().getPlayAddr265();
+                            } catch (Exception ignored) {
+                            }
                             MultiVideoQualityInfoModel multiQualityInfo = new MultiVideoQualityInfoModel(
-                                    getVideoUrl(this.itemInfo.getAwemeDetailModel().getVideo().getPlayAddrH264().getUrlList().get(0)),
-                                    getVideoUrl(this.itemInfo.getAwemeDetailModel().getVideo().getPlayAddr265().getUrlList().get(0))
+                                    getVideoUrl(Objects.isNull(playAddrH264) ? null : playAddrH264.getUrlList().get(0)),
+                                    getVideoUrl(Objects.isNull(playAddr265) ? null : playAddr265.getUrlList().get(0))
                             );
                             redisService.set(TIKTOK_DATA_KEY_PREFIX + key, GsonUtil.toString(new ShortDouYinItemDataModel(title, link, multiQualityInfo, null)), EXPIRE_TIME);
                             this.itemInfo.getAwemeDetailModel().getVideo().setRealPath(ShortKeyGenerator.generateShortUrl(link, EXPIRE_TIME, host, redisService).getUrl());
