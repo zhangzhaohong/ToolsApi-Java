@@ -2,7 +2,7 @@ version: '3'
 services:
   #Service for nameserver
   192.168.2.250:
-    image: apache/rocketmq:4.9.4
+    image: apache/rocketmq:5.1.1
     logging:
       driver: "json-file"
       options:
@@ -20,7 +20,7 @@ services:
 
   #Service for broker
   broker:
-    image: apache/rocketmq:4.9.4
+    image: apache/rocketmq:5.1.1
     logging:
       driver: "json-file"
       options:
