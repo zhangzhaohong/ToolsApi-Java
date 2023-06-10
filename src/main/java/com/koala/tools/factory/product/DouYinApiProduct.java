@@ -280,7 +280,7 @@ public class DouYinApiProduct {
                     }
                 }
                 case VIDEO_TYPE -> {
-                    String vid = this.itemInfo.getAwemeDetailModel().getVideo().getPlayAddrInfoModel().getUri();
+                    String vid = this.itemInfo.getAwemeDetailModel().getVideo().getPlayAddr().getUri();
                     String ratio = this.itemInfo.getAwemeDetailModel().getVideo().getRatio();
                     if (ObjectUtils.isEmpty(ratio) || Objects.equals(ratio, "default")) {
                         ratio = "540p";
@@ -289,9 +289,14 @@ public class DouYinApiProduct {
                         if (this.version.equals(4)) {
                             String key = ShortKeyGenerator.getKey(null);
                             String title = this.itemInfo.getAwemeDetailModel().getDesc();
-                            String link = ShortKeyGenerator.generateShortUrl(this.itemInfo.getAwemeDetailModel().getVideo().getPlayAddrInfoModel().getUrlList().get(0), EXPIRE_TIME, host, redisService).getUrl();
+                            String link = ShortKeyGenerator.generateShortUrl(this.itemInfo.getAwemeDetailModel().getVideo().getPlayAddr().getUrlList().get(0), EXPIRE_TIME, host, redisService).getUrl();
+                            PlayAddrInfoModel playAddr = null;
                             PlayAddrInfoModel playAddrH264 = null;
                             PlayAddrInfoModel playAddr265 = null;
+                            try {
+                                playAddr = this.itemInfo.getAwemeDetailModel().getVideo().getPlayAddr();
+                            } catch (Exception ignored) {
+                            }
                             try {
                                 playAddrH264 = this.itemInfo.getAwemeDetailModel().getVideo().getPlayAddrH264();
                             } catch (Exception ignored) {
@@ -301,7 +306,7 @@ public class DouYinApiProduct {
                             } catch (Exception ignored) {
                             }
                             MultiVideoQualityInfoModel multiQualityInfo = new MultiVideoQualityInfoModel(
-                                    getVideoUrl(Objects.isNull(playAddrH264) ? null : playAddrH264.getUrlList().get(0)),
+                                    getVideoUrl(Objects.isNull(playAddrH264) ? Objects.isNull(playAddr) ? null : playAddr.getUrlList().get(0) : playAddrH264.getUrlList().get(0)),
                                     getVideoUrl(Objects.isNull(playAddr265) ? null : playAddr265.getUrlList().get(0))
                             );
                             redisService.set(TIKTOK_DATA_KEY_PREFIX + key, GsonUtil.toString(new ShortDouYinItemDataModel(title, link, multiQualityInfo, null)), EXPIRE_TIME);
@@ -310,13 +315,13 @@ public class DouYinApiProduct {
                             this.itemInfo.getAwemeDetailModel().getVideo().setMockDownloadVidPath(ShortKeyGenerator.generateShortUrl(host + "tools/DouYin/preview/video?path=" + Base64Utils.encodeToUrlSafeString(link.getBytes(StandardCharsets.UTF_8)) + "&isDownload=true", EXPIRE_TIME, host, redisService).getUrl());
                         } else if (this.version.equals(3)) {
                             String title = this.itemInfo.getAwemeDetailModel().getDesc();
-                            String link = this.itemInfo.getAwemeDetailModel().getVideo().getPlayAddrInfoModel().getUrlList().get(0);
+                            String link = this.itemInfo.getAwemeDetailModel().getVideo().getPlayAddr().getUrlList().get(0);
                             String previewPath = host + "tools/DouYin/preview/video?path=" + Base64Utils.encodeToUrlSafeString(link.getBytes(StandardCharsets.UTF_8));
                             this.itemInfo.getAwemeDetailModel().getVideo().setRealPath(link);
                             this.itemInfo.getAwemeDetailModel().getVideo().setMockPreviewVidPath(host + "tools/DouYin/pro/player/video?" + (StringUtils.hasLength(title) ? "title=" + Base64Utils.encodeToUrlSafeString(title.getBytes(StandardCharsets.UTF_8)) + "&" : "") + "path=" + Base64Utils.encodeToUrlSafeString(previewPath.getBytes(StandardCharsets.UTF_8)));
                             this.itemInfo.getAwemeDetailModel().getVideo().setMockDownloadVidPath(host + "tools/DouYin/preview/video?path=" + Base64Utils.encodeToUrlSafeString(link.getBytes(StandardCharsets.UTF_8)) + "&isDownload=true");
                         } else if (this.version.equals(2)) {
-                            String link = this.itemInfo.getAwemeDetailModel().getVideo().getPlayAddrInfoModel().getUrlList().get(0);
+                            String link = this.itemInfo.getAwemeDetailModel().getVideo().getPlayAddr().getUrlList().get(0);
                             this.itemInfo.getAwemeDetailModel().getVideo().setRealPath(link);
                             this.itemInfo.getAwemeDetailModel().getVideo().setMockPreviewVidPath(host + "tools/DouYin/preview/video?path=" + Base64Utils.encodeToUrlSafeString(link.getBytes(StandardCharsets.UTF_8)));
                             this.itemInfo.getAwemeDetailModel().getVideo().setMockDownloadVidPath(host + "tools/DouYin/preview/video?path=" + Base64Utils.encodeToUrlSafeString(link.getBytes(StandardCharsets.UTF_8)) + "&isDownload=true");

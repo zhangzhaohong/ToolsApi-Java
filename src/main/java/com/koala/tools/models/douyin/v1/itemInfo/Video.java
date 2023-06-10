@@ -1,9 +1,6 @@
 package com.koala.tools.models.douyin.v1.itemInfo;
 
 import com.google.gson.annotations.SerializedName;
-import com.koala.tools.models.douyin.v1.itemInfo.BitRateInfoModel;
-import com.koala.tools.models.douyin.v1.itemInfo.CoverInfoModel;
-import com.koala.tools.models.douyin.v1.itemInfo.PlayAddrInfoModel;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -41,7 +38,7 @@ public class Video<Object extends Serializable> implements Serializable {
     @SerializedName("origin_cover")
     private CoverInfoModel originCover;
     @SerializedName("play_addr")
-    private PlayAddrInfoModel playAddrInfoModel;
+    private PlayAddrInfoModel playAddr;
     @SerializedName("play_addr_265")
     private PlayAddrInfoModel playAddr265;
     @SerializedName("play_addr_h264")
