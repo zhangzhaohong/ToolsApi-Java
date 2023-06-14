@@ -15,11 +15,12 @@
         <java.version>17</java.version>
     </properties>
     <dependencies>
+        <!--gson 依赖-->
         <dependency>
-            <groupId>com.koala</groupId>
-            <artifactId>tools-base</artifactId>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.10.1</version>
         </dependency>
-
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>

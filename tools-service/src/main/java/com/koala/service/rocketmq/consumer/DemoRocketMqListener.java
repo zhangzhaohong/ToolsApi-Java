@@ -2,7 +2,7 @@ package com.koala.service.rocketmq.consumer;
 
 import com.koala.service.rocketmq.data.TopicData;
 import com.koala.service.rocketmq.model.DemoModel;
-//import com.koala.base.utils.GsonUtil;
+import com.koala.base.utils.GsonUtil;
 import org.apache.rocketmq.spring.annotation.RocketMQMessageListener;
 import org.apache.rocketmq.spring.core.RocketMQListener;
 import org.slf4j.Logger;
@@ -36,7 +36,7 @@ public class DemoRocketMqListener implements RocketMQListener<DemoModel> {
             throw new RuntimeException(e);
         }
         Long current = System.currentTimeMillis();
-//        LOG.info("on message[{}] - [cost: {}]: {}", current, (current - demoModel.getId()) + "ms", GsonUtil.toString(demoModel));
+        LOG.info("on message[{}] - [cost: {}]: {}", current, (current - demoModel.getId()) + "ms", GsonUtil.toString(demoModel));
     }
 
 }

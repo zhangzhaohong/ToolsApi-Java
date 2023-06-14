@@ -1,0 +1,48 @@
+package com.koala.service.kafka.service.impl;
+
+import com.koala.service.kafka.service.KafkaService;
+import com.koala.service.kafka.model.MessageModel;
+import com.koala.base.utils.GsonUtil;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.support.SendResult;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Service;
+import org.springframework.util.concurrent.ListenableFuture;
+import org.springframework.util.concurrent.ListenableFutureCallback;
+
+import javax.annotation.Resource;
+import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+
+/**
+ * @author koala
+ * @version 1.0
+ * @date 2023/5/13 11:35
+ * @description
+ */
+@Service("ApiAnalyticsKafkaService")
+@Slf4j
+public class ApiAnalyticsKafkaServiceImpl implements KafkaService {
+    @Resource
+    private KafkaTemplate<String, Object> kafkaTemplate;
+
+    public static final String TOPIC_STR = "api-analytics-process";
+
+    @Async
+    @Override
+    public void send(MessageModel<?> message) {
+        String obj2String = GsonUtil.toString(message);
+        log.info("[Kafka] on prepared message：{}", obj2String);
+        //发送消息
+        kafkaTemplate.send(TOPIC_STR, message).whenComplete((sendResult, throwable) -> {
+            if (!Objects.isNull(throwable)) {
+                log.info("[Kafka] on sent message = " + sendResult + " with offset = " + sendResult.getRecordMetadata().offset());
+            } else {
+                log.error("[Kafka] unable to send message = " + message, throwable);
+            }
+        });
+    }
+}
