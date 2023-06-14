@@ -39,3 +39,7 @@ build/
 .vscode/
 
 ServiceData
+
+signature_web_project/.idea
+
+signature_web_project/node_modules
