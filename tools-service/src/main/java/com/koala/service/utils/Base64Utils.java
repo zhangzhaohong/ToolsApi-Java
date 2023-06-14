@@ -1,9 +1,9 @@
 package com.koala.service.utils;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.UnsupportedEncodingException;
-import java.util.Base64;
 
 /**
  * @author koala
@@ -13,12 +13,7 @@ import java.util.Base64;
  */
 public class Base64Utils {
 
-    // Base64 编码与解码
-    private static final Base64.Decoder DECODER_64 = Base64.getDecoder();
-    private static final Base64.Encoder ENCODER_64 = Base64.getEncoder();
-
-    // dpi越大转换后的图片越清晰，相对转换速度越慢
-    private static final Integer DPI = 200;
+    private static final Base64 base64 = new Base64();
 
     // 编码、解码格式
     private static final String CODE_FORMATE = "UTF-8";
@@ -33,12 +28,7 @@ public class Base64Utils {
         if (StringUtils.isBlank(new String(src))) {
             return new String(src);
         }
-        String encodedToStr = null;
-        try {
-            encodedToStr = ENCODER_64.encodeToString(src);
-        } catch (Exception ignored) {
-        }
-        return encodedToStr;
+        return base64.encodeToString(src);
     }
 
     /**
@@ -47,15 +37,15 @@ public class Base64Utils {
      * @param base64Str text的Base64字符串
      * @return text明文
      */
-    public static String decodeFromUrlSafeString(String base64Str) {
+    public static byte[] decodeFromUrlSafeString(String base64Str) {
         if (StringUtils.isBlank(base64Str)) {
-            return base64Str;
+            try {
+                return base64Str.getBytes(CODE_FORMATE);
+            } catch (UnsupportedEncodingException e) {
+                return new byte[0];
+            }
         }
-        String byteToText = null;
-        try {
-            byteToText = new String(DECODER_64.decode(base64Str), CODE_FORMATE);
-        } catch (UnsupportedEncodingException ignored) {
-        }
-        return byteToText;
+        return base64.decode(base64Str);
     }
+
 }
