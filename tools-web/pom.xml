@@ -7,15 +7,27 @@
         <artifactId>tools</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
-    <artifactId>tools-api</artifactId>
+    <artifactId>tools-web</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>tools-api</name>
-    <description>tools-api</description>
+    <name>tools-web</name>
+    <description>tools-web</description>
     <properties>
         <java.version>17</java.version>
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>com.koala</groupId>
+            <artifactId>tools-base</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.koala</groupId>
+            <artifactId>tools-data</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.koala</groupId>
+            <artifactId>tools-service</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>

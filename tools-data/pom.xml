@@ -19,6 +19,7 @@
             <groupId>com.koala</groupId>
             <artifactId>tools-base</artifactId>
         </dependency>
+
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
