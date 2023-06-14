@@ -9,6 +9,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import jakarta.annotation.Resource;
+
 import java.util.Objects;
 
 /**
@@ -32,7 +33,7 @@ public class EventTrackerKafkaServiceImpl implements KafkaService {
         log.info("[Kafka] on prepared message：{}", obj2String);
         //发送消息
         kafkaTemplate.send(TOPIC_STR, message).whenComplete((sendResult, throwable) -> {
-            if (!Objects.isNull(throwable)) {
+            if (Objects.isNull(throwable)) {
                 log.info("[Kafka] on sent message = " + sendResult + " with offset = " + sendResult.getRecordMetadata().offset());
             } else {
                 log.error("[Kafka] unable to send message = " + message, throwable);
