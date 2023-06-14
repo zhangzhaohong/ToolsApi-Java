@@ -1,4 +1,4 @@
-package com.koala.base.utils;
+package com.koala.service.utils;
 
 import com.koala.data.models.xbogus.XbogusDataModel;
 import com.koala.data.models.xbogus.XbogusRespDataModel;

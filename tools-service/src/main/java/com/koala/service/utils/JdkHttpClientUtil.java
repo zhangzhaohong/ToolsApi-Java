@@ -1,4 +1,4 @@
-package com.koala.base.utils;
+package com.koala.service.utils;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;

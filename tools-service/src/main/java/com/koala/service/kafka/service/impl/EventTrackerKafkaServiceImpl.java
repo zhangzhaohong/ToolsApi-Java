@@ -2,16 +2,13 @@ package com.koala.service.kafka.service.impl;
 
 import com.koala.service.kafka.model.MessageModel;
 import com.koala.service.kafka.service.KafkaService;
-import com.koala.base.utils.GsonUtil;
+import com.koala.service.utils.GsonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.support.SendResult;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.util.concurrent.ListenableFuture;
-import org.springframework.util.concurrent.ListenableFutureCallback;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.Objects;
 
 /**

@@ -1,10 +1,10 @@
-package com.koala.base.utils;
+package com.koala.service.utils;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import static com.koala.base.utils.IpUtil.getRandomIpAddress;
+import static com.koala.service.utils.IpUtil.getRandomIpAddress;
 
 /**
  * @author koala

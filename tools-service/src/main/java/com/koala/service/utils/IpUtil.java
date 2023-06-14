@@ -1,4 +1,4 @@
-package com.koala.base.utils;
+package com.koala.service.utils;
 
 import java.util.ArrayList;
 import java.util.Random;

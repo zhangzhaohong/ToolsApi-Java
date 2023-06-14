@@ -1,6 +1,6 @@
 package com.koala.service.rocketmq.consumer;
 
-import com.koala.base.utils.GsonUtil;
+import com.koala.service.utils.GsonUtil;
 import com.koala.service.kafka.model.apiData.ApiData;
 import com.koala.service.rocketmq.data.TopicData;
 import org.apache.rocketmq.spring.annotation.RocketMQMessageListener;

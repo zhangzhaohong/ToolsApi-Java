@@ -1,4 +1,4 @@
-package com.koala.base.utils;
+package com.koala.service.utils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

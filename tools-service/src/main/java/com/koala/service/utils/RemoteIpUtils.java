@@ -1,4 +1,4 @@
-package com.koala.base.utils;
+package com.koala.service.utils;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
