@@ -21,6 +21,10 @@
         </dependency>
         <dependency>
             <groupId>com.koala</groupId>
+            <artifactId>tools-data</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.koala</groupId>
             <artifactId>rocketmq-spring-boot</artifactId>
             <exclusions>
                 <exclusion>
