@@ -1,7 +1,0 @@
-FROM openjdk:17
-MAINTAINER owen000814@outlook.com
-WORKDIR /
-ADD target/*.jar app.jar
-EXPOSE 8080
-ENTRYPOINT ["java", "-jar"]
-CMD ["app.jar"]
