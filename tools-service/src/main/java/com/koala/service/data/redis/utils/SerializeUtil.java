@@ -17,7 +17,7 @@ public class SerializeUtil {
         } catch (Exception ignored) {
 
         }
-        return null;
+        return new byte[0];
     }
 
     public static Object unserialize(byte[] bytes) {
