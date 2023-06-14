@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.File;
 
 @Slf4j
-@MapperScan(basePackages = {"com.koala.tools.data.mapper"})
+@MapperScan(basePackages = {"com.koala.service.data.database.mapper"})
 @SpringBootApplication(scanBasePackages = {"com.koala"})
 public class ToolsWebApplication {
 

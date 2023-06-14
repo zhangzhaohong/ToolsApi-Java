@@ -1,14 +1,14 @@
 package com.koala.service.utils;
 
 import com.koala.data.models.shortUrl.ShortUrlInfoModel;
-import com.koala.service.redis.service.RedisService;
+import com.koala.service.data.redis.service.RedisService;
 import org.springframework.util.Base64Utils;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.*;
 
-import static com.koala.service.redis.RedisKeyPrefix.SHORT_KEY_PREFIX;
+import static com.koala.service.data.redis.RedisKeyPrefix.SHORT_KEY_PREFIX;
 
 /**
  * @author koala

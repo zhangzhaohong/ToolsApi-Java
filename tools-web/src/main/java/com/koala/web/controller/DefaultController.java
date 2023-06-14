@@ -1,9 +1,10 @@
 package com.koala.web.controller;
 
-import com.koala.service.rocketmq.RocketMqHelper;
-import com.koala.service.rocketmq.data.TopicData;
-import com.koala.service.rocketmq.model.DemoModel;
-import com.koala.service.rocketmq.producer.MessageProducer;
+import com.koala.service.custom.http.annotation.HttpRequestRecorder;
+import com.koala.service.data.rocketmq.RocketMqHelper;
+import com.koala.service.data.rocketmq.data.TopicData;
+import com.koala.service.data.rocketmq.model.DemoModel;
+import com.koala.service.data.rocketmq.producer.MessageProducer;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,14 +23,14 @@ public class DefaultController {
     @Resource
     private RocketMqHelper rocketMqHelper;
 
-    //    @HttpRequestRecorder
+    @HttpRequestRecorder
     @GetMapping("mq/test/c1")
     public String pushMqC1() {
         MessageProducer.asyncSend(rocketMqHelper, TopicData.DEMO, TopicData.DEMO_CHANNEL_1, new DemoModel(System.currentTimeMillis(), "Hello world"));
         return "ok";
     }
 
-    //    @HttpRequestRecorder
+    @HttpRequestRecorder
     @GetMapping("mq/test/c2")
     public String pushMqC2() {
         MessageProducer.asyncSend(rocketMqHelper, TopicData.DEMO, TopicData.DEMO_CHANNEL_2, new DemoModel(System.currentTimeMillis(), "Hello world"));
