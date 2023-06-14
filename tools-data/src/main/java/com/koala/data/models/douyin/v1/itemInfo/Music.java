@@ -1,10 +1,7 @@
 package com.koala.data.models.douyin.v1.itemInfo;
 
 import com.google.gson.annotations.SerializedName;
-import com.koala.data.models.douyin.v1.musicInfo.AvatarThumbModel;
-import com.koala.data.models.douyin.v1.musicInfo.PlayInfoModel;
-import com.koala.data.models.douyin.v1.musicInfo.SearchImprModel;
-import com.koala.data.models.douyin.v1.musicInfo.StrongBeatInfoModel;
+
 import lombok.Data;
 
 import java.io.Serializable;

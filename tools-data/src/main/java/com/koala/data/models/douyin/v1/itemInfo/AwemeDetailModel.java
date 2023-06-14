@@ -1,17 +1,6 @@
 package com.koala.data.models.douyin.v1.itemInfo;
 
 import com.google.gson.annotations.SerializedName;
-import com.koala.data.models.douyin.v1.musicInfo.AwemeControlModel;
-import com.koala.data.models.douyin.v1.musicInfo.BookBarModel;
-import com.koala.data.models.douyin.v1.musicInfo.ItemWarnNotificationModel;
-import com.koala.data.models.douyin.v1.musicInfo.Music;
-import com.koala.data.models.douyin.v1.musicInfo.PhotoSearchEntranceModel;
-import com.koala.data.models.douyin.v1.musicInfo.SearchImprModel;
-import com.koala.data.models.douyin.v1.musicInfo.ShareInfoModel;
-import com.koala.data.models.douyin.v1.musicInfo.Statistics;
-import com.koala.data.models.douyin.v1.musicInfo.Status;
-import com.koala.data.models.douyin.v1.musicInfo.TextExtraModel;
-import com.koala.data.models.douyin.v1.musicInfo.Video;
 import lombok.Data;
 
 import java.io.Serializable;

@@ -2,7 +2,6 @@
 package com.koala.data.models.douyin.v1.itemInfo;
 
 import com.google.gson.annotations.SerializedName;
-import com.koala.data.models.douyin.v1.musicInfo.PlayAddrInfoModel;
 import lombok.Data;
 
 import java.io.Serializable;

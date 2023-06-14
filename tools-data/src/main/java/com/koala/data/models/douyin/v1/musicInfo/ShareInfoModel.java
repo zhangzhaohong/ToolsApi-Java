@@ -1,7 +1,6 @@
 package com.koala.data.models.douyin.v1.musicInfo;
 
 import com.google.gson.annotations.SerializedName;
-import com.koala.data.models.douyin.v1.itemInfo.ShareQrCodeInfoModel;
 import lombok.Data;
 
 import java.io.Serializable;

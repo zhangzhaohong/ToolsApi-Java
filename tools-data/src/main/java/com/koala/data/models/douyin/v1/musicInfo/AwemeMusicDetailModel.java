@@ -1,14 +1,6 @@
 package com.koala.data.models.douyin.v1.musicInfo;
 
 import com.google.gson.annotations.SerializedName;
-import com.koala.data.models.douyin.v1.itemInfo.DiggLottieModel;
-import com.koala.data.models.douyin.v1.itemInfo.ImageCommentModel;
-import com.koala.data.models.douyin.v1.itemInfo.SeriesPaidInfoModel;
-import com.koala.data.models.douyin.v1.itemInfo.VideoGameDataChannelConfigModel;
-import com.koala.data.models.douyin.v1.itemInfo.Author;
-import com.koala.data.models.douyin.v1.itemInfo.ImageAlbumMusicInfoModel;
-import com.koala.data.models.douyin.v1.itemInfo.ImpressionDataModel;
-import com.koala.data.models.douyin.v1.itemInfo.VideoTagModel;
 import lombok.Data;
 
 import java.io.Serializable;

@@ -26,6 +26,10 @@
         </dependency>
         <dependency>
             <groupId>com.koala</groupId>
+            <artifactId>tools-factory</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.koala</groupId>
             <artifactId>tools-service</artifactId>
         </dependency>
         <dependency>
