@@ -2,7 +2,7 @@ package com.koala.service.utils;
 
 import com.koala.data.models.shortUrl.ShortUrlInfoModel;
 import com.koala.service.data.redis.service.RedisService;
-import org.springframework.util.Base64Utils;
+import com.koala.service.utils.Base64Utils;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
