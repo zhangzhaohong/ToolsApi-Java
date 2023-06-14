@@ -17,6 +17,7 @@
 
 package org.apache.rocketmq.spring.autoconfigure;
 
+import jakarta.annotation.PostConstruct;
 import org.apache.rocketmq.client.AccessChannel;
 import org.apache.rocketmq.client.MQAdmin;
 import org.apache.rocketmq.client.consumer.DefaultLitePullConsumer;
@@ -48,8 +49,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.core.env.Environment;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
-
-import javax.annotation.PostConstruct;
 
 @Configuration
 @EnableConfigurationProperties(RocketMQProperties.class)

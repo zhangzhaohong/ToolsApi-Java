@@ -5,7 +5,6 @@ import com.koala.service.rocketmq.data.TopicData;
 import com.koala.service.rocketmq.model.DemoModel;
 import com.koala.service.rocketmq.producer.MessageProducer;
 import jakarta.annotation.Resource;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

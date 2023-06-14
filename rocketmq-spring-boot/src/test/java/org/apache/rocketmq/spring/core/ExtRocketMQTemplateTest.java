@@ -16,6 +16,7 @@
  */
 package org.apache.rocketmq.spring.core;
 
+import jakarta.annotation.Resource;
 import org.apache.rocketmq.client.producer.TransactionMQProducer;
 import org.apache.rocketmq.spring.annotation.ExtRocketMQConsumerConfiguration;
 import org.apache.rocketmq.spring.annotation.ExtRocketMQTemplateConfiguration;
@@ -29,14 +30,12 @@ import org.springframework.messaging.MessagingException;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import javax.annotation.Resource;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 
 @SpringBootTest(properties = {
-    "rocketmq.nameServer=127.0.0.1:9876", "rocketmq.producer.group=extRocketMQTemplate-test-producer_group"}, classes = {RocketMQAutoConfiguration.class, ExtRocketMQTemplate.class, ExtTransactionListenerImpl.class, ExtRocketMQConsumer.class})
+        "rocketmq.nameServer=127.0.0.1:9876", "rocketmq.producer.group=extRocketMQTemplate-test-producer_group"}, classes = {RocketMQAutoConfiguration.class, ExtRocketMQTemplate.class, ExtTransactionListenerImpl.class, ExtRocketMQConsumer.class})
 public class ExtRocketMQTemplateTest {
 
     @Resource(name = "extRocketMQTemplate")
@@ -84,7 +83,7 @@ public class ExtRocketMQTemplateTest {
 }
 
 @ExtRocketMQTemplateConfiguration(nameServer = "172.0.0.1:9876", group = "extRocketMQTemplate-test-group",
-    sendMessageTimeout = 3000, maxMessageSize = 4 * 1024)
+        sendMessageTimeout = 3000, maxMessageSize = 4 * 1024)
 class ExtRocketMQTemplate extends RocketMQTemplate {
 
 }
