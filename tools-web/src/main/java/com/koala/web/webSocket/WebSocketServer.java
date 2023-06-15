@@ -6,6 +6,7 @@ import com.koala.service.data.kafka.model.MessageModel;
 import com.koala.service.data.kafka.service.KafkaService;
 import com.koala.service.utils.GsonUtil;
 import com.koala.web.webSocket.enums.Constants;
+import com.koala.web.webSocket.model.EventTrackerDataModel;
 import com.koala.web.webSocket.model.WebSocketDataModel;
 import com.koala.web.webSocket.model.WebSocketRespDataModel;
 import jakarta.websocket.*;
@@ -14,11 +15,14 @@ import jakarta.websocket.server.ServerEndpoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.text.MessageFormat;
+import java.util.HashMap;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import static com.koala.web.webSocket.enums.Constants.HEARTBREAK;
@@ -115,7 +119,7 @@ public class WebSocketServer {
             respData = new WebSocketRespDataModel<>(constant.getCode(), constant.getEvent(), null);
             sendMessage(GsonUtil.toString(respData));
         } else {
-            kafkaService.send(new MessageModel<>(null, new EventTrackerData(webSocketDataModel.getEvent(), sid, webSocketDataModel.getData())));
+            kafkaService.send(new MessageModel<>(null, new EventTrackerData<>(webSocketDataModel.getEvent(), sid, webSocketDataModel.getData())));
         }
     }
 
@@ -135,4 +139,12 @@ public class WebSocketServer {
     public void sendMessage(String message) throws IOException {
         this.session.getBasicRemote().sendText(message);
     }
+
+    @Scheduled(cron = "*/30 * * * * ?")
+    public void sendStatistics() {
+        HashMap<String, Object> extra = new HashMap<>();
+        extra.put("online", getOnlineCount());
+        kafkaService.send(new MessageModel<>(null, new EventTrackerData<>(Constants.WEBSOCKET_STATISTICS.getEvent(), UUID.randomUUID().toString(), new EventTrackerDataModel<>("Websocket_statistics", extra))));
+    }
+
 }
