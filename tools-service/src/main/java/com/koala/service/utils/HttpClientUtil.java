@@ -4,34 +4,33 @@ import com.google.common.base.Splitter;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.apache.http.Header;
-import org.apache.http.HttpEntity;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.CookieStore;
-import org.apache.http.client.config.CookieSpecs;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.*;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.cookie.Cookie;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.BasicCookieStore;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.client5.http.classic.methods.*;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.cookie.BasicCookieStore;
+import org.apache.hc.client5.http.cookie.Cookie;
+import org.apache.hc.client5.http.cookie.CookieStore;
+import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.core5.http.*;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.io.entity.StringEntity;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
+import org.apache.hc.core5.net.URIBuilder;
 import org.springframework.util.ObjectUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author koala
@@ -50,6 +49,8 @@ public class HttpClientUtil {
     // 请求响应超时时间,单位毫秒
     private static final int SOCKET_TIMEOUT = 3 * 60 * 1000;
 
+    public static final String COOKIE_SPECS_STANDARD = "standard";
+
     /**
      * 发送get请求;带请求头和请求参数
      */
@@ -64,7 +65,7 @@ public class HttpClientUtil {
             // 创建http对象
             HttpGet httpGet = new HttpGet(uriBuilder.build());
             // 设置请求超时时间及响应超时时间
-            RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(CONNECT_TIMEOUT).setSocketTimeout(SOCKET_TIMEOUT).setCookieSpec(CookieSpecs.STANDARD).build();
+            RequestConfig requestConfig = RequestConfig.custom().setConnectionRequestTimeout(CONNECT_TIMEOUT, TimeUnit.MILLISECONDS).setCookieSpec(COOKIE_SPECS_STANDARD).build();
             httpGet.setConfig(requestConfig);
             // 设置请求头
             packageHeader(headers, httpGet);
@@ -96,7 +97,7 @@ public class HttpClientUtil {
             // 创建http对象
             HttpPost httpPost = new HttpPost(url);
             // 设置请求超时时间及响应超时时间
-            RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(CONNECT_TIMEOUT).setSocketTimeout(SOCKET_TIMEOUT).setCookieSpec(CookieSpecs.STANDARD).build();
+            RequestConfig requestConfig = RequestConfig.custom().setConnectionRequestTimeout(CONNECT_TIMEOUT, TimeUnit.MILLISECONDS).setCookieSpec(COOKIE_SPECS_STANDARD).build();
             httpPost.setConfig(requestConfig);
             // 设置请求头
             packageHeader(headers, httpPost);
@@ -130,7 +131,7 @@ public class HttpClientUtil {
             // 创建http对象
             HttpPost httpPost = new HttpPost(url);
             // 设置请求超时时间及响应超时时间
-            RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(CONNECT_TIMEOUT).setSocketTimeout(SOCKET_TIMEOUT).setCookieSpec(CookieSpecs.STANDARD).build();
+            RequestConfig requestConfig = RequestConfig.custom().setConnectionRequestTimeout(CONNECT_TIMEOUT, TimeUnit.MILLISECONDS).setCookieSpec(COOKIE_SPECS_STANDARD).build();
             httpPost.setConfig(requestConfig);
             // 设置请求头
             packageHeader(headers, httpPost);
@@ -159,7 +160,7 @@ public class HttpClientUtil {
             // 创建http对象
             HttpPost httpPost = new HttpPost(url);
             // 设置请求超时时间及响应超时时间
-            RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(CONNECT_TIMEOUT).setSocketTimeout(SOCKET_TIMEOUT).setCookieSpec(CookieSpecs.STANDARD).build();
+            RequestConfig requestConfig = RequestConfig.custom().setConnectionRequestTimeout(CONNECT_TIMEOUT, TimeUnit.MILLISECONDS).setCookieSpec(COOKIE_SPECS_STANDARD).build();
             httpPost.setConfig(requestConfig);
             // 设置请求头
             packageHeader(headers, httpPost);
@@ -181,7 +182,7 @@ public class HttpClientUtil {
     public static String doPut(String url, Map<String, String> headers, Map<String, String> params) throws IOException {
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             HttpPut httpPut = new HttpPut(url);
-            RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(CONNECT_TIMEOUT).setSocketTimeout(SOCKET_TIMEOUT).setCookieSpec(CookieSpecs.STANDARD).build();
+            RequestConfig requestConfig = RequestConfig.custom().setConnectionRequestTimeout(CONNECT_TIMEOUT, TimeUnit.MILLISECONDS).setCookieSpec(COOKIE_SPECS_STANDARD).build();
             httpPut.setConfig(requestConfig);
             packageHeader(headers, httpPut);
             packageParam(params, httpPut);
@@ -213,7 +214,7 @@ public class HttpClientUtil {
                 params.forEach(uriBuilder::setParameter);
             }
             HttpDelete httpDelete = new HttpDelete(uriBuilder.build());
-            RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(CONNECT_TIMEOUT).setSocketTimeout(SOCKET_TIMEOUT).setCookieSpec(CookieSpecs.STANDARD).build();
+            RequestConfig requestConfig = RequestConfig.custom().setConnectionRequestTimeout(CONNECT_TIMEOUT, TimeUnit.MILLISECONDS).setCookieSpec(COOKIE_SPECS_STANDARD).build();
             httpDelete.setConfig(requestConfig);
             packageHeader(headers, httpDelete);
             return getHttpClientResult(httpClient, httpDelete);
@@ -247,7 +248,7 @@ public class HttpClientUtil {
             // 创建http对象
             HttpGet httpGet = new HttpGet(uriBuilder.build());
             // 设置请求超时时间及响应超时时间
-            RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(CONNECT_TIMEOUT).setSocketTimeout(SOCKET_TIMEOUT).setCookieSpec(CookieSpecs.STANDARD).setRedirectsEnabled(false).build();
+            RequestConfig requestConfig = RequestConfig.custom().setConnectionRequestTimeout(CONNECT_TIMEOUT, TimeUnit.MILLISECONDS).setCookieSpec(COOKIE_SPECS_STANDARD).setRedirectsEnabled(false).build();
             httpGet.setConfig(requestConfig);
             // 设置请求头
             packageHeader(headers, httpGet);
@@ -257,7 +258,7 @@ public class HttpClientUtil {
             try {
                 // 获取响应体
                 httpResponse = httpClient.execute(httpGet);
-                responseCode = httpResponse.getStatusLine().getStatusCode();
+                responseCode = httpResponse.getCode();
                 if (Objects.equals(responseCode, 302)) {
                     Header locationHeader = httpResponse.getFirstHeader("Location");
                     location = locationHeader.getValue();
@@ -292,7 +293,7 @@ public class HttpClientUtil {
             // 创建http对象
             HttpGet httpGet = new HttpGet(uriBuilder.build());
             // 设置请求超时时间及响应超时时间
-            RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(CONNECT_TIMEOUT).setSocketTimeout(SOCKET_TIMEOUT).setCookieSpec(CookieSpecs.STANDARD).setRedirectsEnabled(false).build();
+            RequestConfig requestConfig = RequestConfig.custom().setConnectionRequestTimeout(CONNECT_TIMEOUT, TimeUnit.MILLISECONDS).setCookieSpec(COOKIE_SPECS_STANDARD).setRedirectsEnabled(false).build();
             httpGet.setConfig(requestConfig);
             // 设置请求头
             packageHeader(headers, httpGet);
@@ -302,7 +303,7 @@ public class HttpClientUtil {
             try {
                 // 获取响应体
                 httpResponse = httpClient.execute(httpGet);
-                responseCode = httpResponse.getStatusLine().getStatusCode();
+                responseCode = httpResponse.getCode();
                 return responseCode;
             } finally {
                 // 释放资源
@@ -332,7 +333,7 @@ public class HttpClientUtil {
             // 创建http对象
             HttpGet httpGet = new HttpGet(uriBuilder.build());
             // 设置请求超时时间及响应超时时间
-            RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(CONNECT_TIMEOUT).setSocketTimeout(SOCKET_TIMEOUT).setCookieSpec(CookieSpecs.STANDARD).build();
+            RequestConfig requestConfig = RequestConfig.custom().setConnectionRequestTimeout(CONNECT_TIMEOUT, TimeUnit.MILLISECONDS).setCookieSpec(COOKIE_SPECS_STANDARD).build();
             httpGet.setConfig(requestConfig);
             // 设置请求头
             packageHeader(headers, httpGet);
@@ -343,7 +344,7 @@ public class HttpClientUtil {
                 // 获取响应体
                 httpResponse = httpClient.execute(httpGet);
                 HttpEntity entity = httpResponse.getEntity();
-                if (Objects.equals(httpResponse.getStatusLine().getStatusCode(), successCode) && !Objects.isNull(entity)) {
+                if (Objects.equals(httpResponse.getCode(), successCode) && !Objects.isNull(entity)) {
                     responseHeader.forEach(response::addHeader);
                     response.addHeader("Content-Length", String.valueOf(entity.getContentLength()));
                     String rangeString = request.getHeader("Range");
@@ -377,7 +378,7 @@ public class HttpClientUtil {
     /**
      * 设置请求头
      */
-    private static void packageHeader(Map<String, String> headers, HttpRequestBase httpMethod) {
+    private static void packageHeader(Map<String, String> headers, HttpUriRequestBase httpMethod) {
         if (!ObjectUtils.isEmpty(headers)) {
             headers.forEach(httpMethod::setHeader);
         }
@@ -386,18 +387,18 @@ public class HttpClientUtil {
     /**
      * 封装请求参数
      */
-    private static void packageParam(Map<String, String> params, HttpEntityEnclosingRequestBase httpMethod) throws UnsupportedEncodingException {
+    private static void packageParam(Map<String, String> params, HttpUriRequestBase httpMethod) {
         if (!ObjectUtils.isEmpty(params)) {
             List<NameValuePair> nameValuePairs = new ArrayList<>();
             params.forEach((key, value) -> nameValuePairs.add(new BasicNameValuePair(key, value)));
-            httpMethod.setEntity(new UrlEncodedFormEntity(nameValuePairs, ENCODING));
+            httpMethod.setEntity(new UrlEncodedFormEntity(nameValuePairs, Charset.defaultCharset()));
         }
     }
 
     /**
      * 封装请求参数为json格式
      */
-    private static void packageJson(String json, HttpEntityEnclosingRequestBase httpMethod) {
+    private static void packageJson(String json, HttpUriRequestBase httpMethod) {
         if (!ObjectUtils.isEmpty(json)) {
             StringEntity stringEntity = new StringEntity(json, ContentType.APPLICATION_JSON);
             httpMethod.setEntity(stringEntity);
@@ -407,7 +408,7 @@ public class HttpClientUtil {
     /**
      * 执行请求获取响应体并释放资源
      */
-    private static String getHttpClientResult(CloseableHttpClient httpClient, HttpRequestBase httpMethod) throws IOException {
+    private static String getHttpClientResult(CloseableHttpClient httpClient, HttpUriRequestBase httpMethod) throws IOException {
         // 执行请求
         CloseableHttpResponse httpResponse = null;
         try {
@@ -418,6 +419,8 @@ public class HttpClientUtil {
                 content = EntityUtils.toString(httpResponse.getEntity(), ENCODING);
             }
             return content;
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
         } finally {
             // 释放资源
             if (!ObjectUtils.isEmpty(httpResponse)) {

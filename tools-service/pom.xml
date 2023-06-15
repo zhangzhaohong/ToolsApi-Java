@@ -90,9 +90,9 @@
         </dependency>
         <!-- apache httpclient组件 -->
         <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>4.5.14</version>
+            <groupId>org.apache.httpcomponents.client5</groupId>
+            <artifactId>httpclient5</artifactId>
+            <version>5.2.1</version>
         </dependency>
         <!-- 阿里fastjson包JSON转换-->
         <dependency>

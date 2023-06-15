@@ -17,7 +17,7 @@ import com.koala.data.models.shortUrl.ShortImageDataModel;
 import com.koala.data.models.xbogus.XbogusDataModel;
 import com.koala.service.data.redis.service.RedisService;
 import com.koala.service.utils.*;
-import org.apache.http.cookie.Cookie;
+import org.apache.hc.client5.http.cookie.Cookie;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.koala.service.utils.Base64Utils;
