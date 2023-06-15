@@ -2,11 +2,12 @@ package com.koala.web.controller;
 
 import com.koala.base.enums.LanZouResponseEnums;
 import com.koala.base.enums.LanZouTypeEnums;
+import com.koala.data.models.file.FileInfoModel;
 import com.koala.factory.builder.ConcreteLanZouApiBuilder;
 import com.koala.factory.builder.LanZouApiBuilder;
 import com.koala.factory.director.LanZouApiManager;
 import com.koala.factory.product.LanZouApiProduct;
-import com.koala.data.models.file.FileInfoModel;
+import com.koala.service.custom.http.annotation.HttpRequestRecorder;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,6 +50,7 @@ public class LanZouToolsController {
      * @throws IOException
      * @throws URISyntaxException
      */
+    @HttpRequestRecorder
     @GetMapping(value = "api", produces = {"application/json;charset=utf-8"})
     public Object getLanZouInfos(@RequestParam(value = "url", required = false) String url, @RequestParam(value = "password", required = false) String password, @RequestParam(value = "type", required = false, defaultValue = "info") String type, HttpServletResponse response) throws IOException, URISyntaxException {
         logger.info("LanZouApi: params: {url={}, password={}, type={}}", url, password, type);
