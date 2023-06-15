@@ -18,3 +18,6 @@ https://github.com/zhangzhaohong/es-server-docker
 
 ## KAFKA DOCKER
 https://github.com/zhangzhaohong/kafka-docker
+
+## 配套安卓客户端框架
+https://github.com/zhangzhaohong/SAndroid
