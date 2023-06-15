@@ -13,7 +13,8 @@ import java.util.Optional;
  */
 @Getter
 public enum Constants {
-    HEARTBREAK("EVENT_HEART_BREAK", 999);
+    HEARTBREAK("EVENT_HEART_BREAK", 999),
+    WEBSOCKET_STATISTICS("WEBSOCKET_STATISTICS", 1000);
 
     private final String event;
     private final int code;

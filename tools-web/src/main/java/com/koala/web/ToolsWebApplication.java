@@ -6,6 +6,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.Environment;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -14,6 +15,7 @@ import java.io.File;
 @Slf4j
 @MapperScan(basePackages = {"com.koala.service.data.database.mapper"})
 @SpringBootApplication(scanBasePackages = {"com.koala"})
+@EnableScheduling
 public class ToolsWebApplication {
 
     public static void main(String[] args) {
