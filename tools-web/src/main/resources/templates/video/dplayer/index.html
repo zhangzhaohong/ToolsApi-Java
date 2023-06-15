@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${title}"></title>
+    <link href="../assets/css/custom-player.css" th:href="@{/assets/css/custom-player.css}" rel="stylesheet">
+    <script src="../assets/js/DPlayer.min.js" th:src="@{/assets/js/DPlayer.min.js}"></script>
+</head>
+<body class="custom-container">
+<div id="video-player" class="dk-video-player-custom" th:data-hd="${multi.getHd()}" th:data-sd="${multi.getSd()}">
+    <meta name="referrer" content="never">
+</div>
+<script>
+    const videoElement = document.getElementById('video-player');
+    const vidHdPath = videoElement.getAttribute("data-hd");
+    const vidSdPath = videoElement.getAttribute("data-sd");
+    const qualityList = [];
+    if (vidHdPath != null) {
+        qualityList.push({
+            name: '高清',
+            url: vidHdPath,
+            type: 'auto',
+        });
+    }
+    if (vidSdPath != null) {
+        qualityList.push({
+            name: '标清',
+            url: vidSdPath,
+            type: 'auto',
+        });
+    }
+    const dp = new DPlayer({
+        container: videoElement,
+        video: {
+            quality: qualityList,
+            defaultQuality: 0,
+        },
+        autoplay: true,
+        hotkey: true,
+        airplay: true
+    });
+</script>
+</body>

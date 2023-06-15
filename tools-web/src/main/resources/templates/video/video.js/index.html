@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${title}"></title>
+    <link href="../assets/css/video-js.css" th:href="@{/assets/css/video-js.css}" rel="stylesheet">
+    <link href="../assets/css/custom-player.css" th:href="@{/assets/css/custom-player.css}" rel="stylesheet">
+    <script src="../assets/js/video.js" th:src="@{/assets/js/video.js}"></script>
+</head>
+<body class="custom-container">
+<video
+        id="video-player"
+        class="video-js custom-style"
+        controls
+        preload="auto"
+        width="640"
+        height="264"
+        data-setup="{}"
+>
+    <source src="" th:src="${path}" type="video/mp4"/>
+    <meta name="referrer" content="never">
+    <p class="vjs-no-js">
+        To view this video please enable JavaScript, and consider upgrading to a
+        web browser that
+        <a href="https://videojs.com/html5-video-support/" target="_blank"
+        >supports HTML5 video</a>
+    </p>
+</video>
+</body>
