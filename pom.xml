@@ -97,6 +97,55 @@
         </dependencies>
     </dependencyManagement>
 
+    <profiles>
+        <profile>
+            <id>dev</id>
+            <properties>
+                <!-- 用于替换 application.yml 中的变量 -->
+                <mvn.profile.active>dev</mvn.profile.active>
+            </properties>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <modules>
+                <module>rocketmq-spring-boot</module>
+                <module>tools-base</module>
+                <module>tools-data</module>
+                <module>tools-service</module>
+                <module>tools-factory</module>
+                <module>tools-web</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>prod</id>
+            <properties>
+                <mvn.profile.active>prod</mvn.profile.active>
+            </properties>
+            <modules>
+                <module>rocketmq-spring-boot</module>
+                <module>tools-base</module>
+                <module>tools-data</module>
+                <module>tools-service</module>
+                <module>tools-factory</module>
+                <module>tools-web</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>docker</id>
+            <properties>
+                <mvn.profile.active>docker</mvn.profile.active>
+            </properties>
+            <modules>
+                <module>rocketmq-spring-boot</module>
+                <module>tools-base</module>
+                <module>tools-data</module>
+                <module>tools-service</module>
+                <module>tools-factory</module>
+                <module>tools-web</module>
+            </modules>
+        </profile>
+    </profiles>
+
     <build>
         <plugins>
             <plugin>
