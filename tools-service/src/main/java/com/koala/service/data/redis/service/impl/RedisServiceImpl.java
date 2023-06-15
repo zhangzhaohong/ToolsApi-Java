@@ -8,8 +8,10 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import jakarta.annotation.Resource;
+
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Service("RedisService")
@@ -27,16 +29,11 @@ public class RedisServiceImpl implements RedisService {
 
     @Override
     public String get(String key, String defaultValue) {
-        try {
-            byte[] result = redisTemplate.execute((RedisConnection redisConnection) -> redisConnection.get(key.getBytes(StandardCharsets.UTF_8)));
-            if (Objects.isNull(result)) {
-                return defaultValue;
-            }
-            return (String) SerializeUtil.unserialize(result);
-        } catch (Exception e) {
-            log.error("getRedisDataError", e);
+        Object result = redisTemplate.opsForValue().get(key);
+        if (!Objects.isNull(result)) {
+            return String.valueOf(result);
         }
-        return null;
+        return defaultValue;
     }
 
     @Override
@@ -46,6 +43,6 @@ public class RedisServiceImpl implements RedisService {
 
     @Override
     public void set(String key, String value, Long expireTime) {
-        redisTemplate.execute((RedisConnection redisConnection) -> redisConnection.set(key.getBytes(StandardCharsets.UTF_8), Objects.requireNonNull(SerializeUtil.serialize(value))));
+        redisTemplate.opsForValue().set(key, value, expireTime, TimeUnit.SECONDS);
     }
 }
