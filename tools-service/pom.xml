@@ -5,10 +5,10 @@
     <parent>
         <groupId>com.koala</groupId>
         <artifactId>tools</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
+        <version>${revision}</version>
     </parent>
     <artifactId>tools-service</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>${revision}</version>
     <name>tools-service</name>
     <description>tools-service</description>
     <properties>

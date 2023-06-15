@@ -11,10 +11,11 @@
     </parent>
     <groupId>com.koala</groupId>
     <artifactId>tools</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>${revision}</version>
     <name>tools</name>
     <description>tools</description>
     <properties>
+        <revision>1.0.0-SNAPSHOT</revision>
         <java.version>17</java.version>
     </properties>
 
@@ -66,32 +67,32 @@
             <dependency>
                 <groupId>com.koala</groupId>
                 <artifactId>tools-web</artifactId>
-                <version>0.0.1-SNAPSHOT</version>
+                <version>${revision}</version>
             </dependency>
             <dependency>
                 <groupId>com.koala</groupId>
                 <artifactId>tools-base</artifactId>
-                <version>0.0.1-SNAPSHOT</version>
+                <version>${revision}</version>
             </dependency>
             <dependency>
                 <groupId>com.koala</groupId>
                 <artifactId>tools-data</artifactId>
-                <version>0.0.1-SNAPSHOT</version>
+                <version>${revision}</version>
             </dependency>
             <dependency>
                 <groupId>com.koala</groupId>
                 <artifactId>tools-factory</artifactId>
-                <version>0.0.1-SNAPSHOT</version>
+                <version>${revision}</version>
             </dependency>
             <dependency>
                 <groupId>com.koala</groupId>
                 <artifactId>tools-service</artifactId>
-                <version>0.0.1-SNAPSHOT</version>
+                <version>${revision}</version>
             </dependency>
             <dependency>
                 <groupId>com.koala</groupId>
                 <artifactId>rocketmq-spring-boot</artifactId>
-                <version>0.0.1-SNAPSHOT</version>
+                <version>${revision}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
