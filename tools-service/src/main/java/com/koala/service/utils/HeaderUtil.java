@@ -137,4 +137,14 @@ public class HeaderUtil {
         header.put("CLIENT-IP", getRandomIpAddress());
         return header;
     }
+
+    public static Map<String, String> getNeteaseHeader(String cookie) {
+        HashMap<String, String> header = new HashMap<>(0);
+        header.put("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Safari/537.36 Chrome/91.0.4472.164 NeteaseMusicDesktop/2.10.2.200154");
+        header.put("Referer", "");
+        header.put("Cookie", cookie);
+        header.put("X-FORWARDED-FOR", getRandomIpAddress());
+        header.put("CLIENT-IP", getRandomIpAddress());
+        return header;
+    }
 }
