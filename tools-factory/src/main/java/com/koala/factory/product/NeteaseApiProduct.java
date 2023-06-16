@@ -22,13 +22,13 @@ import java.util.UUID;
 public class NeteaseApiProduct {
     private static final Logger logger = LoggerFactory.getLogger(NeteaseApiProduct.class);
     private static final String NETEASE_SERVER_URL = "https://interface3.music.163.com/eapi/song/enhance/player/url/v1";
-    private static final Random random = new Random(0);
+    private static final Random RANDOM = new Random(0);
+    private static final String REQUEST_ID = String.valueOf(RANDOM.nextLong(20000000, 30000000));
     private static final String DEVICE_ID = UUID.randomUUID().toString().replace("-", "");
     private static final byte[] AES_KEY = "e82ckenh8dichen8".getBytes(StandardCharsets.UTF_8);
     private String url;
     private String musicId;
     private String servicePath;
-    private String config;
     private String digest;
     private String level = "hires";
     private String params;
@@ -58,10 +58,11 @@ public class NeteaseApiProduct {
             String host = PatternUtil.matchFullData("http(s)?://(([\\w-]+\\.)+\\w+(:\\d{1,5})?)", NETEASE_SERVER_URL);
             if (StringUtils.hasLength(host)) {
                 this.servicePath = NETEASE_SERVER_URL.replaceFirst(host, "").replaceFirst("/eapi/", "/api/");
-                this.config = getConfig();
-                this.digest = MD5Utils.md5("nobody%suse%smd5forencrypt".formatted(this.servicePath, this.config));
-                this.params = AESUtils.toHexString(Optional.ofNullable(AESUtils.aes256Encode("%s-36cd479b6b5-%s-36cd479b6b5-%s".formatted(this.servicePath, getPayload(this.level, this.config), digest), AES_KEY)).orElse(new byte[]{}));
-                logger.info("[NeteaseApiProject]({}) init finished, data: [config: {}, digest: {}, params: {}], url: {}", this.musicId, this.config, this.digest, this.params, this.url);
+                this.digest = MD5Utils.customMd5(getDigestPayload(this.level));
+                logger.info(getDigestPayload(this.level));
+                this.params = AESUtils.toHexString(Optional.ofNullable(AESUtils.aes256Encode("%s-36cd479b6b5-%s-36cd479b6b5-%s".formatted(this.servicePath, getPayload(this.level), this.digest), AES_KEY)).orElse(new byte[]{}));
+                logger.info("[NeteaseApiProject]({}) params: {}", this.musicId, "%s-36cd479b6b5-%s-36cd479b6b5-%s".formatted(this.servicePath, getPayload(this.level), digest));
+                logger.info("[NeteaseApiProject]({}) init finished, data: [digest: {}, params: {}], url: {}", this.musicId, this.digest, this.params, this.url);
             } else {
                 logger.error("[NeteaseApiProject]({}) Get host error, url: {}", this.musicId, this.url);
             }
@@ -75,36 +76,12 @@ public class NeteaseApiProduct {
         logger.info("[NeteaseApiProject]({}) itemInfoResponse: {}", this.musicId, itemInfoResponse);
     }
 
-    private String getConfig() {
-        HashMap<String, String> config = new HashMap<>();
-        config.put("os", "pc");
-        config.put("appver", "");
-        config.put("osver", "");
-        config.put("deviceId", DEVICE_ID);
-        config.put("requestId", String.valueOf(random.nextLong(20000000, 30000000)));
-        return GsonUtil.toString(config);
+    private String getPayload(String level) {
+        return "{\"ids\": [\"" + this.musicId + "\"], \"level\": \"" + level + "\", \"encodeType\": \"flac\", \"header\": \"{\\\"os\\\": \\\"pc\\\", \\\"appver\\\": \\\"\\\", \\\"osver\\\": \\\"\\\", \\\"deviceId\\\": \\\"" + DEVICE_ID + "\\\", \\\"requestId\\\": \\\"" + REQUEST_ID + "\\\"}\"}";
     }
 
-    private String getPayload(String level, String config) {
-        HashMap<String, Object> payload = new HashMap<>();
-        payload.put("ids", new String[]{musicId});
-        payload.put("level", level);
-        payload.put("encodeType", "flac");
-        payload.put("header", config);
-        return GsonUtil.toString(payload);
+    private String getDigestPayload(String level) {
+        return "nobody" + this.servicePath + "use" + getPayload(level) + "md5forencrypt";
     }
 
-    private String getCookie() {
-        HashMap<String, String> requestCookie = new HashMap<>();
-        requestCookie.put("os", "pc");
-        requestCookie.put("appver", "");
-        requestCookie.put("osver", "");
-        requestCookie.put("deviceId", DEVICE_ID);
-        StringBuilder stringBuilder = new StringBuilder();
-        requestCookie.forEach((key, value) -> {
-            stringBuilder.append(key).append("=").append(value).append(";");
-        });
-        stringBuilder.append(CookieUtil.getNeteaseCookie());
-        return stringBuilder.toString().trim();
-    }
 }

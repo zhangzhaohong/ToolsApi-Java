@@ -29,6 +29,16 @@ public class MD5Utils {
         return md5code;
     }
 
+    public static String customMd5(String plainText) {
+        byte[] secretBytes;
+        try {
+            secretBytes = MessageDigest.getInstance("md5").digest(plainText.getBytes());
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("Md5 NoSuchAlgorithmException");
+        }
+        return AESUtils.toHexString(secretBytes);
+    }
+
     /**
      * 可逆的的加密解密方法；两次是解密，一次是加密
      *
