@@ -96,6 +96,16 @@ public class NeteaseToolsController {
                 case INFO -> {
                     return formatRespData(GET_DATA_SUCCESS, publicData);
                 }
+                case PREVIEW_MUSIC -> {
+                    if (!publicData.getItemInfo().getData().isEmpty() && StringUtils.hasLength(publicData.getItemInfo().getData().get(0).getMockPreviewPath())) {
+                        redirectStrategy.sendRedirect(request, response, publicData.getItemInfo().getData().get(0).getMockPreviewPath());
+                    }
+                }
+                case DOWNLOAD -> {
+                    if (!publicData.getItemInfo().getData().isEmpty() && StringUtils.hasLength(publicData.getItemInfo().getData().get(0).getMockDownloadPath())) {
+                        redirectStrategy.sendRedirect(request, response, publicData.getItemInfo().getData().get(0).getMockDownloadPath());
+                    }
+                }
                 default -> {
                     return formatRespData(UNSUPPORTED_TYPE, null);
                 }
