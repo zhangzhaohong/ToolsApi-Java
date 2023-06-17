@@ -12,7 +12,7 @@ import java.util.Optional;
  * @description
  */
 @Getter
-public enum NeteaseTypeEnums {
+public enum NeteaseRequestTypeEnums {
     DOWNLOAD("download", 1),
     INFO("info", 0),
     PREVIEW_MUSIC("preview_music", 2),
@@ -22,18 +22,18 @@ public enum NeteaseTypeEnums {
     private final String type;
     private final int typeId;
 
-    NeteaseTypeEnums(String type, int typeId) {
+    NeteaseRequestTypeEnums(String type, int typeId) {
         this.type = type;
         this.typeId = typeId;
     }
 
     public static int getTypeIdByType(String type) {
-        Optional<NeteaseTypeEnums> optional = Arrays.stream(NeteaseTypeEnums.values()).filter(item -> item.getType().equals(type)).findFirst();
-        return optional.map(NeteaseTypeEnums::getTypeId).orElse(-1);
+        Optional<NeteaseRequestTypeEnums> optional = Arrays.stream(NeteaseRequestTypeEnums.values()).filter(item -> item.getType().equals(type)).findFirst();
+        return optional.map(NeteaseRequestTypeEnums::getTypeId).orElse(-1);
     }
 
-    public static NeteaseTypeEnums getEnumsByType(String type) {
-        Optional<NeteaseTypeEnums> optional = Arrays.stream(NeteaseTypeEnums.values()).filter(item -> item.getType().equals(type)).findFirst();
+    public static NeteaseRequestTypeEnums getEnumsByType(String type) {
+        Optional<NeteaseRequestTypeEnums> optional = Arrays.stream(NeteaseRequestTypeEnums.values()).filter(item -> item.getType().equals(type)).findFirst();
         return optional.orElse(null);
     }
 }
