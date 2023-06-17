@@ -27,7 +27,7 @@ public class NeteaseApiManager {
     }
 
     public NeteaseApiProduct construct(RedisService redisService, String host, String cookie, String url, Integer version) throws Exception {
-        builder.redis(redisService).host(host).cookie(cookie).url(url).getItemLyricData();
+        builder.redis(redisService).host(host).cookie(cookie).url(url).getIdByUrl().getItemLyricData();
         builder.version(version);
         return builder.getProduct();
     }
