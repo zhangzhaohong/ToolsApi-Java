@@ -33,7 +33,6 @@ public class NeteaseApiProduct {
     private String url;
     private String musicId;
     private String servicePath;
-    private String digest;
     private String level = "hires";
     private String params;
     private String detailPayload;
@@ -65,11 +64,11 @@ public class NeteaseApiProduct {
             String host = PatternUtil.matchFullData("http(s)?://(([\\w-]+\\.)+\\w+(:\\d{1,5})?)", NETEASE_SERVER_URL);
             if (StringUtils.hasLength(host)) {
                 this.servicePath = NETEASE_SERVER_URL.replaceFirst(host, "").replaceFirst("/eapi/", "/api/");
-                this.digest = MD5Utils.customMd5(getDigestPayload(this.level));
-                this.params = AESUtils.toHexString(Optional.ofNullable(AESUtils.aes256Encode("%s-36cd479b6b5-%s-36cd479b6b5-%s".formatted(this.servicePath, getPayload(this.level), this.digest), AES_KEY)).orElse(new byte[]{}));
+                String digest = MD5Utils.customMd5(getDigestPayload(this.level));
+                this.params = AESUtils.toHexString(Optional.ofNullable(AESUtils.aes256Encode("%s-36cd479b6b5-%s-36cd479b6b5-%s".formatted(this.servicePath, getPayload(this.level), digest), AES_KEY)).orElse(new byte[]{}));
                 logger.info("[NeteaseApiProject]({}) params: {}", this.musicId, "%s-36cd479b6b5-%s-36cd479b6b5-%s".formatted(this.servicePath, getPayload(this.level), digest));
                 this.detailPayload = getDetailPayload();
-                logger.info("[NeteaseApiProject]({}) init finished, data: [digest: {}, params: {}, detail payload: {}], url: {}", this.musicId, this.digest, this.params, this.detailPayload, this.url);
+                logger.info("[NeteaseApiProject]({}) init finished, data: [digest: {}, params: {}, detail payload: {}], url: {}", this.musicId, digest, this.params, this.detailPayload, this.url);
             } else {
                 logger.error("[NeteaseApiProject]({}) Get host error, url: {}", this.musicId, this.url);
             }
