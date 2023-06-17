@@ -129,7 +129,7 @@ public class DouYinPlayerController {
         logger.info("[musicPlayer] itemTitle: {}, inputUrl: {}, Sec-Fetch-Dest: {}", itemTitle, url, request.getHeader("Sec-Fetch-Dest"));
         model.addAttribute("title", itemTitle);
         model.addAttribute("path", url);
-        return "music/plyr/index";
+        return "music/plyr/mp3/index";
     }
 
     @HttpRequestRecorder
@@ -142,7 +142,7 @@ public class DouYinPlayerController {
                 ShortDouYinItemDataModel tmp = GsonUtil.toBean(redisService.get(TIKTOK_DATA_KEY_PREFIX + itemKey), ShortDouYinItemDataModel.class);
                 model.addAttribute("title", StringUtils.hasLength(tmp.getTitle()) ? tmp.getTitle() : "MusicPlayer");
                 model.addAttribute("path", tmp.getPath());
-                return "music/plyr/index";
+                return "music/plyr/mp3/index";
             }
         } catch (Exception e) {
             e.printStackTrace();
