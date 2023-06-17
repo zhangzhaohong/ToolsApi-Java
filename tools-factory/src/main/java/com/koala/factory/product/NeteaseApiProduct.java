@@ -1,6 +1,7 @@
 package com.koala.factory.product;
 
 import com.koala.data.models.douyin.v1.roomInfoData.RoomInfoDataRespModel;
+import com.koala.data.models.netease.detailInfo.NeteaseMusicItemDetailInfoRespModel;
 import com.koala.data.models.netease.itemInfo.NeteaseMusicItemInfoRespModel;
 import com.koala.factory.extra.CookieUtil;
 import com.koala.service.utils.*;
@@ -37,6 +38,7 @@ public class NeteaseApiProduct {
     private String params;
     private String detailPayload;
     private NeteaseMusicItemInfoRespModel itemInfoData = null;
+    private NeteaseMusicItemDetailInfoRespModel itemDetailInfoData = null;
 
     public void setUrl(String url) {
         this.url = url;
@@ -91,6 +93,11 @@ public class NeteaseApiProduct {
         data.put("c", this.detailPayload);
         String itemDetailInfoResponse = HttpClientUtil.doPost(NETEASE_DETAIL_SERVER_URL, HeaderUtil.getNeteaseDetailHeader(), data);
         logger.info("[NeteaseApiProject]({}) itemDetailInfoResponse: {}", this.musicId, itemDetailInfoResponse);
+        try {
+            this.itemDetailInfoData = GsonUtil.toBean(itemDetailInfoResponse, NeteaseMusicItemDetailInfoRespModel.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private String getPayload(String level) {
