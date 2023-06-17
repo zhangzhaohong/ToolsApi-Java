@@ -1,5 +1,7 @@
 package com.koala.factory.product;
 
+import com.koala.data.models.douyin.v1.roomInfoData.RoomInfoDataRespModel;
+import com.koala.data.models.netease.itemInfo.NeteaseMusicItemInfoRespModel;
 import com.koala.factory.extra.CookieUtil;
 import com.koala.service.utils.*;
 import org.slf4j.Logger;
@@ -22,6 +24,7 @@ import java.util.UUID;
 public class NeteaseApiProduct {
     private static final Logger logger = LoggerFactory.getLogger(NeteaseApiProduct.class);
     private static final String NETEASE_SERVER_URL = "https://interface3.music.163.com/eapi/song/enhance/player/url/v1";
+    private static final String NETEASE_DETAIL_SERVER_URL = "https://music.163.com/api/v3/song/detail";
     private static final Random RANDOM = new Random(0);
     private static final String REQUEST_ID = String.valueOf(RANDOM.nextLong(20000000, 30000000));
     private static final String DEVICE_ID = UUID.randomUUID().toString().replace("-", "");
@@ -32,6 +35,8 @@ public class NeteaseApiProduct {
     private String digest;
     private String level = "hires";
     private String params;
+    private String detailPayload;
+    private NeteaseMusicItemInfoRespModel itemInfoData = null;
 
     public void setUrl(String url) {
         this.url = url;
@@ -59,10 +64,10 @@ public class NeteaseApiProduct {
             if (StringUtils.hasLength(host)) {
                 this.servicePath = NETEASE_SERVER_URL.replaceFirst(host, "").replaceFirst("/eapi/", "/api/");
                 this.digest = MD5Utils.customMd5(getDigestPayload(this.level));
-                logger.info(getDigestPayload(this.level));
                 this.params = AESUtils.toHexString(Optional.ofNullable(AESUtils.aes256Encode("%s-36cd479b6b5-%s-36cd479b6b5-%s".formatted(this.servicePath, getPayload(this.level), this.digest), AES_KEY)).orElse(new byte[]{}));
                 logger.info("[NeteaseApiProject]({}) params: {}", this.musicId, "%s-36cd479b6b5-%s-36cd479b6b5-%s".formatted(this.servicePath, getPayload(this.level), digest));
-                logger.info("[NeteaseApiProject]({}) init finished, data: [digest: {}, params: {}], url: {}", this.musicId, this.digest, this.params, this.url);
+                this.detailPayload = getDetailPayload();
+                logger.info("[NeteaseApiProject]({}) init finished, data: [digest: {}, params: {}, detail payload: {}], url: {}", this.musicId, this.digest, this.params, this.detailPayload, this.url);
             } else {
                 logger.error("[NeteaseApiProject]({}) Get host error, url: {}", this.musicId, this.url);
             }
@@ -72,8 +77,20 @@ public class NeteaseApiProduct {
     public void getItemInfoData() throws IOException {
         HashMap<String, String> data = new HashMap<>();
         data.put("params", this.params);
-        String itemInfoResponse = HttpClientUtil.doPostJson(NETEASE_SERVER_URL, HeaderUtil.getNeteaseHeader(CookieUtil.getNeteaseCookie()), GsonUtil.toString(data));
+        String itemInfoResponse = HttpClientUtil.doPost(NETEASE_SERVER_URL, HeaderUtil.getNeteaseHeader(CookieUtil.getNeteaseCookie()), data);
         logger.info("[NeteaseApiProject]({}) itemInfoResponse: {}", this.musicId, itemInfoResponse);
+        try {
+            this.itemInfoData = GsonUtil.toBean(itemInfoResponse, NeteaseMusicItemInfoRespModel.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void getItemDetailData() throws IOException {
+        HashMap<String, String> data = new HashMap<>();
+        data.put("c", this.detailPayload);
+        String itemDetailInfoResponse = HttpClientUtil.doPost(NETEASE_DETAIL_SERVER_URL, HeaderUtil.getNeteaseDetailHeader(), data);
+        logger.info("[NeteaseApiProject]({}) itemDetailInfoResponse: {}", this.musicId, itemDetailInfoResponse);
     }
 
     private String getPayload(String level) {
@@ -82,6 +99,10 @@ public class NeteaseApiProduct {
 
     private String getDigestPayload(String level) {
         return "nobody" + this.servicePath + "use" + getPayload(level) + "md5forencrypt";
+    }
+
+    private String getDetailPayload() {
+        return "[{\"id\": " + this.musicId + ", \"v\": 0}]";
     }
 
 }

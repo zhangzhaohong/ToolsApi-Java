@@ -22,6 +22,8 @@ public abstract class NeteaseApiBuilder {
 
     public abstract NeteaseApiBuilder getItemInfoData() throws Exception;
 
+    public abstract NeteaseApiBuilder getItemDetailData() throws Exception;
+
     public NeteaseApiProduct getProduct() {
         return product;
     }

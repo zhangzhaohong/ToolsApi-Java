@@ -1,5 +1,7 @@
 package com.koala.service.utils;
 
+import org.springframework.util.StringUtils;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -143,6 +145,16 @@ public class HeaderUtil {
         header.put("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Safari/537.36 Chrome/91.0.4472.164 NeteaseMusicDesktop/2.10.2.200154");
         header.put("Referer", "");
         header.put("Cookie", cookie);
+        header.put("X-FORWARDED-FOR", getRandomIpAddress());
+        header.put("CLIENT-IP", getRandomIpAddress());
+        return header;
+    }
+
+    public static Map<String, String> getNeteaseDetailHeader() {
+        HashMap<String, String> header = new HashMap<>(0);
+        header.put("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Safari/537.36 Chrome/91.0.4472.164 NeteaseMusicDesktop/2.10.2.200154");
+        header.put("Referer", "");
+        header.put("Content-Type", "application/x-www-form-urlencoded;charset=utf-8");
         header.put("X-FORWARDED-FOR", getRandomIpAddress());
         header.put("CLIENT-IP", getRandomIpAddress());
         return header;
