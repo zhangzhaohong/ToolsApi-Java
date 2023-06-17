@@ -58,5 +58,5 @@ public class SongModel implements Serializable {
     private String rurl;
     private Integer mst;
     private Integer cp;
-    private Integer publishTime;
+    private Long publishTime;
 }
