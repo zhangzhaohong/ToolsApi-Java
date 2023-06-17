@@ -44,4 +44,4 @@ signature_web_project/.idea
 
 signature_web_project/node_modules
 
-tools-factory/src/main/java/com/koala/factory/extra/NeteaseCookieUtil.java
+tools-web/src/main/resources/cookie/custom.netease.cookie.txt

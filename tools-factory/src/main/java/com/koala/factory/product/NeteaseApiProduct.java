@@ -3,7 +3,6 @@ package com.koala.factory.product;
 import com.koala.data.models.netease.NeteaseMusicDataRespModel;
 import com.koala.data.models.netease.detailInfo.NeteaseMusicItemDetailInfoRespModel;
 import com.koala.data.models.netease.itemInfo.NeteaseMusicItemInfoRespModel;
-import com.koala.factory.extra.NeteaseCookieUtil;
 import com.koala.service.data.redis.service.RedisService;
 import com.koala.service.utils.*;
 import org.slf4j.Logger;
@@ -35,6 +34,7 @@ public class NeteaseApiProduct {
     private static final String DEVICE_ID = UUID.randomUUID().toString().replace("-", "");
     private static final byte[] AES_KEY = "e82ckenh8dichen8".getBytes(StandardCharsets.UTF_8);
     private String host;
+    private String cookie;
     private Integer version = 1;
     private String url;
     private String musicId;
@@ -52,6 +52,10 @@ public class NeteaseApiProduct {
 
     public void setHost(String host) {
         this.host = host;
+    }
+
+    public void setCookie(String cookie) {
+        this.cookie = cookie;
     }
 
     public void setRedis(RedisService redisService) {
@@ -99,7 +103,7 @@ public class NeteaseApiProduct {
         if (StringUtils.hasLength(this.url)) {
             HashMap<String, String> data = new HashMap<>();
             data.put("params", this.params);
-            String itemInfoResponse = HttpClientUtil.doPost(NETEASE_SERVER_URL, HeaderUtil.getNeteaseHeader(NeteaseCookieUtil.getNeteaseCookie()), data);
+            String itemInfoResponse = HttpClientUtil.doPost(NETEASE_SERVER_URL, HeaderUtil.getNeteaseHeader(cookie), data);
             logger.info("[NeteaseApiProject]({}) itemInfoResponse: {}", this.musicId, itemInfoResponse);
             try {
                 this.itemInfoData = GsonUtil.toBean(itemInfoResponse, NeteaseMusicItemInfoRespModel.class);

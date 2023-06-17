@@ -28,6 +28,12 @@ public class ConcreteNeteaseApiBuilder extends NeteaseApiBuilder {
     }
 
     @Override
+    public NeteaseApiBuilder cookie(String cookie) {
+        product.setCookie(cookie);
+        return this;
+    }
+
+    @Override
     public NeteaseApiBuilder version(Integer version) {
         product.setVersion(version);
         return this;

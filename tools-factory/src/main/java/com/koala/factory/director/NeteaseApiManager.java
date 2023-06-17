@@ -17,8 +17,8 @@ public class NeteaseApiManager {
         this.builder = builder;
     }
 
-    public NeteaseApiProduct construct(RedisService redisService, String host, String url, Integer version) throws Exception {
-        builder.redis(redisService).host(host).url(url).level(null).getIdByUrl().initRequest().getItemInfoData().getItemDetailData();
+    public NeteaseApiProduct construct(RedisService redisService, String host, String cookie, String url, Integer version) throws Exception {
+        builder.redis(redisService).host(host).cookie(cookie).url(url).level(null).getIdByUrl().initRequest().getItemInfoData().getItemDetailData();
         builder.version(version);
         return builder.getProduct();
     }

@@ -19,6 +19,8 @@ public abstract class NeteaseApiBuilder {
 
     public abstract NeteaseApiBuilder host(String host);
 
+    public abstract NeteaseApiBuilder cookie(String cookie);
+
     public abstract NeteaseApiBuilder version(Integer version);
 
     public abstract NeteaseApiBuilder redis(RedisService redisService);

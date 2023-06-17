@@ -6,6 +6,7 @@ import com.koala.data.models.netease.NeteaseMusicDataRespModel;
 import com.koala.factory.builder.ConcreteNeteaseApiBuilder;
 import com.koala.factory.builder.NeteaseApiBuilder;
 import com.koala.factory.director.NeteaseApiManager;
+import com.koala.factory.extra.NeteaseCookieUtil;
 import com.koala.factory.product.NeteaseApiProduct;
 import com.koala.service.custom.http.annotation.HttpRequestRecorder;
 import com.koala.service.data.redis.service.RedisService;
@@ -49,6 +50,9 @@ public class NeteaseToolsController {
     @Resource(name = "RedisService")
     private RedisService redisService;
 
+    @Resource
+    private NeteaseCookieUtil neteaseCookieUtil;
+
     @HttpRequestRecorder
     @GetMapping(value = "api", produces = {"application/json;charset=utf-8"})
     public Object getNeteaseMusic(@RequestParam(required = false) String link, @RequestParam(required = false, name = "type", defaultValue = "info") String type, @RequestParam(required = false, name = "version", defaultValue = "1") String version, HttpServletRequest request, HttpServletResponse response) {
@@ -66,7 +70,7 @@ public class NeteaseToolsController {
         NeteaseApiManager manager = new NeteaseApiManager(builder);
         NeteaseApiProduct product = null;
         try {
-            product = manager.construct(redisService, host, url, Integer.valueOf(version));
+            product = manager.construct(redisService, host, neteaseCookieUtil.getNeteaseCookie(), url, Integer.valueOf(version));
         } catch (Exception e) {
             e.printStackTrace();
             return formatRespData(FAILURE, null);
