@@ -151,4 +151,9 @@ public class CoreWebConfig implements WebMvcConfigurer {
         String path = property == null ? "" : property;
         return "http://" + ip + (StringUtils.hasLength(port) ? ":" + port : "") + path + "/";
     }
+
+    @Bean
+    public Environment getEnv() {
+        return applicationContext.getEnvironment();
+    }
 }
