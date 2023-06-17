@@ -65,7 +65,7 @@ public class NeteaseToolsController {
 
     @HttpRequestRecorder
     @GetMapping(value = "api", produces = {"application/json;charset=utf-8"})
-    public Object getNeteaseMusic(@RequestParam(required = false) String link, @RequestParam(required = false, name = "type", defaultValue = "info") String type, @RequestParam(value = "quality", required = false, defaultValue = "") String quality, @RequestParam(required = false, name = "version", defaultValue = "1") String version, HttpServletRequest request, HttpServletResponse response) {
+    public Object getNeteaseMusic(@RequestParam(required = false) String link, @RequestParam(required = false, name = "type", defaultValue = "info") String type, @RequestParam(value = "quality", required = false, defaultValue = "") String quality, @RequestParam(required = false, defaultValue = "false") String lyric, @RequestParam(required = false, name = "version", defaultValue = "1") String version, HttpServletRequest request, HttpServletResponse response) {
         if (!StringUtils.hasLength(link)) {
             return formatRespData(INVALID_LINK, null);
         }
@@ -82,9 +82,9 @@ public class NeteaseToolsController {
         try {
             NeteaseRequestQualityEnums qualityEnums = NeteaseRequestQualityEnums.getEnumsByType(quality);
             if (!Objects.isNull(qualityEnums)) {
-                product = manager.construct(redisService, host, neteaseCookieUtil.getNeteaseCookie(), url, qualityEnums.getType(), Integer.valueOf(version));
+                product = manager.construct(redisService, host, neteaseCookieUtil.getNeteaseCookie(), url, qualityEnums.getType(), "true".equals(lyric), Integer.valueOf(version));
             } else {
-                product = manager.construct(redisService, host, neteaseCookieUtil.getNeteaseCookie(), url, null, Integer.valueOf(version));
+                product = manager.construct(redisService, host, neteaseCookieUtil.getNeteaseCookie(), url, null, "true".equals(lyric), Integer.valueOf(version));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -112,6 +112,35 @@ public class NeteaseToolsController {
             }
         } catch (Exception e) {
             e.printStackTrace();
+        }
+        return formatRespData(GET_INFO_ERROR, null);
+    }
+
+    @HttpRequestRecorder
+    @GetMapping(value = "api/lyric", produces = {"application/json;charset=utf-8"})
+    public Object getNeteaseMusic(@RequestParam(required = false) String link, @RequestParam(required = false, name = "version", defaultValue = "1") String version, HttpServletRequest request, HttpServletResponse response) {
+        if (!StringUtils.hasLength(link)) {
+            return formatRespData(INVALID_LINK, null);
+        }
+        String url;
+        Optional<String> optional = Arrays.stream(link.split(" ")).filter(item -> item.contains("music.163.com/")).findFirst();
+        if (optional.isPresent()) {
+            url = optional.get().trim();
+        } else {
+            return formatRespData(INVALID_LINK, null);
+        }
+        NeteaseApiBuilder builder = new ConcreteNeteaseApiBuilder();
+        NeteaseApiManager manager = new NeteaseApiManager(builder);
+        NeteaseApiProduct product = null;
+        try {
+            product = manager.construct(redisService, host, neteaseCookieUtil.getNeteaseCookie(), url, Integer.valueOf(version));
+            NeteaseMusicDataRespModel publicData = product.generateItemInfoRespData();
+            if (!Objects.isNull(publicData)) {
+                return formatRespData(GET_DATA_SUCCESS, publicData);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return formatRespData(FAILURE, null);
         }
         return formatRespData(GET_INFO_ERROR, null);
     }

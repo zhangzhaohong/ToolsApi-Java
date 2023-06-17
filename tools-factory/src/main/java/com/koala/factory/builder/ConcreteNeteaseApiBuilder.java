@@ -68,4 +68,10 @@ public class ConcreteNeteaseApiBuilder extends NeteaseApiBuilder {
         product.getItemDetailData();
         return this;
     }
+
+    @Override
+    public NeteaseApiBuilder getItemLyricData() throws Exception {
+        product.getItemLyricData();
+        return this;
+    }
 }

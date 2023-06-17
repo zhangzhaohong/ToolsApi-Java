@@ -4,6 +4,7 @@ import com.koala.base.enums.NeteaseRequestQualityEnums;
 import com.koala.data.models.netease.NeteaseMusicDataRespModel;
 import com.koala.data.models.netease.detailInfo.NeteaseMusicItemDetailInfoRespModel;
 import com.koala.data.models.netease.itemInfo.NeteaseMusicItemInfoRespModel;
+import com.koala.data.models.netease.lyricInfo.NeteaseMusicLyricInfoRespModel;
 import com.koala.data.models.shortUrl.ShortNeteaseItemDataModel;
 import com.koala.service.data.redis.service.RedisService;
 import com.koala.service.utils.*;
@@ -12,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -28,8 +30,10 @@ public class NeteaseApiProduct {
     private static final Logger logger = LoggerFactory.getLogger(NeteaseApiProduct.class);
     private final static Long EXPIRE_TIME = 12 * 60 * 60L;
     private final static Long DETAIL_EXPIRE_TIME = 3 * 24 * 60 * 60L;
+    private final static Long LYRIC_EXPIRE_TIME = 3 * 24 * 60 * 60L;
     private static final String NETEASE_SERVER_URL = "https://interface3.music.163.com/eapi/song/enhance/player/url/v1";
     private static final String NETEASE_DETAIL_SERVER_URL = "https://music.163.com/api/v3/song/detail";
+    private static final String NETEASE_LYRIC_SERVER_URL = "https://music.163.com/api/song/lyric";
     private static final String UNKNOWN_ARTIST = "未知艺术家";
     private static final Random RANDOM = new Random(0);
     private static final String REQUEST_ID = String.valueOf(RANDOM.nextLong(20000000, 30000000));
@@ -46,6 +50,7 @@ public class NeteaseApiProduct {
     private String detailPayload;
     private NeteaseMusicItemInfoRespModel itemInfoData = null;
     private NeteaseMusicItemDetailInfoRespModel itemDetailInfoData = null;
+    private NeteaseMusicLyricInfoRespModel itemLyricInfoData = null;
     private RedisService redisService;
 
     public void setUrl(String url) {
@@ -122,7 +127,9 @@ public class NeteaseApiProduct {
             if (StringUtils.hasLength(tmp)) {
                 this.itemDetailInfoData = GsonUtil.toBean(tmp, NeteaseMusicItemDetailInfoRespModel.class);
                 logger.info("[NeteaseApiProject]({}) get detail info from redis, info: {}", this.musicId, tmp);
-                return;
+                if (!this.itemDetailInfoData.getSongs().isEmpty()) {
+                    return;
+                }
             }
             HashMap<String, String> data = new HashMap<>();
             data.put("c", this.detailPayload);
@@ -139,14 +146,44 @@ public class NeteaseApiProduct {
         }
     }
 
+    public void getItemLyricData() throws IOException, URISyntaxException {
+        if (StringUtils.hasLength(this.url)) {
+            String key = NETEASE_LYRIC_DATA_KEY_PREFIX + ShortKeyGenerator.getKey(this.url);
+            String tmp = redisService.get(key);
+            if (StringUtils.hasLength(tmp)) {
+                this.itemLyricInfoData = GsonUtil.toBean(tmp, NeteaseMusicLyricInfoRespModel.class);
+                logger.info("[NeteaseApiProject]({}) get lyric info from redis, info: {}", this.musicId, tmp);
+                if (!Objects.isNull(this.itemLyricInfoData)) {
+                    return;
+                }
+            }
+            HashMap<String, String> data = new HashMap<>();
+            data.put("os", "pc");
+            data.put("id", this.musicId);
+            data.put("lv", "-1");
+            data.put("kv", "-1");
+            data.put("tv", "-1");
+            String itemLyricInfoResponse = HttpClientUtil.doGet(NETEASE_LYRIC_SERVER_URL, HeaderUtil.getNeteaseDetailHeader(), data);
+            logger.info("[NeteaseApiProject]({}) itemLyricInfoResponse: {}", this.musicId, itemLyricInfoResponse);
+            try {
+                this.itemLyricInfoData = GsonUtil.toBean(itemLyricInfoResponse, NeteaseMusicLyricInfoRespModel.class);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            if (StringUtils.hasLength(itemLyricInfoResponse)) {
+                redisService.set(key, itemLyricInfoResponse, LYRIC_EXPIRE_TIME);
+            }
+        }
+    }
+
     public NeteaseMusicDataRespModel generateItemInfoRespData() {
-        NeteaseMusicDataRespModel respData = new NeteaseMusicDataRespModel(this.itemInfoData, this.itemDetailInfoData);
+        NeteaseMusicDataRespModel respData = new NeteaseMusicDataRespModel(this.itemInfoData, this.itemDetailInfoData, this.itemLyricInfoData);
         try {
-            if (!respData.getItemInfo().getData().isEmpty()) {
+            if (!Objects.isNull(this.itemInfoData) && !Objects.isNull(this.itemDetailInfoData) && !respData.getItemInfo().getData().isEmpty()) {
                 String artist = UNKNOWN_ARTIST;
                 if (version == 1) {
                     String key = ShortKeyGenerator.getKey(null);
-                    String title = this.itemDetailInfoData.getSongs().get(0).getName();
+                    String title = respData.getDetailInfo().getSongs().get(0).getName();
                     String origin = respData.getItemInfo().getData().get(0).getUrl().split("\\?")[0];
                     String link = ShortKeyGenerator.generateShortUrl(origin, EXPIRE_TIME, host, redisService).getUrl();
                     String type = respData.getItemInfo().getData().get(0).getType();

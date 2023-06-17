@@ -3,6 +3,7 @@ package com.koala.data.models.netease;
 import com.google.gson.annotations.SerializedName;
 import com.koala.data.models.netease.detailInfo.NeteaseMusicItemDetailInfoRespModel;
 import com.koala.data.models.netease.itemInfo.NeteaseMusicItemInfoRespModel;
+import com.koala.data.models.netease.lyricInfo.NeteaseMusicLyricInfoRespModel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -21,4 +22,6 @@ public class NeteaseMusicDataRespModel implements Serializable {
     private NeteaseMusicItemInfoRespModel itemInfo;
     @SerializedName("detail_info")
     private NeteaseMusicItemDetailInfoRespModel detailInfo;
+    @SerializedName("lyric_info")
+    private NeteaseMusicLyricInfoRespModel lyricInfo;
 }
