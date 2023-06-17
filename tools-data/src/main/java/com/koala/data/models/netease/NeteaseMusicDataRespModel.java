@@ -16,7 +16,7 @@ import java.io.Serializable;
  */
 @Data
 @AllArgsConstructor
-public class NeteaseFullDataModel implements Serializable {
+public class NeteaseMusicDataRespModel implements Serializable {
     @SerializedName("item_info")
     private NeteaseMusicItemInfoRespModel itemInfo;
     @SerializedName("detail_info")

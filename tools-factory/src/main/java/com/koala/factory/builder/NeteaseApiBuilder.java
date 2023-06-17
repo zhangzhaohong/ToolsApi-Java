@@ -1,6 +1,7 @@
 package com.koala.factory.builder;
 
 import com.koala.factory.product.NeteaseApiProduct;
+import com.koala.service.data.redis.service.RedisService;
 
 /**
  * @author koala
@@ -15,6 +16,12 @@ public abstract class NeteaseApiBuilder {
     public abstract NeteaseApiBuilder url(String url);
 
     public abstract NeteaseApiBuilder level(String level);
+
+    public abstract NeteaseApiBuilder host(String host);
+
+    public abstract NeteaseApiBuilder version(Integer version);
+
+    public abstract NeteaseApiBuilder redis(RedisService redisService);
 
     public abstract NeteaseApiBuilder getIdByUrl();
 
