@@ -3,7 +3,7 @@ package com.koala.factory.product;
 import com.koala.data.models.netease.NeteaseMusicDataRespModel;
 import com.koala.data.models.netease.detailInfo.NeteaseMusicItemDetailInfoRespModel;
 import com.koala.data.models.netease.itemInfo.NeteaseMusicItemInfoRespModel;
-import com.koala.factory.extra.CookieUtil;
+import com.koala.factory.extra.NeteaseCookieUtil;
 import com.koala.service.data.redis.service.RedisService;
 import com.koala.service.utils.*;
 import org.slf4j.Logger;
@@ -18,7 +18,6 @@ import java.util.Random;
 import java.util.UUID;
 
 import static com.koala.service.data.redis.RedisKeyPrefix.NETEASE_DETAIL_DATA_KEY_PREFIX;
-import static com.koala.service.data.redis.RedisKeyPrefix.TIKTOK_DIRECT_KEY_PREFIX;
 
 /**
  * @author koala
@@ -100,7 +99,7 @@ public class NeteaseApiProduct {
         if (StringUtils.hasLength(this.url)) {
             HashMap<String, String> data = new HashMap<>();
             data.put("params", this.params);
-            String itemInfoResponse = HttpClientUtil.doPost(NETEASE_SERVER_URL, HeaderUtil.getNeteaseHeader(CookieUtil.getNeteaseCookie()), data);
+            String itemInfoResponse = HttpClientUtil.doPost(NETEASE_SERVER_URL, HeaderUtil.getNeteaseHeader(NeteaseCookieUtil.getNeteaseCookie()), data);
             logger.info("[NeteaseApiProject]({}) itemInfoResponse: {}", this.musicId, itemInfoResponse);
             try {
                 this.itemInfoData = GsonUtil.toBean(itemInfoResponse, NeteaseMusicItemInfoRespModel.class);
