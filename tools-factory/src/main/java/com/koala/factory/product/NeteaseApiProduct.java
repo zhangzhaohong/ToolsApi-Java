@@ -18,6 +18,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static com.koala.factory.path.NeteaseWebPathCollector.*;
 import static com.koala.service.data.redis.RedisKeyPrefix.*;
 
 /**
@@ -31,9 +32,6 @@ public class NeteaseApiProduct {
     private final static Long EXPIRE_TIME = 12 * 60 * 60L;
     private final static Long DETAIL_EXPIRE_TIME = 3 * 24 * 60 * 60L;
     private final static Long LYRIC_EXPIRE_TIME = 3 * 24 * 60 * 60L;
-    private static final String NETEASE_SERVER_URL = "https://interface3.music.163.com/eapi/song/enhance/player/url/v1";
-    private static final String NETEASE_DETAIL_SERVER_URL = "https://music.163.com/api/v3/song/detail";
-    private static final String NETEASE_LYRIC_SERVER_URL = "https://music.163.com/api/song/lyric";
     private static final String UNKNOWN_ARTIST = "未知艺术家";
     private static final Random RANDOM = new Random(0);
     private static final String REQUEST_ID = String.valueOf(RANDOM.nextLong(20000000, 30000000));

@@ -1,7 +1,7 @@
 package com.koala.web.controller;
 
-import com.koala.base.enums.DouYinRequestTypeEnums;
 import com.koala.base.enums.NeteaseRequestQualityEnums;
+import com.koala.base.enums.NeteaseRequestSearchTypeEnums;
 import com.koala.base.enums.NeteaseRequestTypeEnums;
 import com.koala.data.models.netease.NeteaseMusicDataRespModel;
 import com.koala.data.models.shortUrl.ShortNeteaseItemDataModel;
@@ -9,6 +9,7 @@ import com.koala.factory.builder.ConcreteNeteaseApiBuilder;
 import com.koala.factory.builder.NeteaseApiBuilder;
 import com.koala.factory.director.NeteaseApiManager;
 import com.koala.factory.extra.NeteaseCookieUtil;
+import com.koala.factory.path.NeteaseWebPathCollector;
 import com.koala.factory.product.NeteaseApiProduct;
 import com.koala.service.custom.http.annotation.HttpRequestRecorder;
 import com.koala.service.data.redis.service.RedisService;
@@ -31,10 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import static com.koala.base.enums.NeteaseResponseEnums.*;
 import static com.koala.service.data.redis.RedisKeyPrefix.NETEASE_DATA_KEY_PREFIX;
@@ -161,6 +159,37 @@ public class NeteaseToolsController {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @HttpRequestRecorder
+    @GetMapping("api/search")
+    public String search(@RequestParam(required = false) String text, @RequestParam(required = false, defaultValue = "1") String type, @RequestParam(required = false, defaultValue = "1") Long page, @RequestParam(required = false, defaultValue = "20") Integer limit) {
+        if (Objects.isNull(NeteaseRequestSearchTypeEnums.getEnumsByType(type))) {
+            return formatRespData(UNSUPPORTED_TYPE, null);
+        }
+        if (!StringUtils.hasLength(text) || page < 1 || limit < 0) {
+            return formatRespData(UNSUPPORTED_PARAMS, null);
+        }
+        Map<String, String> params = new HashMap<>();
+        params.put("s", text);
+        params.put("type", type);
+        params.put("offset", String.valueOf((page - 1) * limit));
+        params.put("total", "true");
+        params.put("limit", String.valueOf(limit));
+        String response = null;
+        try {
+            response = HttpClientUtil.doGet(NeteaseWebPathCollector.NETEASE_SEARCH_WEB_SERVER_URL, HeaderUtil.getNeteaseSearchHeader(), params);
+        } catch (Exception e) {
+            return formatRespData(FAILURE, null);
+        }
+        if (StringUtils.hasLength(response)) {
+            HashMap<String, Object> result = new HashMap<>();
+            result.put("page", page);
+            result.put("limit", limit);
+            result.put("response", response);
+            return formatRespData(GET_DATA_SUCCESS, result);
+        }
+        return formatRespData(GET_INFO_ERROR, null);
     }
 
 }
