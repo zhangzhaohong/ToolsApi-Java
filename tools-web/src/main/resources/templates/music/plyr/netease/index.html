@@ -226,7 +226,7 @@
         autoplay
         style="border-radius: unset !important;"
 >
-    <source src="" th:src="${path}" type="audio/flac"/>
+    <source src="" th:src="${path}" th:type="${type}"/>
     <meta name="referrer" content="never">
     <p class="vjs-no-js">
         To view this video please enable JavaScript, and consider upgrading to a

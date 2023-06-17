@@ -1,8 +1,10 @@
 package com.koala.factory.product;
 
+import com.koala.base.enums.NeteaseRequestQualityEnums;
 import com.koala.data.models.netease.NeteaseMusicDataRespModel;
 import com.koala.data.models.netease.detailInfo.NeteaseMusicItemDetailInfoRespModel;
 import com.koala.data.models.netease.itemInfo.NeteaseMusicItemInfoRespModel;
+import com.koala.data.models.shortUrl.ShortNeteaseItemDataModel;
 import com.koala.service.data.redis.service.RedisService;
 import com.koala.service.utils.*;
 import org.slf4j.Logger;
@@ -11,12 +13,10 @@ import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Optional;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
-import static com.koala.service.data.redis.RedisKeyPrefix.NETEASE_DETAIL_DATA_KEY_PREFIX;
+import static com.koala.service.data.redis.RedisKeyPrefix.*;
 
 /**
  * @author koala
@@ -26,9 +26,11 @@ import static com.koala.service.data.redis.RedisKeyPrefix.NETEASE_DETAIL_DATA_KE
  */
 public class NeteaseApiProduct {
     private static final Logger logger = LoggerFactory.getLogger(NeteaseApiProduct.class);
+    private final static Long EXPIRE_TIME = 12 * 60 * 60L;
     private final static Long DETAIL_EXPIRE_TIME = 3 * 24 * 60 * 60L;
     private static final String NETEASE_SERVER_URL = "https://interface3.music.163.com/eapi/song/enhance/player/url/v1";
     private static final String NETEASE_DETAIL_SERVER_URL = "https://music.163.com/api/v3/song/detail";
+    private static final String UNKNOWN_ARTIST = "未知艺术家";
     private static final Random RANDOM = new Random(0);
     private static final String REQUEST_ID = String.valueOf(RANDOM.nextLong(20000000, 30000000));
     private static final String DEVICE_ID = UUID.randomUUID().toString().replace("-", "");
@@ -39,7 +41,7 @@ public class NeteaseApiProduct {
     private String url;
     private String musicId;
     private String servicePath;
-    private String level = "hires";
+    private String level = NeteaseRequestQualityEnums.DEFAULT.getType();
     private String params;
     private String detailPayload;
     private NeteaseMusicItemInfoRespModel itemInfoData = null;
@@ -138,7 +140,39 @@ public class NeteaseApiProduct {
     }
 
     public NeteaseMusicDataRespModel generateItemInfoRespData() {
-        return new NeteaseMusicDataRespModel(this.itemInfoData, this.itemDetailInfoData);
+        NeteaseMusicDataRespModel respData = new NeteaseMusicDataRespModel(this.itemInfoData, this.itemDetailInfoData);
+        try {
+            if (!respData.getItemInfo().getData().isEmpty()) {
+                String artist = UNKNOWN_ARTIST;
+                if (version == 1) {
+                    String key = ShortKeyGenerator.getKey(null);
+                    String title = this.itemDetailInfoData.getSongs().get(0).getName();
+                    String origin = respData.getItemInfo().getData().get(0).getUrl().split("\\?")[0];
+                    String link = ShortKeyGenerator.generateShortUrl(origin, EXPIRE_TIME, host, redisService).getUrl();
+                    String type = respData.getItemInfo().getData().get(0).getType();
+                    StringBuilder artistBuilder = new StringBuilder();
+                    if (!respData.getDetailInfo().getSongs().isEmpty() && !respData.getDetailInfo().getSongs().get(0).getAr().isEmpty()) {
+                        AtomicInteger index = new AtomicInteger();
+                        respData.getDetailInfo().getSongs().get(0).getAr().forEach(item -> {
+                            index.getAndIncrement();
+                            artistBuilder.append(item.getName());
+                            if (index.get() < respData.getDetailInfo().getSongs().get(0).getAr().size()) {
+                                artistBuilder.append(",");
+                            }
+                        });
+                        if (StringUtils.hasLength(artistBuilder.toString())) {
+                            artist = artistBuilder.toString();
+                        }
+                    }
+                    redisService.set(NETEASE_DATA_KEY_PREFIX + key, GsonUtil.toString(new ShortNeteaseItemDataModel(title, link, origin, type, artist)), EXPIRE_TIME);
+                    respData.getItemInfo().getData().get(0).setMockPreviewPath(host + "tools/Netease/pro/player/music/short?key=" + Base64Utils.encodeToUrlSafeString(key.getBytes(StandardCharsets.UTF_8)));
+                    respData.getItemInfo().getData().get(0).setMockDownloadPath(host + "tools/Netease/download/music/short?key=" + Base64Utils.encodeToUrlSafeString(key.getBytes(StandardCharsets.UTF_8)));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return respData;
     }
 
     private String getPayload(String level) {

@@ -1,5 +1,6 @@
 package com.koala.data.models.netease.itemInfo;
 
+import com.google.gson.annotations.SerializedName;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -37,4 +38,8 @@ public class DataModel implements Serializable {
     private String podcastCtrp;
     private String effectTypes;
     private Long time;
+    @SerializedName("mock_preview_path")
+    private String mockPreviewPath = null;
+    @SerializedName("mock_download_path")
+    private String mockDownloadPath = null;
 }

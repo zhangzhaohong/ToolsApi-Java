@@ -43,14 +43,12 @@ public class NeteasePlayerController {
             logger.info("[musicPlayer] itemKey: {}, Sec-Fetch-Dest: {}", itemKey, request.getHeader("Sec-Fetch-Dest"));
             if (StringUtils.hasLength(itemKey)) {
                 ShortNeteaseItemDataModel tmp = GsonUtil.toBean(redisService.get(NETEASE_DATA_KEY_PREFIX + itemKey), ShortNeteaseItemDataModel.class);
-                model.addAttribute("title", StringUtils.hasLength(tmp.getTitle()) ? tmp.getTitle() : "MusicPlayer");
+                String artist = StringUtils.hasLength(tmp.getArtist()) ? " - " + tmp.getArtist() : "";
+                model.addAttribute("title", StringUtils.hasLength(tmp.getTitle()) ? tmp.getTitle() + artist : "MusicPlayer");
                 model.addAttribute("path", tmp.getPath());
+                model.addAttribute("type", "audio/" + tmp.getType());
                 if ("1".equals(version)) {
-                    if (tmp.getPath().contains(".flac")) {
-                        return "music/plyr/flac/index";
-                    } else if (tmp.getPath().contains(".mp3")) {
-                        return "music/plyr/mp3/index";
-                    }
+                    return "music/plyr/netease/index";
                 }
             }
         } catch (Exception e) {

@@ -18,4 +18,7 @@ import java.io.Serializable;
 public class ShortNeteaseItemDataModel implements Serializable {
     private String title;
     private String path;
+    private String origin;
+    private String type;
+    private String artist;
 }
