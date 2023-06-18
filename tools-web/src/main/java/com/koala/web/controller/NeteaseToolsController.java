@@ -1,11 +1,13 @@
 package com.koala.web.controller;
 
+import com.koala.base.enums.NeteaseRankIdEnums;
 import com.koala.base.enums.NeteaseRequestQualityEnums;
 import com.koala.base.enums.NeteaseRequestSearchTypeEnums;
 import com.koala.base.enums.NeteaseRequestTypeEnums;
 import com.koala.data.models.netease.MultiMvQualityInfoModel;
 import com.koala.data.models.netease.NeteaseMusicDataRespModel;
 import com.koala.data.models.netease.mvInfo.NeteaseMusicMvInfoRespModel;
+import com.koala.data.models.netease.playListInfo.NeteaseMusicPlayListInfoRespModel;
 import com.koala.data.models.shortUrl.ShortNeteaseItemDataModel;
 import com.koala.data.models.shortUrl.ShortNeteaseMvItemDataModel;
 import com.koala.factory.builder.ConcreteNeteaseApiBuilder;
@@ -287,6 +289,48 @@ public class NeteaseToolsController {
         }
         return formatRespData(GET_INFO_ERROR, null);
     }
+
+    @HttpRequestRecorder
+    @GetMapping(value = "api/playlist", produces = "application/json;charset=UTF-8")
+    public String playList(@RequestParam(required = false) String id, @RequestParam(required = false) String configId) {
+        String rankId = null;
+        if (StringUtils.hasLength(configId)) {
+            NeteaseRankIdEnums enums = NeteaseRankIdEnums.getEnumsById(configId);
+            if (!Objects.isNull(enums)) {
+                rankId = enums.getRankId();
+            }
+        } else if (StringUtils.hasLength(id)) {
+            rankId = id;
+        } else {
+            return formatRespData(UNSUPPORTED_PARAMS, null);
+        }
+        Map<String, String> params = new HashMap<>();
+        params.put("id", rankId);
+        String response = null;
+        int retry = 0;
+        try {
+            while (retry < 10) {
+                response = HttpClientUtil.doPost(NeteaseWebPathCollector.NETEASE_PLAY_LIST_SERVER_URL, HeaderUtil.getNeteasePublicWithOutCookieHeader(), params);
+                retry++;
+                if (StringUtils.hasLength(response)) {
+                    NeteaseMusicPlayListInfoRespModel<?> data = GsonUtil.toBean(response, NeteaseMusicPlayListInfoRespModel.class);
+                    if (data.getCode() == 200) {
+                        return formatRespData(GET_DATA_SUCCESS, data);
+                    } else if (data.getCode() != -447) {
+                        return formatRespData(GET_INFO_ERROR, GsonUtil.toBean(response, Object.class));
+                    }
+                }
+            }
+            if (StringUtils.hasLength(response)) {
+                return formatRespData(GET_INFO_ERROR, GsonUtil.toBean(response, Object.class));
+            }
+        } catch (Exception e) {
+            return formatRespData(FAILURE, null);
+        }
+
+        return formatRespData(GET_INFO_ERROR, null);
+    }
+
 
     private String getMvUrl(String url) {
         if (StringUtils.hasLength(url)) {
