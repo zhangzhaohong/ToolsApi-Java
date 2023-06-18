@@ -2,6 +2,7 @@ package com.koala.service.utils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.ToNumberPolicy;
 import com.google.gson.TypeAdapter;
 import com.google.gson.internal.LinkedTreeMap;
 import com.google.gson.reflect.TypeToken;
@@ -29,7 +30,7 @@ public class GsonUtil {
     //判断gson对象是否存在了,不存在则创建对象
     static {
         //当使用GsonBuilder方式时属性为空的时候输出来的json字符串是有键值key的,显示形式是"key":null，而直接new出来的就没有"key":null的
-        GSON = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+        GSON = new GsonBuilder().setNumberToNumberStrategy(ToNumberPolicy.LONG_OR_DOUBLE).setObjectToNumberStrategy(ToNumberPolicy.LONG_OR_DOUBLE).setDateFormat("yyyy-MM-dd HH:mm:ss").create();
     }
 
     private GsonUtil() {

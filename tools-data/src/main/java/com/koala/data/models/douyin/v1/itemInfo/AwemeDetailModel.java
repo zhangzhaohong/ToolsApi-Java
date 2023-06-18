@@ -91,7 +91,7 @@ public class AwemeDetailModel<Object extends Serializable> implements Serializab
     @SerializedName("impression_data")
     private ImpressionDataModel impressionDataModel;
     @SerializedName("interaction_stickers")
-    private String interactionStickers;
+    private Object interactionStickers;
     @SerializedName("is_ads")
     private Boolean isAds;
     @SerializedName("is_collects_selected")
