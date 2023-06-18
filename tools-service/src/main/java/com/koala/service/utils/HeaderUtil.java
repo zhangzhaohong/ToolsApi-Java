@@ -95,6 +95,18 @@ public class HeaderUtil {
         return header;
     }
 
+    public static Map<String, String> getMockDownloadVideoHeader(String fileName, String fileType) {
+        HashMap<String, String> header = new HashMap<>(0);
+        header.put("Cache-Control", "no-cache");
+        header.put("Pragma", "no-cache");
+        header.put("Content-Type", "application/octet-stream");
+        header.put("Content-Disposition", "attachment; " + "filename=\"" + fileName + "." + fileType + "\"");
+        header.put("User-Agent", "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1");
+        header.put("X-FORWARDED-FOR", getRandomIpAddress());
+        header.put("CLIENT-IP", getRandomIpAddress());
+        return header;
+    }
+
     public static Map<String, String> getMockLiveStreamHeader() {
         HashMap<String, String> header = new HashMap<>(0);
         header.put("Accept-Ranges", "bytes");
@@ -179,4 +191,5 @@ public class HeaderUtil {
         header.put("CLIENT-IP", getRandomIpAddress());
         return header;
     }
+
 }

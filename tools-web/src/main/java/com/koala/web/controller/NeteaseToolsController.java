@@ -159,7 +159,50 @@ public class NeteaseToolsController {
                 String artist = StringUtils.hasLength(tmp.getArtist()) ? " - " + tmp.getArtist() : "";
                 String fileName = StringUtils.hasLength(tmp.getTitle()) ? tmp.getTitle() + artist : UUID.randomUUID().toString().replace("-", "");
                 HeaderUtil.getMockDownloadMusicHeader(fileName, tmp.getType()).forEach(response::addHeader);
-                redirectStrategy.sendRedirect(request, response, tmp.getOrigin());
+                redirectStrategy.sendRedirect(request, response, tmp.getPath());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @HttpRequestRecorder
+    @GetMapping("download/mv/short")
+    public void downloadMv(@RequestParam(required = false) String key, @RequestParam(required = false, defaultValue = "sd2") String quality, HttpServletRequest request, HttpServletResponse response) {
+        try {
+            String itemKey = "".equals(key) ? "" : new String(Base64Utils.decodeFromUrlSafeString(key));
+            logger.info("[musicPlayer] itemKey: {}, Sec-Fetch-Dest: {}", itemKey, request.getHeader("Sec-Fetch-Dest"));
+            if (StringUtils.hasLength(itemKey)) {
+                ShortNeteaseMvItemDataModel tmp = GsonUtil.toBean(redisService.get(NETEASE_MV_DATA_KEY_PREFIX + itemKey), ShortNeteaseMvItemDataModel.class);
+                String fileName = StringUtils.hasLength(tmp.getTitle()) ? tmp.getTitle() : UUID.randomUUID().toString().replace("-", "");
+                HeaderUtil.getMockDownloadVideoHeader(fileName, tmp.getType()).forEach(response::addHeader);
+                String redirect = null;
+                switch (quality) {
+                    case "hd1" -> {
+                        if (StringUtils.hasLength(tmp.getMultiMvQualityInfo().getHd1())) {
+                            redirect = tmp.getMultiMvQualityInfo().getHd1();
+                        }
+                    }
+                    case "fullHd1" -> {
+                        if (StringUtils.hasLength(tmp.getMultiMvQualityInfo().getFullHd1())) {
+                            redirect = tmp.getMultiMvQualityInfo().getFullHd1();
+                        }
+                    }
+                    case "sd1" -> {
+                        if (StringUtils.hasLength(tmp.getMultiMvQualityInfo().getSd1())) {
+                            redirect = tmp.getMultiMvQualityInfo().getSd1();
+                        }
+                    }
+                    case "sd2" -> {
+                        if (StringUtils.hasLength(tmp.getMultiMvQualityInfo().getSd2())) {
+                            redirect = tmp.getMultiMvQualityInfo().getSd2();
+                        }
+                    }
+                    default -> {
+
+                    }
+                }
+                redirectStrategy.sendRedirect(request, response, redirect);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -218,13 +261,14 @@ public class NeteaseToolsController {
                 String key = ShortKeyGenerator.getKey(null);
                 String title = mvInfo.getData().getName() + Optional.of(" - " + mvInfo.getData().getArtistName()).orElse("");
                 MultiMvQualityInfoModel multiQualityInfo = new MultiMvQualityInfoModel(
-                        ShortKeyGenerator.generateShortUrl(mvInfo.getData().getBrs().getBrs1080(), EXPIRE_TIME, host, redisService).getUrl(),
-                        ShortKeyGenerator.generateShortUrl(mvInfo.getData().getBrs().getBrs720(), EXPIRE_TIME, host, redisService).getUrl(),
-                        ShortKeyGenerator.generateShortUrl(mvInfo.getData().getBrs().getBrs480(), EXPIRE_TIME, host, redisService).getUrl(),
-                        ShortKeyGenerator.generateShortUrl(mvInfo.getData().getBrs().getBrs240(), EXPIRE_TIME, host, redisService).getUrl()
+                        getMvUrl(mvInfo.getData().getBrs().getBrs1080()),
+                        getMvUrl(mvInfo.getData().getBrs().getBrs720()),
+                        getMvUrl(mvInfo.getData().getBrs().getBrs480()),
+                        getMvUrl(mvInfo.getData().getBrs().getBrs240())
                 );
                 redisService.set(NETEASE_MV_DATA_KEY_PREFIX + key, GsonUtil.toString(new ShortNeteaseMvItemDataModel(title, null, multiQualityInfo)), EXPIRE_TIME);
                 mvInfo.setMockPreviewPath(host + "tools/Netease/pro/player/mv/short?key=" + Base64Utils.encodeToUrlSafeString(key.getBytes(StandardCharsets.UTF_8)));
+                mvInfo.setMockMultiDownloadPath(getMockMvDownloadInfo(key, multiQualityInfo));
                 switch (Objects.requireNonNull(NeteaseRequestTypeEnums.getEnumsByType(type))) {
                     case INFO -> {
                         return formatRespData(GET_DATA_SUCCESS, mvInfo);
@@ -243,6 +287,22 @@ public class NeteaseToolsController {
             }
         }
         return formatRespData(GET_INFO_ERROR, null);
+    }
+
+    private String getMvUrl(String url) {
+        if (StringUtils.hasLength(url)) {
+            return ShortKeyGenerator.generateShortUrl(url, EXPIRE_TIME, host, redisService).getUrl();
+        }
+        return null;
+    }
+
+    private MultiMvQualityInfoModel getMockMvDownloadInfo(String key, MultiMvQualityInfoModel multiMvQualityInfo) {
+        return new MultiMvQualityInfoModel(
+                Objects.isNull(multiMvQualityInfo.getHd1()) ? null : (host + "tools/Netease/download/mv/short?key=" + Base64Utils.encodeToUrlSafeString(key.getBytes(StandardCharsets.UTF_8)) + "&quality=hd1"),
+                Objects.isNull(multiMvQualityInfo.getFullHd1()) ? null : (host + "tools/Netease/download/mv/short?key=" + Base64Utils.encodeToUrlSafeString(key.getBytes(StandardCharsets.UTF_8)) + "&quality=fullHd1"),
+                Objects.isNull(multiMvQualityInfo.getSd1()) ? null : (host + "tools/Netease/download/mv/short?key=" + Base64Utils.encodeToUrlSafeString(key.getBytes(StandardCharsets.UTF_8)) + "&quality=sd1"),
+                Objects.isNull(multiMvQualityInfo.getSd2()) ? null : (host + "tools/Netease/download/mv/short?key=" + Base64Utils.encodeToUrlSafeString(key.getBytes(StandardCharsets.UTF_8)) + "&quality=sd2")
+        );
     }
 
 }

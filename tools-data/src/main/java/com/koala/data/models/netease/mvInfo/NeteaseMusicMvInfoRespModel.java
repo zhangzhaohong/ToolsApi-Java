@@ -1,6 +1,7 @@
 package com.koala.data.models.netease.mvInfo;
 
 import com.google.gson.annotations.SerializedName;
+import com.koala.data.models.netease.MultiMvQualityInfoModel;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -22,4 +23,6 @@ public class NeteaseMusicMvInfoRespModel implements Serializable {
     private Integer code;
     @SerializedName("mock_preview_path")
     private String mockPreviewPath = null;
+    @SerializedName("mock_multi_download_path")
+    private MultiMvQualityInfoModel mockMultiDownloadPath = null;
 }

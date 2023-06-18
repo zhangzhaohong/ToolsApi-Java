@@ -18,4 +18,5 @@ public class ShortNeteaseMvItemDataModel implements Serializable {
     private String title;
     private String path;
     private MultiMvQualityInfoModel multiMvQualityInfo;
+    private final String type = "mp4";
 }
