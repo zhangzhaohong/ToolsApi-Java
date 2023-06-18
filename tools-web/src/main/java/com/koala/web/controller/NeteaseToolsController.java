@@ -202,6 +202,7 @@ public class NeteaseToolsController {
 
                     }
                 }
+                response.setDateHeader("Expires", 0);
                 redirectStrategy.sendRedirect(request, response, redirect);
             }
         } catch (Exception e) {

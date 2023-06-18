@@ -84,9 +84,8 @@ public class HeaderUtil {
 
     public static Map<String, String> getMockDownloadMusicHeader(String fileName, String fileType) {
         HashMap<String, String> header = new HashMap<>(0);
-        header.put("Accept-Ranges", "bytes");
-        header.put("Expect", "100-continue");
-        header.put("Cache-Control", "max-age=604800, must-revalidate");
+        header.put("Cache-Control", "no-cache");
+        header.put("Pragma", "no-cache");
         header.put("Content-Type", "audio/" + fileType);
         header.put("Content-Disposition", "attachment; " + "filename=\"" + fileName + "." + fileType + "\"");
         header.put("User-Agent", "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1");
@@ -99,7 +98,7 @@ public class HeaderUtil {
         HashMap<String, String> header = new HashMap<>(0);
         header.put("Cache-Control", "no-cache");
         header.put("Pragma", "no-cache");
-        header.put("Content-Type", "application/octet-stream");
+        header.put("Content-Type", "video/mp4");
         header.put("Content-Disposition", "attachment; " + "filename=\"" + fileName + "." + fileType + "\"");
         header.put("User-Agent", "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1");
         header.put("X-FORWARDED-FOR", getRandomIpAddress());
