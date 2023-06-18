@@ -13,10 +13,7 @@ import com.koala.factory.path.NeteaseWebPathCollector;
 import com.koala.factory.product.NeteaseApiProduct;
 import com.koala.service.custom.http.annotation.HttpRequestRecorder;
 import com.koala.service.data.redis.service.RedisService;
-import com.koala.service.utils.Base64Utils;
-import com.koala.service.utils.GsonUtil;
-import com.koala.service.utils.HeaderUtil;
-import com.koala.service.utils.HttpClientUtil;
+import com.koala.service.utils.*;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -30,8 +27,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import static com.koala.base.enums.NeteaseResponseEnums.*;
@@ -182,7 +178,7 @@ public class NeteaseToolsController {
         params.put("limit", String.valueOf(limit));
         String response = null;
         try {
-            response = HttpClientUtil.doGet(NeteaseWebPathCollector.NETEASE_SEARCH_WEB_SERVER_URL, HeaderUtil.getNeteaseSearchHeader(), params);
+            response = HttpClientUtil.doPost(NeteaseWebPathCollector.NETEASE_SEARCH_WEB_SERVER_URL_V1, HeaderUtil.getNeteaseSearchHeader(), params);
         } catch (Exception e) {
             return formatRespData(FAILURE, null);
         }
