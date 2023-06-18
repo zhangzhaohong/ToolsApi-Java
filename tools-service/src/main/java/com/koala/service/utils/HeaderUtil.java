@@ -115,11 +115,12 @@ public class HeaderUtil {
     }
 
     public static Map<String, String> getMockDownloadNeteaseFileHeader(String fileName, String fileType) {
+        final String currentFileName = URLEncoder.encode(fileName, StandardCharsets.UTF_8).replaceAll("\\+", "%20");
         HashMap<String, String> header = new HashMap<>(0);
         header.put("Cache-Control", "no-cache");
         header.put("Pragma", "no-cache");
         header.put("Content-Type", "application/octet-stream");
-        header.put("Content-Disposition", "attachment; " + "filename=\"" + URLEncoder.encode(fileName + "." + fileType, StandardCharsets.UTF_8) + "\"");
+        header.put("Content-Disposition", "attachment; " + "filename=" + currentFileName + "." + fileType);
         header.put("User-Agent", "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1");
         header.put("X-FORWARDED-FOR", getRandomIpAddress());
         header.put("CLIENT-IP", getRandomIpAddress());

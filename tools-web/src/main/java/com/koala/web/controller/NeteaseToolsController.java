@@ -173,7 +173,7 @@ public class NeteaseToolsController {
             logger.info("[musicPlayer] itemKey: {}, Sec-Fetch-Dest: {}", itemKey, request.getHeader("Sec-Fetch-Dest"));
             if (StringUtils.hasLength(itemKey)) {
                 ShortNeteaseMvItemDataModel tmp = GsonUtil.toBean(redisService.get(NETEASE_MV_DATA_KEY_PREFIX + itemKey), ShortNeteaseMvItemDataModel.class);
-                String fileName = StringUtils.hasLength(tmp.getTitle()) ? tmp.getTitle() : UUID.randomUUID().toString().replace("-", "");
+                String fileName = StringUtils.hasLength(tmp.getTitle()) ? tmp.getTitle() : UUID.randomUUID().toString().replace("-", "") + "(" + quality + ")";
                 String redirect = null;
                 switch (quality) {
                     case "hd1" -> {
