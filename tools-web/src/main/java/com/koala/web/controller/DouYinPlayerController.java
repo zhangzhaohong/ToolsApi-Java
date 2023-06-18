@@ -67,7 +67,7 @@ public class DouYinPlayerController {
                 model.addAttribute("path", tmp.getPath());
                 model.addAttribute("multi", tmp.getMultiVideoQualityInfo());
                 if ("3".equals(version)) {
-                    return "video/dplayer/index";
+                    return "video/dplayer/tiktok/index";
                 } else if ("2".equals(version)) {
                     return "video/plyr/index";
                 } else if ("1".equals(version)) {

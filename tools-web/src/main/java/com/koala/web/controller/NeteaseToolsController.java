@@ -4,6 +4,7 @@ import com.koala.base.enums.NeteaseRequestQualityEnums;
 import com.koala.base.enums.NeteaseRequestSearchTypeEnums;
 import com.koala.base.enums.NeteaseRequestTypeEnums;
 import com.koala.data.models.netease.NeteaseMusicDataRespModel;
+import com.koala.data.models.netease.mvInfo.NeteaseMusicMvInfoRespModel;
 import com.koala.data.models.shortUrl.ShortNeteaseItemDataModel;
 import com.koala.factory.builder.ConcreteNeteaseApiBuilder;
 import com.koala.factory.builder.NeteaseApiBuilder;
@@ -208,9 +209,10 @@ public class NeteaseToolsController {
         }
         if (StringUtils.hasLength(resp)) {
             try {
+                NeteaseMusicMvInfoRespModel mvInfo = GsonUtil.toBean(resp, NeteaseMusicMvInfoRespModel.class);
                 switch (Objects.requireNonNull(NeteaseRequestTypeEnums.getEnumsByType(type))) {
                     case INFO -> {
-                        return formatRespData(GET_DATA_SUCCESS,  GsonUtil.toBean(resp, Object.class));
+                        return formatRespData(GET_DATA_SUCCESS,  mvInfo);
                     }
                 }
             } catch (Exception e) {
