@@ -11,6 +11,15 @@ import java.util.regex.Pattern;
  */
 public class PatternUtil {
 
+    public static String matchFullData(String regex, String data) {
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(data);
+        if (matcher.find()) {
+            return matcher.group().trim();
+        }
+        return null;
+    }
+
     public static String matchData(String regex, String data) {
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(data);

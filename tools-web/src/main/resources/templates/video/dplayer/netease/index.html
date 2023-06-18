@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${title}"></title>
+    <link href="../assets/css/custom-player.css" th:href="@{/assets/css/custom-player.css}" rel="stylesheet">
+    <script src="../assets/js/DPlayer.min.js" th:src="@{/assets/js/DPlayer.min.js}"></script>
+</head>
+<body class="custom-container">
+<div id="video-player" class="dk-video-player-custom" th:data-full-hd-1="${multi.getFullHd1()}"
+     th:data-hd-1="${multi.getHd1()}" th:data-sd-1="${multi.getSd1()}" th:data-sd-2="${multi.getSd2()}">
+    <meta name="referrer" content="never">
+</div>
+<script>
+    const videoElement = document.getElementById('video-player');
+    const vidFullHd1Path = videoElement.getAttribute("data-full-hd-1");
+    const vidHd1Path = videoElement.getAttribute("data-hd-1");
+    const vidSd1Path = videoElement.getAttribute("data-sd-1");
+    const vidSd2Path = videoElement.getAttribute("data-sd-2");
+    const qualityList = [];
+    if (vidHd1Path != null) {
+        qualityList.push({
+            name: '蓝光',
+            url: vidHd1Path,
+            type: 'auto',
+        });
+    }
+    if (vidFullHd1Path != null) {
+        qualityList.push({
+            name: '超清',
+            url: vidFullHd1Path,
+            type: 'auto',
+        });
+    }
+    if (vidSd1Path != null) {
+        qualityList.push({
+            name: '高清',
+            url: vidSd1Path,
+            type: 'auto',
+        });
+    }
+    if (vidSd2Path != null) {
+        qualityList.push({
+            name: '标清',
+            url: vidSd2Path,
+            type: 'auto',
+        });
+    }
+    const dp = new DPlayer({
+        container: videoElement,
+        video: {
+            quality: qualityList,
+            defaultQuality: 0,
+        },
+        autoplay: true,
+        hotkey: true,
+        airplay: true
+    });
+</script>
+</body>

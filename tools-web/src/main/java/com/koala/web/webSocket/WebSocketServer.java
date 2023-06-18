@@ -15,6 +15,7 @@ import jakarta.websocket.server.ServerEndpoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -48,6 +49,10 @@ public class WebSocketServer {
     //接受sid
     private String sid = "";
     private final KafkaService kafkaService = (KafkaService) BeanContext.getBean("EventTrackerKafkaService");
+    private final Environment env = (Environment) BeanContext.getBean("getEnv");
+    private final String active = env.getProperty("spring.profiles.active");
+    private final String version = env.getProperty("spring.application.version");
+    private final String serverIp = env.getProperty("server.real.address");
 
     /**
      * 群发自定义消息
@@ -144,6 +149,9 @@ public class WebSocketServer {
     public void sendStatistics() {
         HashMap<String, Object> extra = new HashMap<>();
         extra.put("online", getOnlineCount());
+        extra.put("env", active);
+        extra.put("version", version);
+        extra.put("ip", serverIp);
         kafkaService.send(new MessageModel<>(null, new EventTrackerData<>(Constants.WEBSOCKET_STATISTICS.getEvent(), UUID.randomUUID().toString(), new EventTrackerDataModel<>("Websocket_statistics", extra))));
     }
 
