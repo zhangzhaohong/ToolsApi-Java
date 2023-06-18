@@ -14,8 +14,8 @@ import java.io.Serializable;
 @Data
 @AllArgsConstructor
 public class MultiMvQualityInfoModel implements Serializable {
-    private String fullHd1;
     private String hd1;
+    private String fullHd1;
     private String sd1;
     private String sd2;
 }

@@ -13,4 +13,5 @@ public class RedisKeyPrefix {
     public static final String NETEASE_DATA_KEY_PREFIX = "NETEASE:DATA:";
     public static final String NETEASE_DETAIL_DATA_KEY_PREFIX = "NETEASE:DETAIL:DATA:";
     public static final String NETEASE_LYRIC_DATA_KEY_PREFIX = "NETEASE:LYRIC:DATA:";
+    public static final String NETEASE_MV_DATA_KEY_PREFIX = "NETEASE:MV:DATA:";
 }

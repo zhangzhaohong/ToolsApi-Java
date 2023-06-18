@@ -3,9 +3,11 @@ package com.koala.web.controller;
 import com.koala.base.enums.NeteaseRequestQualityEnums;
 import com.koala.base.enums.NeteaseRequestSearchTypeEnums;
 import com.koala.base.enums.NeteaseRequestTypeEnums;
+import com.koala.data.models.netease.MultiMvQualityInfoModel;
 import com.koala.data.models.netease.NeteaseMusicDataRespModel;
 import com.koala.data.models.netease.mvInfo.NeteaseMusicMvInfoRespModel;
 import com.koala.data.models.shortUrl.ShortNeteaseItemDataModel;
+import com.koala.data.models.shortUrl.ShortNeteaseMvItemDataModel;
 import com.koala.factory.builder.ConcreteNeteaseApiBuilder;
 import com.koala.factory.builder.NeteaseApiBuilder;
 import com.koala.factory.director.NeteaseApiManager;
@@ -28,10 +30,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import static com.koala.base.enums.NeteaseResponseEnums.*;
-import static com.koala.service.data.redis.RedisKeyPrefix.NETEASE_DATA_KEY_PREFIX;
+import static com.koala.service.data.redis.RedisKeyPrefix.*;
 import static com.koala.service.utils.RespUtil.formatRespData;
 
 /**
@@ -45,6 +48,8 @@ import static com.koala.service.utils.RespUtil.formatRespData;
 public class NeteaseToolsController {
 
     private static final Logger logger = LoggerFactory.getLogger(NeteaseToolsController.class);
+
+    private static final Long EXPIRE_TIME = 12 * 60 * 60L;
 
     private final RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
 
@@ -210,9 +215,24 @@ public class NeteaseToolsController {
         if (StringUtils.hasLength(resp)) {
             try {
                 NeteaseMusicMvInfoRespModel mvInfo = GsonUtil.toBean(resp, NeteaseMusicMvInfoRespModel.class);
+                String key = ShortKeyGenerator.getKey(null);
+                String title = mvInfo.getData().getName() + Optional.of(" - " + mvInfo.getData().getArtistName()).orElse("");
+                MultiMvQualityInfoModel multiQualityInfo = new MultiMvQualityInfoModel(
+                        ShortKeyGenerator.generateShortUrl(mvInfo.getData().getBrs().getBrs1080(), EXPIRE_TIME, host, redisService).getUrl(),
+                        ShortKeyGenerator.generateShortUrl(mvInfo.getData().getBrs().getBrs720(), EXPIRE_TIME, host, redisService).getUrl(),
+                        ShortKeyGenerator.generateShortUrl(mvInfo.getData().getBrs().getBrs480(), EXPIRE_TIME, host, redisService).getUrl(),
+                        ShortKeyGenerator.generateShortUrl(mvInfo.getData().getBrs().getBrs240(), EXPIRE_TIME, host, redisService).getUrl()
+                );
+                redisService.set(NETEASE_MV_DATA_KEY_PREFIX + key, GsonUtil.toString(new ShortNeteaseMvItemDataModel(title, null, multiQualityInfo)), EXPIRE_TIME);
+                mvInfo.setMockPreviewPath(host + "tools/Netease/pro/player/mv/short?key=" + Base64Utils.encodeToUrlSafeString(key.getBytes(StandardCharsets.UTF_8)));
                 switch (Objects.requireNonNull(NeteaseRequestTypeEnums.getEnumsByType(type))) {
                     case INFO -> {
-                        return formatRespData(GET_DATA_SUCCESS,  mvInfo);
+                        return formatRespData(GET_DATA_SUCCESS, mvInfo);
+                    }
+                    case PREVIEW_MV -> {
+                        if (StringUtils.hasLength(mvInfo.getMockPreviewPath())) {
+                            redirectStrategy.sendRedirect(request, response, mvInfo.getMockPreviewPath());
+                        }
                     }
                 }
             } catch (Exception e) {

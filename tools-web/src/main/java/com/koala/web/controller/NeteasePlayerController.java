@@ -1,6 +1,7 @@
 package com.koala.web.controller;
 
 import com.koala.data.models.shortUrl.ShortNeteaseItemDataModel;
+import com.koala.data.models.shortUrl.ShortNeteaseMvItemDataModel;
 import com.koala.service.custom.http.annotation.HttpRequestRecorder;
 import com.koala.service.data.redis.service.RedisService;
 import com.koala.service.utils.Base64Utils;
@@ -18,7 +19,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import static com.koala.service.data.redis.RedisKeyPrefix.NETEASE_DATA_KEY_PREFIX;
+import static com.koala.service.data.redis.RedisKeyPrefix.*;
 
 /**
  * @author koala
@@ -49,6 +50,28 @@ public class NeteasePlayerController {
                 model.addAttribute("type", "audio/" + tmp.getType());
                 if ("1".equals(version)) {
                     return "music/plyr/netease/index";
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        response.setStatus(HttpStatus.SC_NOT_FOUND);
+        return "404/index";
+    }
+
+    @HttpRequestRecorder
+    @GetMapping("/mv/short")
+    public String videoWithShortKey(@RequestParam(value = "key", required = false, defaultValue = "") String key, @RequestParam(value = "version", required = false, defaultValue = "1") String version, Model model, HttpServletRequest request, HttpServletResponse response) {
+        try {
+            String itemKey = "".equals(key) ? "" : new String(Base64Utils.decodeFromUrlSafeString(key));
+            logger.info("[videoPlayer] itemKey: {}, Sec-Fetch-Dest: {}", itemKey, request.getHeader("Sec-Fetch-Dest"));
+            if (StringUtils.hasLength(itemKey)) {
+                ShortNeteaseMvItemDataModel tmp = GsonUtil.toBean(redisService.get(NETEASE_MV_DATA_KEY_PREFIX + itemKey), ShortNeteaseMvItemDataModel.class);
+                model.addAttribute("title", StringUtils.hasLength(tmp.getTitle()) ? tmp.getTitle() : "VideoPlayer");
+                model.addAttribute("path", tmp.getPath());
+                model.addAttribute("multi", tmp.getMultiMvQualityInfo());
+                if ("1".equals(version)) {
+                    return "video/dplayer/netease/index";
                 }
             }
         } catch (Exception e) {

@@ -1,6 +1,6 @@
-
 package com.koala.data.models.netease.mvInfo;
 
+import com.google.gson.annotations.SerializedName;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -20,4 +20,6 @@ public class NeteaseMusicMvInfoRespModel implements Serializable {
     private Boolean subed;
     private DataModel data;
     private Integer code;
+    @SerializedName("mock_preview_path")
+    private String mockPreviewPath = null;
 }

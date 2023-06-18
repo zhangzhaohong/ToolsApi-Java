@@ -1,7 +1,6 @@
 package com.koala.data.models.shortUrl;
 
-import com.koala.data.models.douyin.MultiLiveQualityInfoModel;
-import com.koala.data.models.douyin.MultiVideoQualityInfoModel;
+import com.koala.data.models.netease.MultiMvQualityInfoModel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -15,8 +14,8 @@ import java.io.Serializable;
  */
 @Data
 @AllArgsConstructor
-public class ShortNeteaseMvDataModel implements Serializable {
+public class ShortNeteaseMvItemDataModel implements Serializable {
     private String title;
     private String path;
-    private MultiVideoQualityInfoModel multiVideoQualityInfo;
+    private MultiMvQualityInfoModel multiMvQualityInfo;
 }

@@ -1,4 +1,3 @@
-
 package com.koala.data.models.netease.mvInfo;
 
 import com.google.gson.annotations.SerializedName;

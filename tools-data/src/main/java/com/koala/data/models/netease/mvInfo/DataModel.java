@@ -1,5 +1,5 @@
-
 package com.koala.data.models.netease.mvInfo;
+
 import lombok.Data;
 
 import java.io.Serializable;
