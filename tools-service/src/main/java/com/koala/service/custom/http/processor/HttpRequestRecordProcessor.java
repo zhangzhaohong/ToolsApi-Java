@@ -15,6 +15,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.core.annotation.Order;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -35,6 +36,12 @@ public class HttpRequestRecordProcessor {
 
     @Resource(name = "ApiAnalyticsKafkaService")
     private KafkaService kafkaService;
+
+    @Resource(name = "getEnv")
+    private Environment env;
+
+    private final String active = env.getProperty("spring.profiles.active");
+    private final String version = env.getProperty("spring.application.version");
 
     /**
      * 带有@TakeTime注解的方法
@@ -73,7 +80,7 @@ public class HttpRequestRecordProcessor {
                 request.getServletPath(),
                 request.getMethod(),
                 System.currentTimeMillis() - startTime,
-                GsonUtil.toString(new StatisticsData(ip))
+                GsonUtil.toString(new StatisticsData(ip, active, version))
         );
         kafkaService.send(new MessageModel<>(null, apiData));
     }

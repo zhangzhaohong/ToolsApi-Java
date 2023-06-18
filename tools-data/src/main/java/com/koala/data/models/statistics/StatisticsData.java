@@ -14,9 +14,14 @@ import java.util.UUID;
 @Data
 public class StatisticsData implements Serializable {
     private String ip;
-    private String uuid = UUID.randomUUID().toString().replace("-", "");
+    private String env;
+    private String version;
 
-    public StatisticsData(String ip) {
+    public StatisticsData(String ip, String env, String version) {
         this.ip = ip;
+        this.env = env;
+        this.version = version;
     }
+
+    private final String uuid = UUID.randomUUID().toString().replace("-", "");
 }
