@@ -234,6 +234,9 @@ public class NeteaseToolsController {
                             redirectStrategy.sendRedirect(request, response, mvInfo.getMockPreviewPath());
                         }
                     }
+                    default -> {
+                        return formatRespData(UNSUPPORTED_TYPE, null);
+                    }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
