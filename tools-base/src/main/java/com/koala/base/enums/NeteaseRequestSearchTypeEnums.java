@@ -14,7 +14,7 @@ import java.util.Optional;
 @Getter
 public enum NeteaseRequestSearchTypeEnums {
     MUSIC_1("1", "单曲"),
-    MUSIC_10("10", "单曲"),
+    MUSIC_10("10", "专辑"),
     MUSIC_100("100", "歌手"),
     MUSIC_1000("1000", "歌单"),
     MUSIC_1002("1002", "用户"),
