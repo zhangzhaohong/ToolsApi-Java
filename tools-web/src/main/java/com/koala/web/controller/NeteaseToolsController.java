@@ -149,7 +149,7 @@ public class NeteaseToolsController {
     }
 
     @HttpRequestRecorder
-    @GetMapping("download/music/short")
+    @GetMapping(value = "download/music/short", produces = "application/json;charset=UTF-8")
     public void downloadMusic(@RequestParam(required = false) String key, HttpServletRequest request, HttpServletResponse response) {
         try {
             String itemKey = "".equals(key) ? "" : new String(Base64Utils.decodeFromUrlSafeString(key));
@@ -158,8 +158,7 @@ public class NeteaseToolsController {
                 ShortNeteaseItemDataModel tmp = GsonUtil.toBean(redisService.get(NETEASE_DATA_KEY_PREFIX + itemKey), ShortNeteaseItemDataModel.class);
                 String artist = StringUtils.hasLength(tmp.getArtist()) ? " - " + tmp.getArtist() : "";
                 String fileName = StringUtils.hasLength(tmp.getTitle()) ? tmp.getTitle() + artist : UUID.randomUUID().toString().replace("-", "");
-                HeaderUtil.getMockDownloadMusicHeader(fileName, tmp.getType()).forEach(response::addHeader);
-                redirectStrategy.sendRedirect(request, response, tmp.getPath());
+                HttpClientUtil.doRelay(tmp.getPath(), HeaderUtil.getNeteaseAudioDownloadHeader(), null, 206, HeaderUtil.getMockDownloadNeteaseFileHeader(fileName, tmp.getType()), request, response);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -167,7 +166,7 @@ public class NeteaseToolsController {
     }
 
     @HttpRequestRecorder
-    @GetMapping("download/mv/short")
+    @GetMapping(value = "download/mv/short", produces = "application/json;charset=UTF-8")
     public void downloadMv(@RequestParam(required = false) String key, @RequestParam(required = false, defaultValue = "sd2") String quality, HttpServletRequest request, HttpServletResponse response) {
         try {
             String itemKey = "".equals(key) ? "" : new String(Base64Utils.decodeFromUrlSafeString(key));
@@ -175,7 +174,6 @@ public class NeteaseToolsController {
             if (StringUtils.hasLength(itemKey)) {
                 ShortNeteaseMvItemDataModel tmp = GsonUtil.toBean(redisService.get(NETEASE_MV_DATA_KEY_PREFIX + itemKey), ShortNeteaseMvItemDataModel.class);
                 String fileName = StringUtils.hasLength(tmp.getTitle()) ? tmp.getTitle() : UUID.randomUUID().toString().replace("-", "");
-                HeaderUtil.getMockDownloadVideoHeader(fileName, tmp.getType()).forEach(response::addHeader);
                 String redirect = null;
                 switch (quality) {
                     case "hd1" -> {
@@ -203,7 +201,7 @@ public class NeteaseToolsController {
                     }
                 }
                 response.setDateHeader("Expires", 0);
-                redirectStrategy.sendRedirect(request, response, redirect);
+                HttpClientUtil.doRelay(redirect, HeaderUtil.getNeteaseVideoDownloadHeader(), null, 206, HeaderUtil.getMockDownloadNeteaseFileHeader(fileName, tmp.getType()), request, response);
             }
         } catch (Exception e) {
             e.printStackTrace();

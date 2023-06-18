@@ -1,5 +1,7 @@
 package com.koala.service.utils;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -69,6 +71,36 @@ public class HeaderUtil {
         return header;
     }
 
+    public static Map<String, String> getNeteaseVideoDownloadHeader() {
+        HashMap<String, String> header = new HashMap<>(0);
+        header.put("Accept", "*/*");
+        header.put("Accept-Encoding", "identity;q=1, *;q=0");
+        header.put("Accept-Language", "zh-CN,zh;q=0.9,ja;q=0.8,en;q=0.7,zh-TW;q=0.6,de;q=0.5,fr;q=0.4,ca;q=0.3,ga;q=0.2");
+        header.put("Range", "bytes=0-");
+        header.put("Sec-Fetch-Dest", "video");
+        header.put("Sec-Fetch-Mode", "no-cors");
+        header.put("Sec-Fetch-Site", "cross-sit");
+        header.put("User-Agent", "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1");
+        header.put("X-FORWARDED-FOR", getRandomIpAddress());
+        header.put("CLIENT-IP", getRandomIpAddress());
+        return header;
+    }
+
+    public static Map<String, String> getNeteaseAudioDownloadHeader() {
+        HashMap<String, String> header = new HashMap<>(0);
+        header.put("Accept", "*/*");
+        header.put("Accept-Encoding", "identity;q=1, *;q=0");
+        header.put("Accept-Language", "zh-CN,zh;q=0.9,ja;q=0.8,en;q=0.7,zh-TW;q=0.6,de;q=0.5,fr;q=0.4,ca;q=0.3,ga;q=0.2");
+        header.put("Range", "bytes=0-");
+        header.put("Sec-Fetch-Dest", "audio");
+        header.put("Sec-Fetch-Mode", "no-cors");
+        header.put("Sec-Fetch-Site", "cross-sit");
+        header.put("User-Agent", "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1");
+        header.put("X-FORWARDED-FOR", getRandomIpAddress());
+        header.put("CLIENT-IP", getRandomIpAddress());
+        return header;
+    }
+
     public static Map<String, String> getMockVideoHeader(Boolean isDownload) {
         HashMap<String, String> header = new HashMap<>(0);
         header.put("Accept-Ranges", "bytes");
@@ -82,24 +114,12 @@ public class HeaderUtil {
         return header;
     }
 
-    public static Map<String, String> getMockDownloadMusicHeader(String fileName, String fileType) {
+    public static Map<String, String> getMockDownloadNeteaseFileHeader(String fileName, String fileType) {
         HashMap<String, String> header = new HashMap<>(0);
         header.put("Cache-Control", "no-cache");
         header.put("Pragma", "no-cache");
-        header.put("Content-Type", "audio/" + fileType);
-        header.put("Content-Disposition", "attachment; " + "filename=\"" + fileName + "." + fileType + "\"");
-        header.put("User-Agent", "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1");
-        header.put("X-FORWARDED-FOR", getRandomIpAddress());
-        header.put("CLIENT-IP", getRandomIpAddress());
-        return header;
-    }
-
-    public static Map<String, String> getMockDownloadVideoHeader(String fileName, String fileType) {
-        HashMap<String, String> header = new HashMap<>(0);
-        header.put("Cache-Control", "no-cache");
-        header.put("Pragma", "no-cache");
-        header.put("Content-Type", "video/mp4");
-        header.put("Content-Disposition", "attachment; " + "filename=\"" + fileName + "." + fileType + "\"");
+        header.put("Content-Type", "application/octet-stream");
+        header.put("Content-Disposition", "attachment; " + "filename=\"" + URLEncoder.encode(fileName + "." + fileType, StandardCharsets.UTF_8) + "\"");
         header.put("User-Agent", "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1");
         header.put("X-FORWARDED-FOR", getRandomIpAddress());
         header.put("CLIENT-IP", getRandomIpAddress());
