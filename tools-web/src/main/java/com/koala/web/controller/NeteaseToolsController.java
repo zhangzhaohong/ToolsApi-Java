@@ -27,7 +27,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import static com.koala.base.enums.NeteaseResponseEnums.*;
@@ -178,7 +177,7 @@ public class NeteaseToolsController {
         params.put("limit", String.valueOf(limit));
         String response = null;
         try {
-            response = HttpClientUtil.doPost(NeteaseWebPathCollector.NETEASE_SEARCH_WEB_SERVER_URL_V1, HeaderUtil.getNeteaseSearchHeader(), params);
+            response = HttpClientUtil.doPost(NeteaseWebPathCollector.NETEASE_SEARCH_WEB_SERVER_URL_V1, HeaderUtil.getNeteasePublicWithOutCookieHeader(), params);
         } catch (Exception e) {
             return formatRespData(FAILURE, null);
         }
@@ -188,6 +187,35 @@ public class NeteaseToolsController {
             result.put("limit", limit);
             result.put("response", GsonUtil.toBean(response, Object.class));
             return formatRespData(GET_DATA_SUCCESS, result);
+        }
+        return formatRespData(GET_INFO_ERROR, null);
+    }
+
+    @HttpRequestRecorder
+    @GetMapping(value = "api/mv", produces = "application/json;charset=UTF-8")
+    public String mv(@RequestParam(required = false) String mid, @RequestParam(required = false, name = "type", defaultValue = "info") String type, HttpServletRequest request, HttpServletResponse response) {
+        if (!StringUtils.hasLength(mid)) {
+            return formatRespData(UNSUPPORTED_PARAMS, null);
+        }
+        Map<String, String> params = new HashMap<>();
+        params.put("id", mid);
+        params.put("type", "mp4");
+        String resp = null;
+        try {
+            resp = HttpClientUtil.doPost(NeteaseWebPathCollector.NETEASE_MV_DETAIL_SERVER_URL, HeaderUtil.getNeteasePublicWithOutCookieHeader(), params);
+        } catch (Exception e) {
+            return formatRespData(FAILURE, null);
+        }
+        if (StringUtils.hasLength(resp)) {
+            try {
+                switch (Objects.requireNonNull(NeteaseRequestTypeEnums.getEnumsByType(type))) {
+                    case INFO -> {
+                        return formatRespData(GET_DATA_SUCCESS,  GsonUtil.toBean(resp, Object.class));
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         return formatRespData(GET_INFO_ERROR, null);
     }

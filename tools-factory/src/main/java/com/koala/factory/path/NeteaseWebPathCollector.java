@@ -12,4 +12,5 @@ public class NeteaseWebPathCollector {
     public static final String NETEASE_LYRIC_SERVER_URL = "https://music.163.com/api/song/lyric";
     public static final String NETEASE_SEARCH_WEB_SERVER_URL_V1 = "https://music.163.com/api/search/get/web";
     public static final String NETEASE_SEARCH_WEB_SERVER_URL_V2 = "https://music.163.com/weapi/cloudsearch/get/web";
+    public static final String NETEASE_MV_DETAIL_SERVER_URL = "https://music.163.com/api/mv/detail";
 }

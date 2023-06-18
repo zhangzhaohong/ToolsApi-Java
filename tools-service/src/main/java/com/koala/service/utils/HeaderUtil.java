@@ -1,7 +1,5 @@
 package com.koala.service.utils;
 
-import org.springframework.util.StringUtils;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -173,7 +171,7 @@ public class HeaderUtil {
         return header;
     }
 
-    public static Map<String, String> getNeteaseSearchHeader() {
+    public static Map<String, String> getNeteasePublicWithOutCookieHeader() {
         HashMap<String, String> header = new HashMap<>(0);
         header.put("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Safari/537.36 Chrome/91.0.4472.164 NeteaseMusicDesktop/2.10.2.200154");
         header.put("Referer", "");
