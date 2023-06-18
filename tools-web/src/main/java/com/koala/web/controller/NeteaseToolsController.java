@@ -162,7 +162,7 @@ public class NeteaseToolsController {
     }
 
     @HttpRequestRecorder
-    @GetMapping("api/search")
+    @GetMapping(value = "api/search", produces = "application/json;charset=UTF-8")
     public String search(@RequestParam(required = false) String text, @RequestParam(required = false, defaultValue = "1") String type, @RequestParam(required = false, defaultValue = "1") Long page, @RequestParam(required = false, defaultValue = "20") Integer limit) {
         if (Objects.isNull(NeteaseRequestSearchTypeEnums.getEnumsByType(type))) {
             return formatRespData(UNSUPPORTED_TYPE, null);
@@ -186,7 +186,7 @@ public class NeteaseToolsController {
             HashMap<String, Object> result = new HashMap<>();
             result.put("page", page);
             result.put("limit", limit);
-            result.put("response", response);
+            result.put("response", GsonUtil.toBean(response, Object.class));
             return formatRespData(GET_DATA_SUCCESS, result);
         }
         return formatRespData(GET_INFO_ERROR, null);
