@@ -63,16 +63,20 @@ public class NeteaseToolsController {
 
     @HttpRequestRecorder
     @GetMapping(value = "api", produces = {"application/json;charset=utf-8"})
-    public Object getNeteaseMusic(@RequestParam(required = false) String link, @RequestParam(required = false, name = "type", defaultValue = "info") String type, @RequestParam(value = "quality", required = false, defaultValue = "") String quality, @RequestParam(required = false, defaultValue = "false") String lyric, @RequestParam(required = false, name = "version", defaultValue = "1") String version, HttpServletRequest request, HttpServletResponse response) {
-        if (!StringUtils.hasLength(link)) {
+    public Object getNeteaseMusic(@RequestParam(required = false) String link, @RequestParam(required = false) String id, @RequestParam(required = false, name = "type", defaultValue = "info") String type, @RequestParam(value = "quality", required = false, defaultValue = "") String quality, @RequestParam(required = false, defaultValue = "false") String lyric, @RequestParam(required = false, name = "version", defaultValue = "1") String version, HttpServletRequest request, HttpServletResponse response) {
+        if (!StringUtils.hasLength(link) && !StringUtils.hasLength(id)) {
             return formatRespData(INVALID_LINK, null);
         }
         String url;
-        Optional<String> optional = Arrays.stream(link.split(" ")).filter(item -> item.contains("music.163.com/")).findFirst();
-        if (optional.isPresent()) {
-            url = optional.get().trim();
+        if (StringUtils.hasLength(id)) {
+            url = "https://music.163.com/#/song?id=" + id;
         } else {
-            return formatRespData(INVALID_LINK, null);
+            Optional<String> optional = Arrays.stream(link.split(" ")).filter(item -> item.contains("music.163.com/")).findFirst();
+            if (optional.isPresent()) {
+                url = optional.get().trim();
+            } else {
+                return formatRespData(INVALID_LINK, null);
+            }
         }
         NeteaseApiBuilder builder = new ConcreteNeteaseApiBuilder();
         NeteaseApiManager manager = new NeteaseApiManager(builder);

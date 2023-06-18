@@ -14,6 +14,7 @@ import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
@@ -37,11 +38,11 @@ public class HttpRequestRecordProcessor {
     @Resource(name = "ApiAnalyticsKafkaService")
     private KafkaService kafkaService;
 
-    @Resource(name = "getEnv")
-    private Environment env;
+    @Value("spring.profiles.active")
+    private String active;
 
-    private final String active = env.getProperty("spring.profiles.active");
-    private final String version = env.getProperty("spring.application.version");
+    @Value("spring.application.version")
+    private String version;
 
     /**
      * 带有@TakeTime注解的方法
