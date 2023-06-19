@@ -2,9 +2,36 @@ const axios = require('axios');
 const crypto = require('crypto');
 const express = require("express");
 const { sign } = require("./Signer.js");
+const cryptoJs = require('crypto-js');
 
 const app = express();
 app.use(express.json());
+
+app.post("/kugou", async (req, res) => {
+  try {
+    const { params } = req.body;
+
+    if (!params) {
+      throw new Error("Missing required parameters.");
+    }
+
+    console.info({
+      params: params,
+    });
+
+    res.status(200).json({
+      code: 200,
+      msg: "success",
+      data: {
+        signature: cryptoJs.MD5(params).toString(),
+        params: params
+      }
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({ code: 201, msg: err.message });
+  }
+});
 
 app.post("/tiktok", async (req, res) => {
   try {
