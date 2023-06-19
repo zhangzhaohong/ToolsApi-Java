@@ -212,4 +212,13 @@ public class HeaderUtil {
         return header;
     }
 
+    public static Map<String, String> getKugouPublicWithOutCookieHeader() {
+        HashMap<String, String> header = new HashMap<>(0);
+        header.put("User-Agent", RandomUserAgentGenerator.getUserAgent());
+        header.put("Referer", "https://www.kugou.com/");
+        header.put("X-FORWARDED-FOR", getRandomIpAddress());
+        header.put("CLIENT-IP", getRandomIpAddress());
+        return header;
+    }
+
 }
