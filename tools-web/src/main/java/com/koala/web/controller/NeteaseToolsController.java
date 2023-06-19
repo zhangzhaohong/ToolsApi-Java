@@ -13,7 +13,7 @@ import com.koala.data.models.shortUrl.ShortNeteaseMvItemDataModel;
 import com.koala.factory.builder.ConcreteNeteaseApiBuilder;
 import com.koala.factory.builder.NeteaseApiBuilder;
 import com.koala.factory.director.NeteaseApiManager;
-import com.koala.factory.extra.NeteaseCookieUtil;
+import com.koala.factory.extra.netease.NeteaseCookieUtil;
 import com.koala.factory.path.NeteaseWebPathCollector;
 import com.koala.factory.product.NeteaseApiProduct;
 import com.koala.service.custom.http.annotation.HttpRequestRecorder;

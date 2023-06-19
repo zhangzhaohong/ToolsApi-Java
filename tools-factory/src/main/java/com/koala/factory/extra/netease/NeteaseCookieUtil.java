@@ -1,4 +1,4 @@
-package com.koala.factory.extra;
+package com.koala.factory.extra.netease;
 
 import jakarta.annotation.Resource;
 import org.springframework.core.io.ResourceLoader;
