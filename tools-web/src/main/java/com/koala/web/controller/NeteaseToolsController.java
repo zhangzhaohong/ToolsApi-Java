@@ -296,7 +296,7 @@ public class NeteaseToolsController {
 
     @HttpRequestRecorder
     @GetMapping(value = "api/playlist", produces = "application/json;charset=UTF-8")
-    public String playList(@RequestParam(required = false) String id, @RequestParam(required = false) String configId) {
+    public String playList(@RequestParam(required = false) String id, @RequestParam(required = false) String configId, @RequestParam(required = false, defaultValue = "2") String version) {
         String rankId = null;
         if (StringUtils.hasLength(configId)) {
             NeteaseRankIdEnums enums = NeteaseRankIdEnums.getEnumsById(configId);
@@ -311,17 +311,21 @@ public class NeteaseToolsController {
         Map<String, String> params = new HashMap<>();
         params.put("id", rankId);
         String response = null;
-        int retry = 0;
         try {
-            while (retry < 10) {
-                response = HttpClientUtil.doPost(NeteaseWebPathCollector.NETEASE_PLAY_LIST_SERVER_URL, HeaderUtil.getNeteasePublicWithOutCookieHeader(), params);
-                retry++;
-                if (StringUtils.hasLength(response)) {
-                    NeteaseMusicPlayListInfoRespModel<?> data = GsonUtil.toBean(response, NeteaseMusicPlayListInfoRespModel.class);
-                    if (data.getCode() == 200) {
-                        return formatRespData(GET_DATA_SUCCESS, data);
-                    } else if (data.getCode() != -447) {
-                        return formatRespData(GET_INFO_ERROR, GsonUtil.toBean(response, Object.class));
+            if ("2".equals(version)) {
+                response = HttpClientUtil.doPost(NeteaseWebPathCollector.NETEASE_PLAY_LIST_SERVER_URL_V2, HeaderUtil.getNeteasePublicWithOutCookieHeader(), params);
+            } else if ("1".equals(version)) {
+                int retry = 0;
+                while (retry < 10) {
+                    response = HttpClientUtil.doPost(NeteaseWebPathCollector.NETEASE_PLAY_LIST_SERVER_URL_V1, HeaderUtil.getNeteasePublicWithOutCookieHeader(), params);
+                    retry++;
+                    if (StringUtils.hasLength(response)) {
+                        NeteaseMusicPlayListInfoRespModel<?> data = GsonUtil.toBean(response, NeteaseMusicPlayListInfoRespModel.class);
+                        if (data.getCode() == 200) {
+                            return formatRespData(GET_DATA_SUCCESS, data);
+                        } else if (data.getCode() != -447) {
+                            return formatRespData(GET_INFO_ERROR, GsonUtil.toBean(response, Object.class));
+                        }
                     }
                 }
             }
