@@ -16,7 +16,8 @@ public enum NeteaseRankIdEnums {
     RANK_1("1", "19723756", "云音乐飙升榜"),
     RANK_2("2", "3779629", "云音乐新歌榜"),
     RANK_3("3", "3778678", "云音乐热歌榜"),
-    RANK_4("4", "2250011882", "抖音排行榜");
+    RANK_4("4", "2250011882", "抖音排行榜"),
+    RANK_5("5", "2557908184", "每日推荐");
 
     private final String id;
     private final String rankId;
