@@ -49,9 +49,7 @@ app.post("/kugou/v2", async (req, res) => {
             code: 200,
             msg: "success",
             data: {
-                key: crypto.createHash('md5')
-                    .update(params)
-                    .digest('hex'),
+                key:cryptoJs.MD5(params).toString(),
                 params: params
             }
         });
