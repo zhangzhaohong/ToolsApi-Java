@@ -1,7 +1,7 @@
 package com.koala.service.utils;
 
-import com.koala.data.models.kugou.signature.KugouSignatureDataModel;
-import com.koala.data.models.kugou.signature.KugouSignatureRespDataModel;
+import com.koala.data.models.kugou.key.KugouKeyDataModel;
+import com.koala.data.models.kugou.key.KugouKeyRespDataModel;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
@@ -18,22 +18,22 @@ import java.util.Objects;
  * @description
  */
 @Component
-public class KugouSignatureUtil {
+public class KugouKeyUtil {
     private static String host;
 
     @SuppressWarnings("AlibabaCommentsMustBeJavadocFormat")
-    @Value("${kugou.signature.host-1}")  //删除掉static
+    @Value("${kugou.signature.host-2}")  //删除掉static
     public void setHost(String host) {
-        KugouSignatureUtil.host = host;
+        KugouKeyUtil.host = host;
     }
 
-    public static KugouSignatureDataModel encrypt(String paramsData) throws IOException {
+    public static KugouKeyDataModel encrypt(String paramsData) throws IOException {
         Map<String, String> params = new HashMap<>(0);
         params.put("params", paramsData);
         String response = HttpClientUtil.doPostJson(host, GsonUtil.toString(params));
         if (!ObjectUtils.isEmpty(response)) {
-            KugouSignatureRespDataModel respData = GsonUtil.toBean(response, KugouSignatureRespDataModel.class);
-            if (!Objects.isNull(respData) && !Objects.isNull(respData.getData()) && !ObjectUtils.isEmpty(respData.getData().getSignature())) {
+            KugouKeyRespDataModel respData = GsonUtil.toBean(response, KugouKeyRespDataModel.class);
+            if (!Objects.isNull(respData) && !Objects.isNull(respData.getData()) && !ObjectUtils.isEmpty(respData.getData().getKey())) {
                 return respData.getData();
             }
             return null;

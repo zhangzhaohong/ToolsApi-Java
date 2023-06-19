@@ -1,76 +1,104 @@
 const axios = require('axios');
 const crypto = require('crypto');
 const express = require("express");
-const { sign } = require("./Signer.js");
+const {sign} = require("./Signer.js");
 const cryptoJs = require('crypto-js');
 
 const app = express();
 app.use(express.json());
 
-app.post("/kugou", async (req, res) => {
-  try {
-    const { params } = req.body;
+app.post("/kugou/v1", async (req, res) => {
+    try {
+        const {params} = req.body;
 
-    if (!params) {
-      throw new Error("Missing required parameters.");
+        if (!params) {
+            throw new Error("Missing required parameters.");
+        }
+
+        console.info({
+            params: params,
+        });
+
+        res.status(200).json({
+            code: 200,
+            msg: "success",
+            data: {
+                signature: cryptoJs.MD5(params).toString(),
+                params: params
+            }
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(400).json({code: 201, msg: err.message});
     }
+});
 
-    console.info({
-      params: params,
-    });
+app.post("/kugou/v2", async (req, res) => {
+    try {
+        const {params} = req.body;
 
-    res.status(200).json({
-      code: 200,
-      msg: "success",
-      data: {
-        signature: cryptoJs.MD5(params).toString(),
-        params: params
-      }
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(400).json({ code: 201, msg: err.message });
-  }
+        if (!params) {
+            throw new Error("Missing required parameters.");
+        }
+
+        console.info({
+            params: params,
+        });
+
+        res.status(200).json({
+            code: 200,
+            msg: "success",
+            data: {
+                key: crypto.createHash('md5')
+                    .update(params)
+                    .digest('hex'),
+                params: params
+            }
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(400).json({code: 201, msg: err.message});
+    }
 });
 
 app.post("/tiktok", async (req, res) => {
-  try {
-    const { url, userAgent } = req.body;
+    try {
+        const {url, userAgent} = req.body;
 
-    if (!url || !userAgent) {
-      throw new Error("Missing required parameters.");
+        if (!url || !userAgent) {
+            throw new Error("Missing required parameters.");
+        }
+
+        const query = url.includes("?") ? url.split("?")[1] : "";
+        const xbogus = sign(query, userAgent);
+        const newUrl = `${url}&X-Bogus=${xbogus}`;
+        const [xbogusToken, ttwid] = await Promise.all([msToken(107), getTtwid()]);
+
+        console.info({
+            xbogus: xbogus,
+            mstoken: xbogusToken,
+            ttwid: ttwid,
+            url: newUrl
+        });
+
+        res.status(200).json({
+            code: 200,
+            msg: "success",
+            data: {
+                xbogus: xbogus,
+                mstoken: xbogusToken,
+                ttwid: ttwid,
+                url: newUrl
+            }
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(400).json({code: 201, msg: err.message});
     }
-
-    const query = url.includes("?") ? url.split("?")[1] : "";
-    const xbogus = sign(query, userAgent);
-    const newUrl = `${url}&X-Bogus=${xbogus}`;
-    const [xbogusToken, ttwid] = await Promise.all([msToken(107), getTtwid()]);
-
-    console.info({
-      xbogus: xbogus,
-      mstoken: xbogusToken,
-      ttwid: ttwid,
-      url: newUrl
-    });
-
-    res.status(200).json({
-      code: 200,
-      msg: "success",
-      data: {
-        xbogus: xbogus,
-        mstoken: xbogusToken,
-        ttwid: ttwid,
-        url: newUrl
-      }
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(400).json({ code: 201, msg: err.message });
-  }
 });
 
 app.get("/", (req, res) => {
-  res.status(200).send(`
+    res.status(200).send(`
     <html lang="en">
       <head>
         <title>Tiktok_Signature</title>
@@ -103,34 +131,34 @@ app.get("/", (req, res) => {
 });
 
 function msToken(length) {
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  const randomBytes = crypto.randomBytes(length);
-  return Array.from(randomBytes, byte => characters[byte % characters.length]).join('');
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const randomBytes = crypto.randomBytes(length);
+    return Array.from(randomBytes, byte => characters[byte % characters.length]).join('');
 }
 
 async function getTtwid() {
-  try {
-    const url = 'https://ttwid.bytedance.com/ttwid/union/register/';
-    const data = {
-      "region": "cn",
-      "aid": 1768,
-      "needFid": false,
-      "service": "www.ixigua.com",
-      "migrate_info": { "ticket": "", "source": "node" },
-      "cbUrlProtocol": "https",
-      "union": true
-    };
-    const response = await axios.post(url, data, { headers: { 'Content-Type': 'application/json' } });
-    const setCookie = response.headers['set-cookie'];
-    const regex = /ttwid=([^;]+)/;
-    const match = regex.exec(setCookie[0]);
-    return match && match.length > 1 ? match[1] : '';
-  } catch (error) {
-    console.error(error);
-    return '';
-  }
+    try {
+        const url = 'https://ttwid.bytedance.com/ttwid/union/register/';
+        const data = {
+            "region": "cn",
+            "aid": 1768,
+            "needFid": false,
+            "service": "www.ixigua.com",
+            "migrate_info": {"ticket": "", "source": "node"},
+            "cbUrlProtocol": "https",
+            "union": true
+        };
+        const response = await axios.post(url, data, {headers: {'Content-Type': 'application/json'}});
+        const setCookie = response.headers['set-cookie'];
+        const regex = /ttwid=([^;]+)/;
+        const match = regex.exec(setCookie[0]);
+        return match && match.length > 1 ? match[1] : '';
+    } catch (error) {
+        console.error(error);
+        return '';
+    }
 }
 
 app.listen(8080, () => {
-  console.log("Server is running on port 8080");
+    console.log("Server is running on port 8080");
 });
