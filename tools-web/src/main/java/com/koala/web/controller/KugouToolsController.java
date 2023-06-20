@@ -1,6 +1,7 @@
 package com.koala.web.controller;
 
 import com.koala.factory.extra.kugou.KugouCustomParamsUtil;
+import com.koala.factory.extra.kugou.KugouMidGenerator;
 import com.koala.service.custom.http.annotation.HttpRequestRecorder;
 import com.koala.service.utils.*;
 import jakarta.annotation.Resource;
@@ -42,11 +43,12 @@ public class KugouToolsController {
     @GetMapping(value = "api/search", produces = {"application/json;charset=utf-8"})
     public String search(@RequestParam(required = false) String key, @RequestParam(required = false, defaultValue = "1") Long page, @RequestParam(required = false, defaultValue = "30") Long limit) throws IOException, URISyntaxException {
         Long timestamp = System.currentTimeMillis();
-        String signature = MD5Utils.md5(getSearchTextParams(timestamp, key, page, limit, customParams));
+        String mid = KugouMidGenerator.getMid();
+        String signature = MD5Utils.md5(getSearchTextParams(timestamp, key, mid, page, limit, customParams));
         if (!StringUtils.hasLength(signature)) {
             return formatRespData(GET_SIGNATURE_FAILED, null);
         }
-        String response = HttpClientUtil.doGet(KUGOU_SEARCH_WEB_SERVER_URL_V1, HeaderUtil.getKugouPublicWithOutCookieHeader(), getSearchParams(timestamp, key, page, limit, signature, customParams));
+        String response = HttpClientUtil.doGet(KUGOU_SEARCH_WEB_SERVER_URL_V1, HeaderUtil.getKugouPublicWithOutCookieHeader(), getSearchParams(timestamp, key, mid, page, limit, signature, customParams));
         if (StringUtils.hasLength(response)) {
             return formatRespData(GET_DATA_SUCCESS, GsonUtil.toBean(response, Object.class));
         }

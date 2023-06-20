@@ -14,7 +14,7 @@ public class KugouSearchParamsGenerator {
 
     private static final String CURRENT_UUID = UUID.randomUUID().toString().replace("-", "");
 
-    public static String getSearchTextParams(Long timestamp, String key, Long page, Long limit, KugouCustomParamsUtil customParams) {
+    public static String getSearchTextParams(Long timestamp, String key, String mid, Long page, Long limit, KugouCustomParamsUtil customParams) {
         String[] paramsArray = {
                 "NVPh5oo715z5DIWAeQlhMDsWXXQV4hwt",
                 "bitrate=0",
@@ -27,7 +27,7 @@ public class KugouSearchParamsGenerator {
                 "iscorrection=1",
                 "isfuzzy=0",
                 "keyword=" + key,
-                "mid=" + timestamp,
+                "mid=" + mid,
                 "page=" + page,
                 "pagesize=" + limit,
                 "platform=WebFilter",
@@ -41,7 +41,7 @@ public class KugouSearchParamsGenerator {
         return String.join("", paramsArray);
     }
 
-    public static Map<String, String> getSearchParams(Long timestamp, String key, Long page, Long limit, String signature, KugouCustomParamsUtil customParams) {
+    public static Map<String, String> getSearchParams(Long timestamp, String key, String mid, Long page, Long limit, String signature, KugouCustomParamsUtil customParams) {
         Map<String, String> params = new HashMap<>();
         params.put("bitrate", "0");
         params.put("clienttime", String.valueOf(timestamp));
@@ -52,7 +52,7 @@ public class KugouSearchParamsGenerator {
         params.put("iscorrection", "1");
         params.put("isfuzzy", "0");
         params.put("keyword", key);
-        params.put("mid", String.valueOf(timestamp));
+        params.put("mid", mid);
         params.put("page", String.valueOf(page));
         params.put("pagesize", String.valueOf(limit));
         params.put("platform", "WebFilter");
