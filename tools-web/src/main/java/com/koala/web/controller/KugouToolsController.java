@@ -106,7 +106,7 @@ public class KugouToolsController {
         }
         KugouProductConfigModel config = new KugouProductConfigModel(
                 "true".equals(albumInfo),
-                "true".equals(albumMusicInfo) || "true".equals(musicInfo),
+                "true".equals(albumMusicInfo),
                 "true".equals(musicInfo)
         );
         KugouApiBuilder builder = new ConcreteKugouApiBuilder();

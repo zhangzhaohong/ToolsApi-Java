@@ -100,23 +100,37 @@ public class KugouApiProduct {
         if (checkNotNullHashAndAlbumId()) {
             return;
         }
+        this.albumMusicInfoData = requestAlbumMusicInfoAndToBean();
+    }
+
+    private KugouAlbumMusicInfoRespDataModel<?> requestAlbumMusicInfoAndToBean() throws IOException, URISyntaxException {
+        if (checkNotNullHashAndAlbumId()) {
+            return null;
+        }
         HashMap<String, String> params = new HashMap<>();
         params.put("data", getAlbumRequestPayload());
         String response = HttpClientUtil.doGet(KUGOU_ALBUM_MUSIC_DETAIL_SERVER_URL, HeaderUtil.getKugouPublicHeader(null, this.customParams.get("kg_mid_cookie").toString()), params);
         logger.info("[KugouApiProduct]({}) album music info: {}", this.hash, response);
         try {
-            this.albumMusicInfoData = GsonUtil.toBean(response, KugouAlbumMusicInfoRespDataModel.class);
+            return GsonUtil.toBean(response, KugouAlbumMusicInfoRespDataModel.class);
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return null;
     }
 
-    public void generatePlayInfo() {
-        if (checkNotNullHashAndAlbumId() || Objects.isNull(this.albumMusicInfoData)) {
+    public void generatePlayInfo() throws IOException, URISyntaxException {
+        if (checkNotNullHashAndAlbumId()) {
             return;
         }
+        KugouAlbumMusicInfoRespDataModel<?> tmpAlbumMusicInfoRespData = null;
+        if (Objects.isNull(this.albumMusicInfoData)) {
+            tmpAlbumMusicInfoRespData = requestAlbumMusicInfoAndToBean();
+        } else {
+            tmpAlbumMusicInfoRespData = this.albumMusicInfoData;
+        }
         try {
-            ArrayList<?> tmp1 = (ArrayList<?>) this.albumMusicInfoData.getData();
+            ArrayList<?> tmp1 = (ArrayList<?>) tmpAlbumMusicInfoRespData.getData();
             if (tmp1.isEmpty())
                 return;
             ArrayList<?> tmp2 = (ArrayList<?>) tmp1.get(0);
