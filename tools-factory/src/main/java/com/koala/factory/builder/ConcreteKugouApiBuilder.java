@@ -1,5 +1,6 @@
 package com.koala.factory.builder;
 
+import com.koala.factory.extra.kugou.KugouCustomParamsUtil;
 import com.koala.service.data.redis.service.RedisService;
 
 import java.io.IOException;
@@ -31,6 +32,12 @@ public class ConcreteKugouApiBuilder extends KugouApiBuilder {
     }
 
     @Override
+    public KugouApiBuilder customParams(KugouCustomParamsUtil customParams) {
+        product.setCustomParams(customParams.getKugouCustomParams());
+        return this;
+    }
+
+    @Override
     public KugouApiBuilder version(Integer version) {
         product.setVersion(version);
         return this;
@@ -45,6 +52,18 @@ public class ConcreteKugouApiBuilder extends KugouApiBuilder {
     @Override
     public KugouApiBuilder prepareItemIdByShareUrl() throws IOException, URISyntaxException {
         product.prepareItemIdByShareUrl();
+        return this;
+    }
+
+    @Override
+    public KugouApiBuilder getAlbumInfo() throws IOException, URISyntaxException {
+        product.getAlbumInfo();
+        return this;
+    }
+
+    @Override
+    public KugouApiBuilder getAlbumMusicInfo() throws IOException, URISyntaxException {
+        product.getAlbumMusicInfo();
         return this;
     }
 }

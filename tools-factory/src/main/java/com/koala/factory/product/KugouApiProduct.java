@@ -1,6 +1,10 @@
 package com.koala.factory.product;
 
+import com.koala.data.models.kugou.AlbumInfo.KugouAlbumInfoRespDataModel;
+import com.koala.data.models.kugou.AlbumMusicInfo.KugouAlbumMusicInfoRespDataModel;
+import com.koala.data.models.kugou.KugouMusicDataRespModel;
 import com.koala.service.data.redis.service.RedisService;
+import com.koala.service.utils.GsonUtil;
 import com.koala.service.utils.HeaderUtil;
 import com.koala.service.utils.HttpClientUtil;
 import com.koala.service.utils.PatternUtil;
@@ -10,6 +14,11 @@ import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.Map;
+
+import static com.koala.factory.path.KugouWebPathCollector.KUGOU_ALBUM_DETAIL_SERVER_URL;
+import static com.koala.factory.path.KugouWebPathCollector.KUGOU_ALBUM_MUSIC_DETAIL_SERVER_URL;
 
 /**
  * @author koala
@@ -27,6 +36,9 @@ public class KugouApiProduct {
     private String url;
     private String host;
     private RedisService redisService;
+    private Map<String, Object> customParams;
+    private KugouAlbumInfoRespDataModel<?> albumInfoData = null;
+    private KugouAlbumMusicInfoRespDataModel<?> albumMusicInfoData = null;
 
     public void setUrl(String url) {
         this.url = url;
@@ -45,6 +57,11 @@ public class KugouApiProduct {
         this.redisService = redisService;
     }
 
+    public void setHashAndAlbumId(String hash, String albumId) {
+        this.hash = hash;
+        this.albumId = albumId;
+    }
+
     public void prepareItemIdByShareUrl() throws IOException, URISyntaxException {
         if (StringUtils.hasLength(this.url)) {
             String redirectLocation = HttpClientUtil.doGetRedirectLocation(this.url);
@@ -57,8 +74,57 @@ public class KugouApiProduct {
         }
     }
 
-    public void setHashAndAlbumId(String hash, String albumId) {
-        this.hash = hash;
-        this.albumId = albumId;
+    public void getAlbumInfo() throws IOException, URISyntaxException {
+        if (checkNotNullHashAndAlbumId()) {
+            return;
+        }
+        HashMap<String, String> params = new HashMap<>();
+        params.put("data", getAlbumRequestPayload());
+        String response = HttpClientUtil.doGet(KUGOU_ALBUM_DETAIL_SERVER_URL, HeaderUtil.getKugouPublicHeader(null, this.customParams.get("kg_mid_cookie").toString()), params);
+        logger.info("[KugouApiProduct]({}) album info: {}", this.hash, response);
+        try {
+            this.albumInfoData = GsonUtil.toBean(response, KugouAlbumInfoRespDataModel.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void getAlbumMusicInfo() throws IOException, URISyntaxException {
+        if (checkNotNullHashAndAlbumId()) {
+            return;
+        }
+        HashMap<String, String> params = new HashMap<>();
+        params.put("data", getAlbumRequestPayload());
+        String response = HttpClientUtil.doGet(KUGOU_ALBUM_MUSIC_DETAIL_SERVER_URL, HeaderUtil.getKugouPublicHeader(null, this.customParams.get("kg_mid_cookie").toString()), params);
+        logger.info("[KugouApiProduct]({}) album music info: {}", this.hash, response);
+        try {
+            this.albumMusicInfoData = GsonUtil.toBean(response, KugouAlbumMusicInfoRespDataModel.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public KugouMusicDataRespModel generateItemInfoRespData() {
+        KugouMusicDataRespModel respData = new KugouMusicDataRespModel(this.albumInfoData, this.albumMusicInfoData);
+        try {
+            if ("1".equals(version.toString())) {
+
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return respData;
+    }
+
+    private String getAlbumRequestPayload() {
+        return "[{\"hash\":\"" + this.hash + "\",\"audio_id\":0,\"album_audio_id\":0}]";
+    }
+
+    private Boolean checkNotNullHashAndAlbumId() {
+        return !StringUtils.hasLength(this.hash) && !StringUtils.hasLength(this.albumId);
+    }
+
+    public void setCustomParams(Map<String, Object> kugouCustomParams) {
+        this.customParams = kugouCustomParams;
     }
 }

@@ -1,5 +1,6 @@
 package com.koala.factory.builder;
 
+import com.koala.factory.extra.kugou.KugouCustomParamsUtil;
 import com.koala.factory.product.DouYinApiProduct;
 import com.koala.factory.product.KugouApiProduct;
 import com.koala.service.data.redis.service.RedisService;
@@ -23,11 +24,17 @@ public abstract class KugouApiBuilder {
 
     public abstract KugouApiBuilder host(String host);
 
+    public abstract KugouApiBuilder customParams(KugouCustomParamsUtil customParams);
+
     public abstract KugouApiBuilder version(Integer version);
 
     public abstract KugouApiBuilder redis(RedisService redisService);
 
     public abstract KugouApiBuilder prepareItemIdByShareUrl() throws IOException, URISyntaxException;
+
+    public abstract KugouApiBuilder getAlbumInfo() throws IOException, URISyntaxException;
+
+    public abstract KugouApiBuilder getAlbumMusicInfo() throws IOException, URISyntaxException;
 
     public KugouApiProduct getProduct() {
         return product;

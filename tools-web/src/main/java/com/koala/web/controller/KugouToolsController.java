@@ -1,19 +1,21 @@
 package com.koala.web.controller;
 
+import com.koala.base.enums.KugouRequestTypeEnums;
+import com.koala.data.models.kugou.KugouMusicDataRespModel;
+import com.koala.data.models.kugou.config.KugouProductConfigModel;
 import com.koala.factory.builder.ConcreteKugouApiBuilder;
-import com.koala.factory.builder.ConcreteNeteaseApiBuilder;
 import com.koala.factory.builder.KugouApiBuilder;
-import com.koala.factory.builder.NeteaseApiBuilder;
 import com.koala.factory.director.KugouApiManager;
-import com.koala.factory.director.NeteaseApiManager;
 import com.koala.factory.extra.kugou.KugouCustomParamsUtil;
 import com.koala.factory.extra.kugou.KugouMidGenerator;
 import com.koala.factory.extra.kugou.KugouPlayInfoParamsGenerator;
 import com.koala.factory.product.KugouApiProduct;
-import com.koala.factory.product.NeteaseApiProduct;
 import com.koala.service.custom.http.annotation.HttpRequestRecorder;
 import com.koala.service.data.redis.service.RedisService;
-import com.koala.service.utils.*;
+import com.koala.service.utils.GsonUtil;
+import com.koala.service.utils.HeaderUtil;
+import com.koala.service.utils.HttpClientUtil;
+import com.koala.service.utils.MD5Utils;
 import jakarta.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,10 +31,9 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.Optional;
 
-import static com.koala.base.enums.DouYinResponseEnums.FAILURE;
-import static com.koala.base.enums.DouYinResponseEnums.INVALID_LINK;
 import static com.koala.base.enums.KugouResponseEnums.*;
 import static com.koala.factory.extra.kugou.KugouSearchParamsGenerator.getSearchParams;
 import static com.koala.factory.extra.kugou.KugouSearchParamsGenerator.getSearchTextParams;
@@ -92,7 +93,7 @@ public class KugouToolsController {
 
     @HttpRequestRecorder
     @GetMapping(value = "api", produces = {"application/json;charset=utf-8"})
-    public String api(@RequestParam(required = false) String link, @RequestParam(required = false) String hash, @RequestParam(required = false) String albumId, @RequestParam(required = false, defaultValue = "1") Integer version) throws IOException, URISyntaxException {
+    public String api(@RequestParam(required = false) String link, @RequestParam(required = false) String hash, @RequestParam(required = false) String albumId, @RequestParam(required = false, name = "type", defaultValue = "info") String type, @RequestParam(required = false, defaultValue = "1") Integer version, @RequestParam(required = false, defaultValue = "false") String albumInfo, @RequestParam(required = false, defaultValue = "false") String albumMusicInfo) throws IOException, URISyntaxException {
         if (!StringUtils.hasLength(link) && (!StringUtils.hasLength(hash) && !StringUtils.hasLength(albumId))) {
             return formatRespData(UNSUPPORTED_PARAMS, null);
         }
@@ -103,16 +104,39 @@ public class KugouToolsController {
         } else {
             return formatRespData(INVALID_LINK, null);
         }
+        KugouProductConfigModel config = new KugouProductConfigModel(
+                "true".equals(albumInfo),
+                "true".equals(albumMusicInfo)
+        );
         KugouApiBuilder builder = new ConcreteKugouApiBuilder();
         KugouApiManager manager = new KugouApiManager(builder);
         KugouApiProduct product = null;
         try {
-            product = manager.construct(redisService, host, url, hash, albumId, version);
+            product = manager.construct(redisService, host, url, hash, albumId, version, customParams, config);
         } catch (Exception e) {
             e.printStackTrace();
             return formatRespData(FAILURE, null);
         }
-        return "ok";
+        KugouMusicDataRespModel publicData = product.generateItemInfoRespData();
+        try {
+            switch (Objects.requireNonNull(KugouRequestTypeEnums.getEnumsByType(type))) {
+                case INFO -> {
+                    return formatRespData(GET_DATA_SUCCESS, publicData);
+                }
+                case PREVIEW_MUSIC -> {
+                    // todo preview music
+                }
+                case DOWNLOAD -> {
+                    // todo download
+                }
+                default -> {
+                    return formatRespData(UNSUPPORTED_TYPE, null);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return formatRespData(GET_INFO_ERROR, null);
     }
 
     @HttpRequestRecorder
