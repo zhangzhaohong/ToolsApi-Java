@@ -2,6 +2,8 @@ package com.koala.factory.product;
 
 import com.koala.data.models.kugou.AlbumInfo.KugouAlbumInfoRespDataModel;
 import com.koala.data.models.kugou.AlbumMusicInfo.KugouAlbumMusicInfoRespDataModel;
+import com.koala.data.models.kugou.AlbumMusicInfo.custom.KugouAlbumCustomMusicInfoModel;
+import com.koala.data.models.kugou.AlbumMusicInfo.pattern.KugouAlbumMusicItemPatternInfoDataModel;
 import com.koala.data.models.kugou.KugouMusicDataRespModel;
 import com.koala.service.data.redis.service.RedisService;
 import com.koala.service.utils.GsonUtil;
@@ -10,13 +12,17 @@ import com.koala.service.utils.HttpClientUtil;
 import com.koala.service.utils.PatternUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
+import static com.koala.factory.extra.kugou.KugouMusicInfoDataGenerator.generateMusicInfoData;
 import static com.koala.factory.path.KugouWebPathCollector.KUGOU_ALBUM_DETAIL_SERVER_URL;
 import static com.koala.factory.path.KugouWebPathCollector.KUGOU_ALBUM_MUSIC_DETAIL_SERVER_URL;
 
@@ -39,6 +45,7 @@ public class KugouApiProduct {
     private Map<String, Object> customParams;
     private KugouAlbumInfoRespDataModel<?> albumInfoData = null;
     private KugouAlbumMusicInfoRespDataModel<?> albumMusicInfoData = null;
+    private KugouAlbumCustomMusicInfoModel musicInfoData = null;
 
     public void setUrl(String url) {
         this.url = url;
@@ -104,8 +111,27 @@ public class KugouApiProduct {
         }
     }
 
+    public void generatePlayInfo() {
+        if (checkNotNullHashAndAlbumId() || Objects.isNull(this.albumMusicInfoData)) {
+            return;
+        }
+        try {
+            ArrayList<?> tmp1 = (ArrayList<?>) this.albumMusicInfoData.getData();
+            if (tmp1.isEmpty())
+                return;
+            ArrayList<?> tmp2 = (ArrayList<?>) tmp1.get(0);
+            if (tmp2.isEmpty())
+                return;
+            KugouAlbumMusicItemPatternInfoDataModel tmp = GsonUtil.toBean(GsonUtil.toString(tmp2.get(0)), KugouAlbumMusicItemPatternInfoDataModel.class);
+            this.musicInfoData = generateMusicInfoData(tmp);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
     public KugouMusicDataRespModel generateItemInfoRespData() {
-        KugouMusicDataRespModel respData = new KugouMusicDataRespModel(this.albumInfoData, this.albumMusicInfoData);
+        KugouMusicDataRespModel respData = new KugouMusicDataRespModel(this.albumInfoData, this.albumMusicInfoData, this.musicInfoData);
         try {
             if ("1".equals(version.toString())) {
 

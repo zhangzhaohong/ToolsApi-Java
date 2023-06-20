@@ -16,4 +16,5 @@ import java.io.Serializable;
 public class KugouProductConfigModel implements Serializable {
     private Boolean albumInfo;
     private Boolean albumMusicInfo;
+    private Boolean musicInfo;
 }

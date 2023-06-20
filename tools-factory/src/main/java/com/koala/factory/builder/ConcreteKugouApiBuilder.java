@@ -66,4 +66,10 @@ public class ConcreteKugouApiBuilder extends KugouApiBuilder {
         product.getAlbumMusicInfo();
         return this;
     }
+
+    @Override
+    public KugouApiBuilder generatePlayInfo() throws IOException, URISyntaxException {
+        product.generatePlayInfo();
+        return this;
+    }
 }

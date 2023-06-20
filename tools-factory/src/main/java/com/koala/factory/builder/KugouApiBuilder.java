@@ -36,6 +36,8 @@ public abstract class KugouApiBuilder {
 
     public abstract KugouApiBuilder getAlbumMusicInfo() throws IOException, URISyntaxException;
 
+    public abstract KugouApiBuilder generatePlayInfo() throws IOException, URISyntaxException;
+
     public KugouApiProduct getProduct() {
         return product;
     }

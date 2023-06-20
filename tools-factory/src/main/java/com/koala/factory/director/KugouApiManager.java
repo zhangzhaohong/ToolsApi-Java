@@ -37,6 +37,9 @@ public class KugouApiManager {
         if (config.getAlbumMusicInfo()) {
             builder.getAlbumMusicInfo();
         }
+        if (config.getMusicInfo()) {
+            builder.generatePlayInfo();
+        }
         return builder.getProduct();
     }
 }

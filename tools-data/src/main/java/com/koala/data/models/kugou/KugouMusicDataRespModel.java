@@ -3,6 +3,7 @@ package com.koala.data.models.kugou;
 import com.google.gson.annotations.SerializedName;
 import com.koala.data.models.kugou.AlbumInfo.KugouAlbumInfoRespDataModel;
 import com.koala.data.models.kugou.AlbumMusicInfo.KugouAlbumMusicInfoRespDataModel;
+import com.koala.data.models.kugou.AlbumMusicInfo.custom.KugouAlbumCustomMusicInfoModel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -21,4 +22,6 @@ public class KugouMusicDataRespModel implements Serializable {
     private KugouAlbumInfoRespDataModel<?> albumInfo;
     @SerializedName("album_music_info")
     private KugouAlbumMusicInfoRespDataModel<?> albumMusicInfo;
+    @SerializedName("music_info_data")
+    private KugouAlbumCustomMusicInfoModel musicInfoData;
 }
