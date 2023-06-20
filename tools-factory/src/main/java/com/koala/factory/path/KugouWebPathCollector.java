@@ -10,4 +10,5 @@ public class KugouWebPathCollector {
     public static final String KUGOU_SEARCH_WEB_SERVER_URL_V1 = "https://complexsearchretry.kugou.com/v2/search/song";
     public static final String KUGOU_DETAIL_SERVER_URL_V1 = "https://wwwapi.kugou.com/yy/index.php";
     public static final String KUGOU_DETAIL_SERVER_URL_V2 = "https://trackercdn.kugou.com/i/v2/";
+    public static final String KUGOU_SEARCH_TIP_SERVER_URL = "https://searchtip.kugou.com/getSearchTip";
 }

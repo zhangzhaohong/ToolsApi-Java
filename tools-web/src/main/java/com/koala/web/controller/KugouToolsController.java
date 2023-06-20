@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.HashMap;
 
 import static com.koala.base.enums.KugouResponseEnums.*;
 import static com.koala.factory.extra.kugou.KugouSearchParamsGenerator.getSearchParams;
@@ -55,11 +56,23 @@ public class KugouToolsController {
     }
 
     @HttpRequestRecorder
+    @GetMapping(value = "api/search/tips", produces = {"application/json;charset=utf-8"})
+    public String searchTip(@RequestParam(required = false) String text) throws IOException, URISyntaxException {
+        HashMap<String, String> params = new HashMap<>();
+        params.put("keyword", text);
+        String response = HttpClientUtil.doGet(KUGOU_SEARCH_TIP_SERVER_URL, HeaderUtil.getKugouPublicHeader(null, null), params);
+        if (StringUtils.hasLength(response)) {
+            return formatRespData(GET_DATA_SUCCESS, GsonUtil.toBean(response, Object.class));
+        }
+        return formatRespData(GET_INFO_ERROR, null);
+    }
+
+    @HttpRequestRecorder
     @GetMapping(value = "api/playInfo", produces = {"application/json;charset=utf-8"})
     public String playInfo(@RequestParam(required = false) String hash, @RequestParam(required = false) String albumId) throws IOException, URISyntaxException {
         String mid = KugouMidGenerator.getMid();
         String cookie = customParams.getKugouCustomParams().get("kg_mid_cookie").toString();
-        String response = HttpClientUtil.doGet(KUGOU_DETAIL_SERVER_URL_V2, HeaderUtil.getKugouPublicHeader(null,cookie), KugouPlayInfoParamsGenerator.getPlayInfoParams(hash, mid, albumId, customParams));
+        String response = HttpClientUtil.doGet(KUGOU_DETAIL_SERVER_URL_V2, HeaderUtil.getKugouPublicHeader(null, cookie), KugouPlayInfoParamsGenerator.getPlayInfoParams(hash, mid, albumId, customParams));
         if (StringUtils.hasLength(response)) {
             return formatRespData(GET_DATA_SUCCESS, GsonUtil.toBean(response, Object.class));
         }
