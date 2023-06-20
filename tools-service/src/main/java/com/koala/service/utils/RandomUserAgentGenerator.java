@@ -27,4 +27,8 @@ public class RandomUserAgentGenerator {
     static String getUserAgent() {
         return userAgentList[random.nextInt(0, userAgentList.length)];
     }
+
+    public static String getKugouApplicationUserAgent() {
+        return "KugouMusic/3.1.2 (Mac OS X ban ben13.5(ban hao22G5048d))";
+    }
 }

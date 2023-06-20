@@ -1,5 +1,7 @@
 package com.koala.service.utils;
 
+import org.springframework.util.StringUtils;
+
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -212,10 +214,17 @@ public class HeaderUtil {
         return header;
     }
 
-    public static Map<String, String> getKugouPublicWithOutCookieHeader() {
+    public static Map<String, String> getKugouPublicHeader(String userAgent, String cookie) {
         HashMap<String, String> header = new HashMap<>(0);
-        header.put("User-Agent", RandomUserAgentGenerator.getUserAgent());
+        if (StringUtils.hasLength(userAgent)) {
+            header.put("User-Agent", userAgent);
+        } else {
+            header.put("User-Agent", RandomUserAgentGenerator.getUserAgent());
+        }
         header.put("Referer", "https://www.kugou.com/");
+        if (StringUtils.hasLength(cookie)) {
+            header.put("Cookie", cookie);
+        }
         header.put("X-FORWARDED-FOR", getRandomIpAddress());
         header.put("CLIENT-IP", getRandomIpAddress());
         return header;

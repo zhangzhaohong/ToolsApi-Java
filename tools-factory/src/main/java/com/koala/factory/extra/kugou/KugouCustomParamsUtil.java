@@ -37,7 +37,7 @@ public class KugouCustomParamsUtil {
         HashMap<String, Object> defaultHashMap = new HashMap<>();
         defaultHashMap.put("userId", "0");
         defaultHashMap.put("token", "");
-        defaultHashMap.put("kg_mid", KugouMidGenerator.getMid());
+        defaultHashMap.put("kg_mid_cookie", "kg_mid=" + KugouMidGenerator.getMid() + ";");
         return defaultHashMap;
     }
 

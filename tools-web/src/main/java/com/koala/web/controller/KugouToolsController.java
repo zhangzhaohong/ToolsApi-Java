@@ -2,6 +2,7 @@ package com.koala.web.controller;
 
 import com.koala.factory.extra.kugou.KugouCustomParamsUtil;
 import com.koala.factory.extra.kugou.KugouMidGenerator;
+import com.koala.factory.extra.kugou.KugouPlayInfoParamsGenerator;
 import com.koala.service.custom.http.annotation.HttpRequestRecorder;
 import com.koala.service.utils.*;
 import jakarta.annotation.Resource;
@@ -15,13 +16,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.*;
 
 import static com.koala.base.enums.KugouResponseEnums.*;
 import static com.koala.factory.extra.kugou.KugouSearchParamsGenerator.getSearchParams;
 import static com.koala.factory.extra.kugou.KugouSearchParamsGenerator.getSearchTextParams;
-import static com.koala.factory.path.KugouWebPathCollector.KUGOU_DETAIL_SERVER_URL;
-import static com.koala.factory.path.KugouWebPathCollector.KUGOU_SEARCH_WEB_SERVER_URL_V1;
+import static com.koala.factory.path.KugouWebPathCollector.*;
 import static com.koala.service.utils.RespUtil.formatRespData;
 
 /**
@@ -48,7 +47,7 @@ public class KugouToolsController {
         if (!StringUtils.hasLength(signature)) {
             return formatRespData(GET_SIGNATURE_FAILED, null);
         }
-        String response = HttpClientUtil.doGet(KUGOU_SEARCH_WEB_SERVER_URL_V1, HeaderUtil.getKugouPublicWithOutCookieHeader(), getSearchParams(timestamp, key, mid, page, limit, signature, customParams));
+        String response = HttpClientUtil.doGet(KUGOU_SEARCH_WEB_SERVER_URL_V1, HeaderUtil.getKugouPublicHeader(null, null), getSearchParams(timestamp, key, mid, page, limit, signature, customParams));
         if (StringUtils.hasLength(response)) {
             return formatRespData(GET_DATA_SUCCESS, GsonUtil.toBean(response, Object.class));
         }
@@ -56,14 +55,15 @@ public class KugouToolsController {
     }
 
     @HttpRequestRecorder
-    @GetMapping(value = "api", produces = {"application/json;charset=utf-8"})
-    public String api(@RequestParam(required = false) String hash, @RequestParam(required = false) String albumId) throws IOException, URISyntaxException {
-        Map<String, String> params = new HashMap<>();
-        params.put("r", "play/getdata");
-        params.put("hash", hash);
-        params.put("mid", "ed88352145d854ebf55490805de8c8a1");
-        params.put("album_id", albumId);
-        String response = HttpClientUtil.doGet(KUGOU_DETAIL_SERVER_URL, HeaderUtil.getKugouPublicWithOutCookieHeader(), params);
-        return formatRespData(GET_DATA_SUCCESS, GsonUtil.toBean(response, Object.class));
+    @GetMapping(value = "api/playInfo", produces = {"application/json;charset=utf-8"})
+    public String playInfo(@RequestParam(required = false) String hash, @RequestParam(required = false) String albumId) throws IOException, URISyntaxException {
+        String mid = KugouMidGenerator.getMid();
+        String cookie = customParams.getKugouCustomParams().get("kg_mid_cookie").toString();
+        String response = HttpClientUtil.doGet(KUGOU_DETAIL_SERVER_URL_V2, HeaderUtil.getKugouPublicHeader(null,cookie), KugouPlayInfoParamsGenerator.getPlayInfoParams(hash, mid, albumId, customParams));
+        if (StringUtils.hasLength(response)) {
+            return formatRespData(GET_DATA_SUCCESS, GsonUtil.toBean(response, Object.class));
+        }
+        return formatRespData(GET_INFO_ERROR, null);
     }
+
 }
