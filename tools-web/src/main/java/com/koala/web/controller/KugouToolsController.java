@@ -1,13 +1,24 @@
 package com.koala.web.controller;
 
+import com.koala.factory.builder.ConcreteKugouApiBuilder;
+import com.koala.factory.builder.ConcreteNeteaseApiBuilder;
+import com.koala.factory.builder.KugouApiBuilder;
+import com.koala.factory.builder.NeteaseApiBuilder;
+import com.koala.factory.director.KugouApiManager;
+import com.koala.factory.director.NeteaseApiManager;
 import com.koala.factory.extra.kugou.KugouCustomParamsUtil;
 import com.koala.factory.extra.kugou.KugouMidGenerator;
 import com.koala.factory.extra.kugou.KugouPlayInfoParamsGenerator;
+import com.koala.factory.product.KugouApiProduct;
+import com.koala.factory.product.NeteaseApiProduct;
 import com.koala.service.custom.http.annotation.HttpRequestRecorder;
+import com.koala.service.data.redis.service.RedisService;
 import com.koala.service.utils.*;
 import jakarta.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.web.DefaultRedirectStrategy;
+import org.springframework.security.web.RedirectStrategy;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,8 +27,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Optional;
 
+import static com.koala.base.enums.DouYinResponseEnums.FAILURE;
+import static com.koala.base.enums.DouYinResponseEnums.INVALID_LINK;
 import static com.koala.base.enums.KugouResponseEnums.*;
 import static com.koala.factory.extra.kugou.KugouSearchParamsGenerator.getSearchParams;
 import static com.koala.factory.extra.kugou.KugouSearchParamsGenerator.getSearchTextParams;
@@ -35,6 +50,14 @@ import static com.koala.service.utils.RespUtil.formatRespData;
 public class KugouToolsController {
 
     private static final Logger logger = LoggerFactory.getLogger(KugouToolsController.class);
+
+    private final RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
+
+    @Resource(name = "getHost")
+    private String host;
+
+    @Resource(name = "RedisService")
+    private RedisService redisService;
 
     @Resource
     private KugouCustomParamsUtil customParams;
@@ -65,6 +88,31 @@ public class KugouToolsController {
             return formatRespData(GET_DATA_SUCCESS, GsonUtil.toBean(response, Object.class));
         }
         return formatRespData(GET_INFO_ERROR, null);
+    }
+
+    @HttpRequestRecorder
+    @GetMapping(value = "api", produces = {"application/json;charset=utf-8"})
+    public String api(@RequestParam(required = false) String link, @RequestParam(required = false) String hash, @RequestParam(required = false) String albumId, @RequestParam(required = false, defaultValue = "1") Integer version) throws IOException, URISyntaxException {
+        if (!StringUtils.hasLength(link) && (!StringUtils.hasLength(hash) && !StringUtils.hasLength(albumId))) {
+            return formatRespData(UNSUPPORTED_PARAMS, null);
+        }
+        String url;
+        Optional<String> optional = Arrays.stream(link.split(" ")).filter(item -> item.contains("kugou.com/")).findFirst();
+        if (optional.isPresent()) {
+            url = optional.get().trim();
+        } else {
+            return formatRespData(INVALID_LINK, null);
+        }
+        KugouApiBuilder builder = new ConcreteKugouApiBuilder();
+        KugouApiManager manager = new KugouApiManager(builder);
+        KugouApiProduct product = null;
+        try {
+            product = manager.construct(redisService, host, url, hash, albumId, version);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return formatRespData(FAILURE, null);
+        }
+        return "ok";
     }
 
     @HttpRequestRecorder
