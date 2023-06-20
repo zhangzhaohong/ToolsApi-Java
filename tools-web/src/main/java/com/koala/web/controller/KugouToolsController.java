@@ -1,15 +1,11 @@
 package com.koala.web.controller;
 
-import com.koala.base.enums.NeteaseResponseEnums;
-import com.koala.factory.path.KugouWebPathCollector;
+import com.koala.factory.extra.kugou.KugouCustomParamsUtil;
 import com.koala.service.custom.http.annotation.HttpRequestRecorder;
-import com.koala.service.utils.GsonUtil;
-import com.koala.service.utils.HeaderUtil;
-import com.koala.service.utils.HttpClientUtil;
-import com.koala.service.utils.KugouSignatureUtil;
+import com.koala.service.utils.*;
+import jakarta.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -39,15 +35,18 @@ public class KugouToolsController {
 
     private static final Logger logger = LoggerFactory.getLogger(KugouToolsController.class);
 
+    @Resource
+    private KugouCustomParamsUtil customParams;
+
     @HttpRequestRecorder
     @GetMapping(value = "api/search", produces = {"application/json;charset=utf-8"})
     public String search(@RequestParam(required = false) String key, @RequestParam(required = false, defaultValue = "1") Long page, @RequestParam(required = false, defaultValue = "30") Long limit) throws IOException, URISyntaxException {
         Long timestamp = System.currentTimeMillis();
-        String signature = Objects.requireNonNull(KugouSignatureUtil.encrypt(getSearchTextParams(timestamp, key, page, limit))).getSignature();
+        String signature = MD5Utils.md5(getSearchTextParams(timestamp, key, page, limit, customParams));
         if (!StringUtils.hasLength(signature)) {
             return formatRespData(GET_SIGNATURE_FAILED, null);
         }
-        String response = HttpClientUtil.doGet(KUGOU_SEARCH_WEB_SERVER_URL_V1, HeaderUtil.getKugouPublicWithOutCookieHeader(), getSearchParams(timestamp, key, page, limit, signature));
+        String response = HttpClientUtil.doGet(KUGOU_SEARCH_WEB_SERVER_URL_V1, HeaderUtil.getKugouPublicWithOutCookieHeader(), getSearchParams(timestamp, key, page, limit, signature, customParams));
         if (StringUtils.hasLength(response)) {
             return formatRespData(GET_DATA_SUCCESS, GsonUtil.toBean(response, Object.class));
         }

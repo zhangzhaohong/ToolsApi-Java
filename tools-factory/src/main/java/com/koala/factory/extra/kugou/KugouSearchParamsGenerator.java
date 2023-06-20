@@ -2,6 +2,7 @@ package com.koala.factory.extra.kugou;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * @author koala
@@ -10,7 +11,10 @@ import java.util.Map;
  * @description
  */
 public class KugouSearchParamsGenerator {
-    public static String getSearchTextParams(Long timestamp, String key, Long page, Long limit) {
+
+    private static final String CURRENT_UUID = UUID.randomUUID().toString().replace("-", "");
+
+    public static String getSearchTextParams(Long timestamp, String key, Long page, Long limit, KugouCustomParamsUtil customParams) {
         String[] paramsArray = {
                 "NVPh5oo715z5DIWAeQlhMDsWXXQV4hwt",
                 "bitrate=0",
@@ -29,15 +33,15 @@ public class KugouSearchParamsGenerator {
                 "platform=WebFilter",
                 "privilege_filter=0",
                 "srcappid=2919",
-                "token=",
-                "userid=0",
-                "uuid=" + timestamp,
+                "token=" + customParams.getKugouCustomParams().get("token"),
+                "userid=" + customParams.getKugouCustomParams().get("userId"),
+                "uuid=" + CURRENT_UUID,
                 "NVPh5oo715z5DIWAeQlhMDsWXXQV4hwt"
         };
         return String.join("", paramsArray);
     }
 
-    public static Map<String, String> getSearchParams(Long timestamp, String key, Long page, Long limit, String signature) {
+    public static Map<String, String> getSearchParams(Long timestamp, String key, Long page, Long limit, String signature, KugouCustomParamsUtil customParams) {
         Map<String, String> params = new HashMap<>();
         params.put("bitrate", "0");
         params.put("clienttime", String.valueOf(timestamp));
@@ -54,10 +58,10 @@ public class KugouSearchParamsGenerator {
         params.put("platform", "WebFilter");
         params.put("privilege_filter", "0");
         params.put("srcappid", "2919");
-        params.put("token", "");
-        params.put("userid", "0");
-        params.put("uuid", String.valueOf(timestamp));
+        params.put("token", customParams.getKugouCustomParams().get("token").toString());
+        params.put("userid", customParams.getKugouCustomParams().get("userId").toString());
+        params.put("uuid", CURRENT_UUID);
         params.put("signature", signature);
-       return params;
+        return params;
     }
 }
