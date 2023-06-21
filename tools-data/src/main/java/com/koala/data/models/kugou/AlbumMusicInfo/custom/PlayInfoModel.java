@@ -1,6 +1,7 @@
 package com.koala.data.models.kugou.AlbumMusicInfo.custom;
 
 import com.google.gson.annotations.SerializedName;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -12,6 +13,7 @@ import java.io.Serializable;
  * @description
  */
 @Data
+@AllArgsConstructor
 public class PlayInfoModel implements Serializable {
     private String bitrate;
     private String hash;

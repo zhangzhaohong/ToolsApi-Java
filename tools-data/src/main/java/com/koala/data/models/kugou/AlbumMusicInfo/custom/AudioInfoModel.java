@@ -5,6 +5,7 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.Optional;
 
 /**
  * @author koala
@@ -27,4 +28,8 @@ public class AudioInfoModel implements Serializable {
     private String extname;
     @SerializedName("play_info_list")
     private HashMap<String, PlayInfoModel> playInfoList;
+
+    public HashMap<String, PlayInfoModel> getPlayInfoList() {
+        return Optional.ofNullable(this.playInfoList).orElse(new HashMap<>());
+    }
 }

@@ -1,10 +1,18 @@
 package com.koala.factory.extra.kugou;
 
+import com.koala.base.enums.KugouRequestQualityEnums;
 import com.koala.data.models.kugou.AlbumMusicInfo.custom.AlbumInfoModel;
 import com.koala.data.models.kugou.AlbumMusicInfo.custom.AudioInfoModel;
 import com.koala.data.models.kugou.AlbumMusicInfo.custom.KugouAlbumCustomMusicInfoModel;
+import com.koala.data.models.kugou.AlbumMusicInfo.custom.PlayInfoModel;
 import com.koala.data.models.kugou.AlbumMusicInfo.pattern.KugouAlbumMusicItemPatternInfoDataModel;
+import com.koala.service.utils.GsonUtil;
 import org.springframework.beans.BeanUtils;
+import org.springframework.util.StringUtils;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author koala
@@ -18,10 +26,28 @@ public class KugouMusicInfoDataGenerator {
         BeanUtils.copyProperties(data, musicInfoData);
         AlbumInfoModel albumInfo = new AlbumInfoModel();
         BeanUtils.copyProperties(data.getAlbumInfo(), albumInfo);
+        musicInfoData.setAlbumInfo(albumInfo);
         AudioInfoModel audioInfo = new AudioInfoModel();
         BeanUtils.copyProperties(data.getAudioInfo(), audioInfo);
-        musicInfoData.setAlbumInfo(albumInfo);
+        Map<String, Object> musicPlayInfoMapData = GsonUtil.toMaps(GsonUtil.toString(data.getAudioInfo()));
+        HashMap<String, PlayInfoModel> playInfoData = new HashMap<>();
+        Arrays.stream(KugouRequestQualityEnums.values()).forEach(qualityEnum -> {
+            playInfoData.put(qualityEnum.getType(), new PlayInfoModel(
+                    getDataFromMap(qualityEnum.getBitrateKey(), musicPlayInfoMapData),
+                    getDataFromMap(qualityEnum.getHashKey(), musicPlayInfoMapData),
+                    getDataFromMap(qualityEnum.getFilesizeKey(), musicPlayInfoMapData),
+                    getDataFromMap(qualityEnum.getTimelengthKey(), musicPlayInfoMapData)
+            ));
+        });
+        audioInfo.setPlayInfoList(playInfoData);
         musicInfoData.setAudioInfo(audioInfo);
         return musicInfoData;
+    }
+
+    private static String getDataFromMap(String key, Map<String, Object> data) {
+        if (StringUtils.hasLength(key)) {
+            return data.get(key).toString();
+        }
+        return null;
     }
 }
