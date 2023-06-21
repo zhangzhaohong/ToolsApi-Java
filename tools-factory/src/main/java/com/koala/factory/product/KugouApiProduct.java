@@ -192,11 +192,11 @@ public class KugouApiProduct {
                     patternMusicInfo.setAuthorName(this.authorName);
                     patternMusicInfo.setAlbumInfo(patternAlbumInfo);
                     patternMusicInfo.setAudioInfo(patternAudioInfo);
-                    redisService.set(KUGOU_DATA_KEY_PREFIX + key, GsonUtil.toString(new ShortKugouItemDataModel(this.title, this.authorName, patternMusicInfo)), EXPIRE_TIME);
+                    redisService.set(KUGOU_DATA_KEY_PREFIX + key, GsonUtil.toString(new ShortKugouItemDataModel(this.title, this.authorName, patternMusicInfo, null)), EXPIRE_TIME);
                     respData.getMockPreviewPath().put(KugouRequestQualityEnums.QUALITY_DEFAULT.getType(), host + "tools/Kugou/pro/player/music/short?key=" + Base64Utils.encodeToUrlSafeString(key.getBytes(StandardCharsets.UTF_8)) + "&quality=" + KugouRequestQualityEnums.QUALITY_DEFAULT.getType());
                     respData.getMockDownloadPath().put(KugouRequestQualityEnums.QUALITY_DEFAULT.getType(), host + "tools/Kugou/download/music/short?key=" + Base64Utils.encodeToUrlSafeString(key.getBytes(StandardCharsets.UTF_8)) + "&quality=" + KugouRequestQualityEnums.QUALITY_DEFAULT.getType());
                 } else {
-                    redisService.set(KUGOU_DATA_KEY_PREFIX + key, GsonUtil.toString(new ShortKugouItemDataModel(this.title, this.authorName, this.musicInfoData)), EXPIRE_TIME);
+                    redisService.set(KUGOU_DATA_KEY_PREFIX + key, GsonUtil.toString(new ShortKugouItemDataModel(this.title, this.authorName, this.musicInfoData, null)), EXPIRE_TIME);
                     Arrays.stream(KugouRequestQualityEnums.values()).forEach(qualityEnum -> {
                         PlayInfoModel tmp = this.musicInfoData.getAudioInfo().getPlayInfoList().get(qualityEnum.getType());
                         if (StringUtils.hasLength(tmp.getHash())) {

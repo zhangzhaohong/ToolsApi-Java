@@ -13,6 +13,7 @@ public class KugouWebPathCollector {
     public static final String KUGOU_SEARCH_TIP_SERVER_URL = "https://searchtip.kugou.com/getSearchTip";
     public static final String KUGOU_SEARCH_MV_SERVER_URL = "https://mvsearch.kugou.com/mv_search";
     public static final String KUGOU_MV_DETAIL_SERVER_URL = "http://kmr.service.kugou.com/v1/video";
+    public static final String KUGOU_MV_VIDEO_SERVER_URL = "https://trackermv.kugou.com/interface/index/cmd=104&ext=mp4";
     public static final String KUGOU_ALBUM_DETAIL_SERVER_URL = "http://kmr.service.kugou.com/v1/album/audio";
     public static final String KUGOU_ALBUM_MUSIC_DETAIL_SERVER_URL = "http://kmr.service.kugou.com/v2/album_audio/audio";
 }

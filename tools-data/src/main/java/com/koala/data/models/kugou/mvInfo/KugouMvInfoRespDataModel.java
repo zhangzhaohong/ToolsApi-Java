@@ -23,6 +23,8 @@ public class KugouMvInfoRespDataModel<Object extends Serializable> implements Se
     private Object data;
     @SerializedName("mv_info_data")
     private LinkedHashMap<String, PlayInfoModel> mvInfoData;
+    @SerializedName("mock_preview_path")
+    private LinkedHashMap<String, String> mockPreviewPath = null;
 
     public LinkedHashMap<String, PlayInfoModel> getMvInfoData() {
         return Optional.ofNullable(mvInfoData).orElse(new LinkedHashMap<>());

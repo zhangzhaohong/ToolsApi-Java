@@ -27,10 +27,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.Objects;
 
-import static com.koala.base.enums.KugouResponseEnums.GET_DATA_SUCCESS;
 import static com.koala.factory.path.KugouWebPathCollector.KUGOU_DETAIL_SERVER_URL_V2;
 import static com.koala.service.data.redis.RedisKeyPrefix.KUGOU_DATA_KEY_PREFIX;
-import static com.koala.service.utils.RespUtil.formatRespData;
 
 /**
  * @author koala
@@ -86,6 +84,27 @@ public class KugouPlayerController {
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        response.setStatus(HttpStatus.SC_NOT_FOUND);
+        return "404/index";
+    }
+
+    @HttpRequestRecorder
+    @GetMapping("/mv/short")
+    public String videoWithShortKey(@RequestParam(value = "key", required = false, defaultValue = "") String key, @RequestParam(value = "version", required = false, defaultValue = "1") String version, Model model, HttpServletRequest request, HttpServletResponse response) {
+        try {
+            String itemKey = "".equals(key) ? "" : new String(Base64Utils.decodeFromUrlSafeString(key));
+            logger.info("[videoPlayer] itemKey: {}, Sec-Fetch-Dest: {}", itemKey, request.getHeader("Sec-Fetch-Dest"));
+            if (StringUtils.hasLength(itemKey)) {
+                ShortKugouItemDataModel tmp = GsonUtil.toBean(redisService.get(KUGOU_DATA_KEY_PREFIX + itemKey), ShortKugouItemDataModel.class);
+                model.addAttribute("title", StringUtils.hasLength(tmp.getTitle()) ? tmp.getTitle() : "VideoPlayer");
+                model.addAttribute("media", GsonUtil.toString(tmp.getMvInfo()));
+                if ("1".equals(version)) {
+                    return "video/dplayer/kugou/index";
                 }
             }
         } catch (Exception e) {

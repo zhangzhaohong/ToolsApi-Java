@@ -6,6 +6,7 @@ import com.koala.base.enums.KugouRequestTypeEnums;
 import com.koala.data.models.kugou.KugouMusicDataRespModel;
 import com.koala.data.models.kugou.config.KugouProductConfigModel;
 import com.koala.data.models.kugou.mvInfo.KugouMvInfoRespDataModel;
+import com.koala.data.models.kugou.mvInfo.custom.MvInfoModel;
 import com.koala.data.models.kugou.mvInfo.custom.PlayInfoModel;
 import com.koala.data.models.kugou.playInfo.KugouPlayInfoRespDataModel;
 import com.koala.data.models.shortUrl.ShortKugouItemDataModel;
@@ -35,6 +36,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import static com.koala.base.enums.KugouResponseEnums.*;
@@ -55,6 +57,8 @@ import static com.koala.service.utils.RespUtil.formatRespData;
 public class KugouToolsController {
 
     private static final Logger logger = LoggerFactory.getLogger(KugouToolsController.class);
+
+    private final static Long EXPIRE_TIME = 12 * 60 * 60L;
 
     private final RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
 
@@ -198,19 +202,29 @@ public class KugouToolsController {
         if (StringUtils.hasLength(response)) {
             try {
                 KugouMvInfoRespDataModel<?> respData = GsonUtil.toBean(response, KugouMvInfoRespDataModel.class);
+                respData.setMockPreviewPath(new LinkedHashMap<>());
                 if ("true".equals(generateInfo)) {
+                    String key = ShortKeyGenerator.getKey(null);
                     respData.setMvInfoData(new LinkedHashMap<>());
                     ArrayList<?> tmp1 = (ArrayList<?>) respData.getData();
                     if (tmp1.isEmpty())
                         return formatRespData(GET_INFO_ERROR, null);
                     Map<String, Object> tmp = GsonUtil.toMaps(GsonUtil.toString(tmp1.get(0)));
+                    ArrayList<MvInfoModel> mvInfo = new ArrayList<>();
                     Arrays.stream(KugouMvRequestQualityEnums.values()).forEach(qualityEnum -> {
+                        String hashItem = getDataFromMap(qualityEnum.getHashKey(), tmp);
                         respData.getMvInfoData().put(qualityEnum.getType(), new PlayInfoModel(
                                 getLongDataFromMap(qualityEnum.getBitrateKey(), tmp),
-                                getDataFromMap(qualityEnum.getHashKey(), tmp),
+                                hashItem,
                                 getLongDataFromMap(qualityEnum.getFilesizeKey(), tmp)
                         ));
+                        if (qualityEnum.getCanPreview()) {
+                            String mvPath = ShortKeyGenerator.generateShortUrl(KUGOU_MV_VIDEO_SERVER_URL + "&hash=" + hashItem, EXPIRE_TIME, host, redisService).getUrl();
+                            mvInfo.add(new MvInfoModel(mvPath, hashItem, qualityEnum.getTypeName()));
+                        }
                     });
+                    redisService.set(KUGOU_DATA_KEY_PREFIX + key, GsonUtil.toString(new ShortKugouItemDataModel(getDataFromMap("video_name", tmp), getDataFromMap("author_name", tmp), null, mvInfo)), EXPIRE_TIME);
+                    respData.getMockPreviewPath().put(KugouMvRequestQualityEnums.QUALITY_DEFAULT.getType(), host + "tools/Kugou/pro/player/mv/short?key=" + Base64Utils.encodeToUrlSafeString(key.getBytes(StandardCharsets.UTF_8)));
                 }
                 return formatRespData(GET_DATA_SUCCESS, respData);
             } catch (Exception e) {
