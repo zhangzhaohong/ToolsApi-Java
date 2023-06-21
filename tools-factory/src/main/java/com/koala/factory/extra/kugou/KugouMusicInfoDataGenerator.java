@@ -12,6 +12,7 @@ import org.springframework.util.StringUtils;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -30,7 +31,7 @@ public class KugouMusicInfoDataGenerator {
         AudioInfoModel audioInfo = new AudioInfoModel();
         BeanUtils.copyProperties(data.getAudioInfo(), audioInfo);
         Map<String, Object> musicPlayInfoMapData = GsonUtil.toMaps(GsonUtil.toString(data.getAudioInfo()));
-        HashMap<String, PlayInfoModel> playInfoData = new HashMap<>();
+        LinkedHashMap<String, PlayInfoModel> playInfoData = new LinkedHashMap<>();
         Arrays.stream(KugouRequestQualityEnums.values()).forEach(qualityEnum -> {
             playInfoData.put(qualityEnum.getType(), new PlayInfoModel(
                     getDataFromMap(qualityEnum.getBitrateKey(), musicPlayInfoMapData),

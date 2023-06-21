@@ -9,6 +9,7 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 /**
  * @author koala
@@ -26,7 +27,7 @@ public class KugouMusicDataRespModel implements Serializable {
     @SerializedName("music_info_data")
     private KugouAlbumCustomMusicInfoModel musicInfoData;
     @SerializedName("mock_preview_path")
-    private HashMap<String, String> mockPreviewPath = null;
+    private LinkedHashMap<String, String> mockPreviewPath = null;
     @SerializedName("mock_download_path")
-    private HashMap<String, String> mockDownloadPath = null;
+    private LinkedHashMap<String, String> mockDownloadPath = null;
 }

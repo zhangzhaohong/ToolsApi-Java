@@ -5,6 +5,7 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Optional;
 
 /**
@@ -27,9 +28,9 @@ public class AudioInfoModel implements Serializable {
     private String extnameSuper;
     private String extname;
     @SerializedName("play_info_list")
-    private HashMap<String, PlayInfoModel> playInfoList;
+    private LinkedHashMap<String, PlayInfoModel> playInfoList;
 
-    public HashMap<String, PlayInfoModel> getPlayInfoList() {
-        return Optional.ofNullable(this.playInfoList).orElse(new HashMap<>());
+    public LinkedHashMap<String, PlayInfoModel> getPlayInfoList() {
+        return Optional.ofNullable(this.playInfoList).orElse(new LinkedHashMap<>());
     }
 }

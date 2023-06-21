@@ -176,7 +176,7 @@ public class KugouApiProduct {
     }
 
     public KugouMusicDataRespModel generateItemInfoRespData() {
-        KugouMusicDataRespModel respData = new KugouMusicDataRespModel(this.albumInfoData, this.albumMusicInfoData, this.musicInfoData, new HashMap<>(), new HashMap<>());
+        KugouMusicDataRespModel respData = new KugouMusicDataRespModel(this.albumInfoData, this.albumMusicInfoData, this.musicInfoData, new LinkedHashMap<>(), new LinkedHashMap<>());
         try {
             if ("1".equals(version.toString())) {
                 String key = ShortKeyGenerator.getKey(null);
@@ -184,7 +184,7 @@ public class KugouApiProduct {
                     AlbumInfoModel patternAlbumInfo = new AlbumInfoModel();
                     patternAlbumInfo.setAlbumId(this.albumId);
                     AudioInfoModel patternAudioInfo = new AudioInfoModel();
-                    HashMap<String, PlayInfoModel> patternPlayInfo = new HashMap<>();
+                    LinkedHashMap<String, PlayInfoModel> patternPlayInfo = new LinkedHashMap<>();
                     patternPlayInfo.put(KugouRequestQualityEnums.QUALITY_DEFAULT.getType(), new PlayInfoModel(null, this.hash, null, null));
                     patternAudioInfo.setPlayInfoList(patternPlayInfo);
                     KugouAlbumCustomMusicInfoModel patternMusicInfo = new KugouAlbumCustomMusicInfoModel();
