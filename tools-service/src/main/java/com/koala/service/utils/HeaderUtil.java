@@ -103,7 +103,7 @@ public class HeaderUtil {
         return header;
     }
 
-    public static Map<String, String> getKugouAudioDownloadHeader() {
+    public static Map<String, String> getKugouMediaDownloadHeader() {
         HashMap<String, String> header = new HashMap<>(0);
         header.put("Accept", "*/*");
         header.put("Accept-Encoding", "identity;q=1, *;q=0");

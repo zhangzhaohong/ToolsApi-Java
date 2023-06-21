@@ -203,6 +203,7 @@ public class KugouToolsController {
             try {
                 KugouMvInfoRespDataModel<?> respData = GsonUtil.toBean(response, KugouMvInfoRespDataModel.class);
                 respData.setMockPreviewPath(new LinkedHashMap<>());
+                respData.setMockDownloadPath(new LinkedHashMap<>());
                 if ("true".equals(generateInfo)) {
                     String key = ShortKeyGenerator.getKey(null);
                     respData.setMvInfoData(new LinkedHashMap<>());
@@ -220,11 +221,14 @@ public class KugouToolsController {
                         ));
                         if (qualityEnum.getCanPreview()) {
                             String mvPath = ShortKeyGenerator.generateShortUrl(KUGOU_MV_VIDEO_SERVER_URL + "&hash=" + hashItem, EXPIRE_TIME, host, redisService).getUrl();
-                            mvInfo.add(new MvInfoModel(mvPath, hashItem, qualityEnum.getTypeName()));
+                            mvInfo.add(new MvInfoModel(mvPath, hashItem, qualityEnum.getTypeName(), qualityEnum.getType()));
                         }
                     });
                     redisService.set(KUGOU_DATA_KEY_PREFIX + key, GsonUtil.toString(new ShortKugouItemDataModel(getDataFromMap("video_name", tmp), getDataFromMap("author_name", tmp), null, mvInfo)), EXPIRE_TIME);
                     respData.getMockPreviewPath().put(KugouMvRequestQualityEnums.QUALITY_DEFAULT.getType(), host + "tools/Kugou/pro/player/mv/short?key=" + Base64Utils.encodeToUrlSafeString(key.getBytes(StandardCharsets.UTF_8)));
+                    mvInfo.forEach(item -> {
+                        respData.getMockDownloadPath().put(item.getType(), host + "tools/Kugou/download/mv/short?key=" + Base64Utils.encodeToUrlSafeString(key.getBytes(StandardCharsets.UTF_8)) + "&quality=" + item.getType());
+                    });
                 }
                 return formatRespData(GET_DATA_SUCCESS, respData);
             } catch (Exception e) {
@@ -247,7 +251,7 @@ public class KugouToolsController {
             if (StringUtils.hasLength(itemKey)) {
                 ShortKugouItemDataModel tmp = GsonUtil.toBean(redisService.get(KUGOU_DATA_KEY_PREFIX + itemKey), ShortKugouItemDataModel.class);
                 String artist = StringUtils.hasLength(tmp.getAuthorName()) ? " - " + tmp.getAuthorName() : "";
-                String fileName = StringUtils.hasLength(tmp.getTitle()) ? tmp.getTitle() + artist : UUID.randomUUID().toString().replace("-", "");
+                String fileName = (StringUtils.hasLength(tmp.getTitle()) ? tmp.getTitle() + artist : UUID.randomUUID().toString().replace("-", "")) + "[" + quality + "]";
                 String hash = tmp.getMusicInfo().getAudioInfo().getPlayInfoList().get(quality).getHash();
                 String albumId = tmp.getMusicInfo().getAlbumInfo().getAlbumId();
                 String mid = KugouMidGenerator.getMid();
@@ -260,7 +264,30 @@ public class KugouToolsController {
                 if (Objects.isNull(respData) || respData.getUrl().isEmpty()) {
                     return;
                 }
-                HttpClientUtil.doRelay(respData.getUrl().get(0), HeaderUtil.getKugouAudioDownloadHeader(), null, 206, HeaderUtil.getMockDownloadKugouFileHeader(fileName, respData.getExtName()), request, response);
+                HttpClientUtil.doRelay(respData.getUrl().get(0), HeaderUtil.getKugouMediaDownloadHeader(), null, 206, HeaderUtil.getMockDownloadKugouFileHeader(fileName, respData.getExtName()), request, response);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @HttpRequestRecorder
+    @GetMapping(value = "download/mv/short", produces = "application/json;charset=UTF-8")
+    public void downloadMv(@RequestParam(required = false) String key, @RequestParam(value = "quality", required = false, defaultValue = "default") String quality, HttpServletRequest request, HttpServletResponse response) {
+        try {
+            String itemKey = "".equals(key) ? "" : new String(Base64Utils.decodeFromUrlSafeString(key));
+            logger.info("[videoPlayer] itemKey: {}, Sec-Fetch-Dest: {}", itemKey, request.getHeader("Sec-Fetch-Dest"));
+            if (Objects.isNull(KugouMvRequestQualityEnums.getEnumsByType(quality))) {
+                return;
+            }
+            if (StringUtils.hasLength(itemKey)) {
+                ShortKugouItemDataModel tmp = GsonUtil.toBean(redisService.get(KUGOU_DATA_KEY_PREFIX + itemKey), ShortKugouItemDataModel.class);
+                String artist = StringUtils.hasLength(tmp.getAuthorName()) ? " - " + tmp.getAuthorName() : "";
+                String fileName = (StringUtils.hasLength(tmp.getTitle()) ? tmp.getTitle() + artist : UUID.randomUUID().toString().replace("-", "")) + "[" + quality + "]";
+                Optional<MvInfoModel> optional = tmp.getMvInfo().stream().filter(item -> quality.equals(item.getType())).findFirst();
+                if (optional.isPresent()) {
+                    HttpClientUtil.doRelay(optional.get().getPath(), HeaderUtil.getKugouMediaDownloadHeader(), null, 206, HeaderUtil.getMockDownloadKugouFileHeader(fileName, "mp4"), request, response);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();

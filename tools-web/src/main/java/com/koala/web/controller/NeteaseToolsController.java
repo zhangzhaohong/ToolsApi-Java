@@ -176,7 +176,7 @@ public class NeteaseToolsController {
     public void downloadMv(@RequestParam(required = false) String key, @RequestParam(required = false, defaultValue = "sd2") String quality, HttpServletRequest request, HttpServletResponse response) {
         try {
             String itemKey = "".equals(key) ? "" : new String(Base64Utils.decodeFromUrlSafeString(key));
-            logger.info("[musicPlayer] itemKey: {}, Sec-Fetch-Dest: {}", itemKey, request.getHeader("Sec-Fetch-Dest"));
+            logger.info("[videoPlayer] itemKey: {}, Sec-Fetch-Dest: {}", itemKey, request.getHeader("Sec-Fetch-Dest"));
             if (StringUtils.hasLength(itemKey)) {
                 ShortNeteaseMvItemDataModel tmp = GsonUtil.toBean(redisService.get(NETEASE_MV_DATA_KEY_PREFIX + itemKey), ShortNeteaseMvItemDataModel.class);
                 String fileName = (StringUtils.hasLength(tmp.getTitle()) ? tmp.getTitle() : UUID.randomUUID().toString().replace("-", "")) + "(" + quality + ")";

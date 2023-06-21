@@ -17,4 +17,5 @@ public class MvInfoModel implements Serializable {
     private String path;
     private String hash;
     private String name;
+    private String type;
 }
