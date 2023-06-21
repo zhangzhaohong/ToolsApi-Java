@@ -92,6 +92,20 @@ public class KugouToolsController {
     }
 
     @HttpRequestRecorder
+    @GetMapping(value = "api/search/mv", produces = {"application/json;charset=utf-8"})
+    public String searchMv(@RequestParam(required = false) String text, @RequestParam(required = false, defaultValue = "1") Long page, @RequestParam(required = false, defaultValue = "30") Long limit) throws IOException, URISyntaxException {
+        HashMap<String, String> params = new HashMap<>();
+        params.put("keyword", text);
+        params.put("pagesize", limit.toString());
+        params.put("page", page.toString());
+        String response = HttpClientUtil.doGet(KUGOU_SEARCH_MV_SERVER_URL, HeaderUtil.getKugouPublicHeader(null, null), params);
+        if (StringUtils.hasLength(response)) {
+            return formatRespData(GET_DATA_SUCCESS, GsonUtil.toBean(response, Object.class));
+        }
+        return formatRespData(GET_INFO_ERROR, null);
+    }
+
+    @HttpRequestRecorder
     @GetMapping(value = "api", produces = {"application/json;charset=utf-8"})
     public String api(@RequestParam(required = false) String link, @RequestParam(required = false) String hash, @RequestParam(required = false) String albumId, @RequestParam(required = false, name = "type", defaultValue = "info") String type, @RequestParam(required = false, defaultValue = "1") Integer version, @RequestParam(required = false, defaultValue = "false") String albumInfo, @RequestParam(required = false, defaultValue = "false") String albumMusicInfo, @RequestParam(required = false, defaultValue = "false") String musicInfo, HttpServletRequest request, HttpServletResponse response) throws IOException, URISyntaxException {
         if (!StringUtils.hasLength(link) && (!StringUtils.hasLength(hash) && !StringUtils.hasLength(albumId))) {
