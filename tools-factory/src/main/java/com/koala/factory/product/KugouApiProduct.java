@@ -1,10 +1,16 @@
 package com.koala.factory.product;
 
+import com.koala.base.enums.KugouRequestQualityEnums;
 import com.koala.data.models.kugou.AlbumInfo.KugouAlbumInfoRespDataModel;
 import com.koala.data.models.kugou.AlbumMusicInfo.KugouAlbumMusicInfoRespDataModel;
+import com.koala.data.models.kugou.AlbumMusicInfo.custom.AlbumInfoModel;
+import com.koala.data.models.kugou.AlbumMusicInfo.custom.AudioInfoModel;
 import com.koala.data.models.kugou.AlbumMusicInfo.custom.KugouAlbumCustomMusicInfoModel;
+import com.koala.data.models.kugou.AlbumMusicInfo.custom.PlayInfoModel;
 import com.koala.data.models.kugou.AlbumMusicInfo.pattern.KugouAlbumMusicItemPatternInfoDataModel;
 import com.koala.data.models.kugou.KugouMusicDataRespModel;
+import com.koala.data.models.shortUrl.ShortKugouItemDataModel;
+import com.koala.data.models.shortUrl.ShortNeteaseItemDataModel;
 import com.koala.service.data.redis.service.RedisService;
 import com.koala.service.utils.*;
 import org.slf4j.Logger;
@@ -13,6 +19,7 @@ import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,8 +28,7 @@ import java.util.Objects;
 import static com.koala.factory.extra.kugou.KugouMusicInfoDataGenerator.generateMusicInfoData;
 import static com.koala.factory.path.KugouWebPathCollector.KUGOU_ALBUM_DETAIL_SERVER_URL;
 import static com.koala.factory.path.KugouWebPathCollector.KUGOU_ALBUM_MUSIC_DETAIL_SERVER_URL;
-import static com.koala.service.data.redis.RedisKeyPrefix.KUGOU_ALBUM_DATA_KEY_PREFIX;
-import static com.koala.service.data.redis.RedisKeyPrefix.KUGOU_ALBUM_MUSIC_DATA_KEY_PREFIX;
+import static com.koala.service.data.redis.RedisKeyPrefix.*;
 
 /**
  * @author koala
@@ -35,6 +41,7 @@ public class KugouApiProduct {
     private final static Long EXPIRE_TIME = 12 * 60 * 60L;
     private final static Long ALBUM_EXPIRE_TIME = 3 * 24 * 60 * 60L;
     private final static Long ALBUM_MUSIC_EXPIRE_TIME = 3 * 24 * 60 * 60L;
+    private String title, authorName;
     private String hash;
     private String albumId;
     private Integer version = 4;
@@ -73,6 +80,8 @@ public class KugouApiProduct {
             String redirectLocation = HttpClientUtil.doGetRedirectLocation(this.url);
             String response = HttpClientUtil.doGet(redirectLocation, HeaderUtil.getKugouPublicHeader(null, null), null);
             if (StringUtils.hasLength(response)) {
+                this.title = UnicodeUtils.unicodeToString(PatternUtil.matchData("\"song_name\":\"(.*?)\"", response));
+                this.authorName = UnicodeUtils.unicodeToString(PatternUtil.matchData("\"author_name\":\"(.*?)\"", response));
                 this.hash = PatternUtil.matchData("\"hash\":\"(.*?)\"", response);
                 this.albumId = PatternUtil.matchData("\"album_id\":\"(.*?)\"", response);
             }
@@ -171,10 +180,27 @@ public class KugouApiProduct {
     }
 
     public KugouMusicDataRespModel generateItemInfoRespData() {
-        KugouMusicDataRespModel respData = new KugouMusicDataRespModel(this.albumInfoData, this.albumMusicInfoData, this.musicInfoData);
+        KugouMusicDataRespModel respData = new KugouMusicDataRespModel(this.albumInfoData, this.albumMusicInfoData, this.musicInfoData, new HashMap<>(), new HashMap<>());
         try {
             if ("1".equals(version.toString())) {
-
+                String key = ShortKeyGenerator.getKey(null);
+                if (Objects.isNull(this.musicInfoData)) {
+                    AlbumInfoModel patternAlbumInfo = new AlbumInfoModel();
+                    patternAlbumInfo.setAlbumId(this.albumId);
+                    AudioInfoModel patternAudioInfo = new AudioInfoModel();
+                    HashMap<String, PlayInfoModel> patternPlayInfo = new HashMap<>();
+                    patternPlayInfo.put(KugouRequestQualityEnums.QUALITY_DEFAULT.getType(), new PlayInfoModel(null, this.hash, null, null));
+                    patternAudioInfo.setPlayInfoList(patternPlayInfo);
+                    KugouAlbumCustomMusicInfoModel patternMusicInfo = new KugouAlbumCustomMusicInfoModel();
+                    patternMusicInfo.setSongname(this.title);
+                    patternMusicInfo.setAuthorName(this.authorName);
+                    patternMusicInfo.setAlbumInfo(patternAlbumInfo);
+                    patternMusicInfo.setAudioInfo(patternAudioInfo);
+                    redisService.set(NETEASE_DATA_KEY_PREFIX + key, GsonUtil.toString(new ShortKugouItemDataModel(this.title, this.authorName, patternMusicInfo)), EXPIRE_TIME);
+                    respData.getMockPreviewPath().put(KugouRequestQualityEnums.QUALITY_DEFAULT.getType(), host + "tools/Kugou/pro/player/music/short?key=" + Base64Utils.encodeToUrlSafeString(key.getBytes(StandardCharsets.UTF_8)) + "&quality=" + KugouRequestQualityEnums.QUALITY_DEFAULT.getType());
+                } else {
+                    redisService.set(NETEASE_DATA_KEY_PREFIX + key, GsonUtil.toString(new ShortKugouItemDataModel(this.title, this.authorName, this.musicInfoData)), EXPIRE_TIME);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();

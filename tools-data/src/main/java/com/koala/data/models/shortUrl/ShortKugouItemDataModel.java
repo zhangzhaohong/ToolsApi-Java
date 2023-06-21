@@ -17,6 +17,8 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class ShortKugouItemDataModel implements Serializable {
     private String title;
+    @SerializedName("author_name")
+    private String authorName;
     @SerializedName("music_info")
     private KugouAlbumCustomMusicInfoModel musicInfo;
 }

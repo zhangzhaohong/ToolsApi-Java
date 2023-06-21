@@ -1,6 +1,6 @@
 package com.koala.web.controller;
 
-import com.koala.data.models.shortUrl.ShortNeteaseItemDataModel;
+import com.koala.data.models.shortUrl.ShortKugouItemDataModel;
 import com.koala.service.custom.http.annotation.HttpRequestRecorder;
 import com.koala.service.data.redis.service.RedisService;
 import com.koala.service.utils.Base64Utils;
@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import static com.koala.service.data.redis.RedisKeyPrefix.KUGOU_DATA_KEY_PREFIX;
-import static com.koala.service.data.redis.RedisKeyPrefix.NETEASE_DATA_KEY_PREFIX;
 
 /**
  * @author koala
@@ -43,11 +42,10 @@ public class KugouPlayerController {
             String itemKey = "".equals(key) ? "" : new String(Base64Utils.decodeFromUrlSafeString(key));
             logger.info("[musicPlayer] itemKey: {}, Sec-Fetch-Dest: {}", itemKey, request.getHeader("Sec-Fetch-Dest"));
             if (StringUtils.hasLength(itemKey)) {
-                ShortNeteaseItemDataModel tmp = GsonUtil.toBean(redisService.get(KUGOU_DATA_KEY_PREFIX + itemKey), ShortNeteaseItemDataModel.class);
-                String artist = StringUtils.hasLength(tmp.getArtist()) ? " - " + tmp.getArtist() : "";
+                ShortKugouItemDataModel tmp = GsonUtil.toBean(redisService.get(KUGOU_DATA_KEY_PREFIX + itemKey), ShortKugouItemDataModel.class);
+                String artist = StringUtils.hasLength(tmp.getAuthorName()) ? " - " + tmp.getAuthorName() : "";
                 model.addAttribute("title", StringUtils.hasLength(tmp.getTitle()) ? tmp.getTitle() + artist : "MusicPlayer");
-                model.addAttribute("path", tmp.getPath());
-                model.addAttribute("type", "audio/" + tmp.getType());
+                // model.addAttribute("type", "audio/" + tmp.getType());
                 if ("1".equals(version)) {
                     return "music/plyr/netease/index";
                 }
