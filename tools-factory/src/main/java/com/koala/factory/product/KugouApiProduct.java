@@ -1,16 +1,15 @@
 package com.koala.factory.product;
 
 import com.koala.base.enums.KugouRequestQualityEnums;
-import com.koala.data.models.kugou.AlbumInfo.KugouAlbumInfoRespDataModel;
-import com.koala.data.models.kugou.AlbumMusicInfo.KugouAlbumMusicInfoRespDataModel;
-import com.koala.data.models.kugou.AlbumMusicInfo.custom.AlbumInfoModel;
-import com.koala.data.models.kugou.AlbumMusicInfo.custom.AudioInfoModel;
-import com.koala.data.models.kugou.AlbumMusicInfo.custom.KugouAlbumCustomMusicInfoModel;
-import com.koala.data.models.kugou.AlbumMusicInfo.custom.PlayInfoModel;
-import com.koala.data.models.kugou.AlbumMusicInfo.pattern.KugouAlbumMusicItemPatternInfoDataModel;
+import com.koala.data.models.kugou.albumInfo.KugouAlbumInfoRespDataModel;
+import com.koala.data.models.kugou.albumMusicInfo.KugouAlbumMusicInfoRespDataModel;
+import com.koala.data.models.kugou.albumMusicInfo.custom.AlbumInfoModel;
+import com.koala.data.models.kugou.albumMusicInfo.custom.AudioInfoModel;
+import com.koala.data.models.kugou.albumMusicInfo.custom.KugouAlbumCustomMusicInfoModel;
+import com.koala.data.models.kugou.albumMusicInfo.custom.PlayInfoModel;
+import com.koala.data.models.kugou.albumMusicInfo.pattern.KugouAlbumMusicItemPatternInfoDataModel;
 import com.koala.data.models.kugou.KugouMusicDataRespModel;
 import com.koala.data.models.shortUrl.ShortKugouItemDataModel;
-import com.koala.data.models.shortUrl.ShortNeteaseItemDataModel;
 import com.koala.service.data.redis.service.RedisService;
 import com.koala.service.utils.*;
 import org.slf4j.Logger;
@@ -20,10 +19,7 @@ import org.springframework.util.StringUtils;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 import static com.koala.factory.extra.kugou.KugouMusicInfoDataGenerator.generateMusicInfoData;
 import static com.koala.factory.path.KugouWebPathCollector.KUGOU_ALBUM_DETAIL_SERVER_URL;
@@ -200,6 +196,12 @@ public class KugouApiProduct {
                     respData.getMockPreviewPath().put(KugouRequestQualityEnums.QUALITY_DEFAULT.getType(), host + "tools/Kugou/pro/player/music/short?key=" + Base64Utils.encodeToUrlSafeString(key.getBytes(StandardCharsets.UTF_8)) + "&quality=" + KugouRequestQualityEnums.QUALITY_DEFAULT.getType());
                 } else {
                     redisService.set(NETEASE_DATA_KEY_PREFIX + key, GsonUtil.toString(new ShortKugouItemDataModel(this.title, this.authorName, this.musicInfoData)), EXPIRE_TIME);
+                    Arrays.stream(KugouRequestQualityEnums.values()).forEach(qualityEnum -> {
+                        PlayInfoModel tmp = this.musicInfoData.getAudioInfo().getPlayInfoList().get(qualityEnum.getType());
+                        if (StringUtils.hasLength(tmp.getHash())) {
+                            respData.getMockPreviewPath().put(qualityEnum.getType(), host + "tools/Kugou/pro/player/music/short?key=" + Base64Utils.encodeToUrlSafeString(key.getBytes(StandardCharsets.UTF_8)) + "&quality=" + qualityEnum.getType());
+                        }
+                    });
                 }
             }
         } catch (Exception e) {

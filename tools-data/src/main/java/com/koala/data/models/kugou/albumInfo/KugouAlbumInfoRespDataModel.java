@@ -1,4 +1,4 @@
-package com.koala.data.models.kugou.AlbumInfo;
+package com.koala.data.models.kugou.albumInfo;
 
 import com.google.gson.annotations.SerializedName;
 import lombok.Data;

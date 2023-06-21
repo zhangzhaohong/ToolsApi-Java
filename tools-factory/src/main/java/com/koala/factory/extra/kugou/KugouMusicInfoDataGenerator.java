@@ -1,11 +1,11 @@
 package com.koala.factory.extra.kugou;
 
 import com.koala.base.enums.KugouRequestQualityEnums;
-import com.koala.data.models.kugou.AlbumMusicInfo.custom.AlbumInfoModel;
-import com.koala.data.models.kugou.AlbumMusicInfo.custom.AudioInfoModel;
-import com.koala.data.models.kugou.AlbumMusicInfo.custom.KugouAlbumCustomMusicInfoModel;
-import com.koala.data.models.kugou.AlbumMusicInfo.custom.PlayInfoModel;
-import com.koala.data.models.kugou.AlbumMusicInfo.pattern.KugouAlbumMusicItemPatternInfoDataModel;
+import com.koala.data.models.kugou.albumMusicInfo.custom.AlbumInfoModel;
+import com.koala.data.models.kugou.albumMusicInfo.custom.AudioInfoModel;
+import com.koala.data.models.kugou.albumMusicInfo.custom.KugouAlbumCustomMusicInfoModel;
+import com.koala.data.models.kugou.albumMusicInfo.custom.PlayInfoModel;
+import com.koala.data.models.kugou.albumMusicInfo.pattern.KugouAlbumMusicItemPatternInfoDataModel;
 import com.koala.service.utils.GsonUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.util.StringUtils;

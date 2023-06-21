@@ -1,9 +1,9 @@
 package com.koala.data.models.kugou;
 
 import com.google.gson.annotations.SerializedName;
-import com.koala.data.models.kugou.AlbumInfo.KugouAlbumInfoRespDataModel;
-import com.koala.data.models.kugou.AlbumMusicInfo.KugouAlbumMusicInfoRespDataModel;
-import com.koala.data.models.kugou.AlbumMusicInfo.custom.KugouAlbumCustomMusicInfoModel;
+import com.koala.data.models.kugou.albumInfo.KugouAlbumInfoRespDataModel;
+import com.koala.data.models.kugou.albumMusicInfo.KugouAlbumMusicInfoRespDataModel;
+import com.koala.data.models.kugou.albumMusicInfo.custom.KugouAlbumCustomMusicInfoModel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

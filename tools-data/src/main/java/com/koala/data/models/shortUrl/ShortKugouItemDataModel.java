@@ -1,7 +1,7 @@
 package com.koala.data.models.shortUrl;
 
 import com.google.gson.annotations.SerializedName;
-import com.koala.data.models.kugou.AlbumMusicInfo.custom.KugouAlbumCustomMusicInfoModel;
+import com.koala.data.models.kugou.albumMusicInfo.custom.KugouAlbumCustomMusicInfoModel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
