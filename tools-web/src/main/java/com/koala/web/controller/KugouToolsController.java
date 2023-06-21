@@ -175,6 +175,29 @@ public class KugouToolsController {
     }
 
     @HttpRequestRecorder
+    @GetMapping(value = "api/mv/detail", produces = {"application/json;charset=utf-8"})
+    public String mvDetail(@RequestParam(required = false) String hash) throws IOException, URISyntaxException {
+        if (!StringUtils.hasLength(hash)) {
+            return formatRespData(UNSUPPORTED_PARAMS, null);
+        }
+        String mid = KugouMidGenerator.getMid();
+        String cookie = customParams.getKugouCustomParams().get("kg_mid_cookie").toString();
+        Long timestamp = System.currentTimeMillis();
+        HashMap<String, String> params = new HashMap<>();
+        params.put("clienttime", String.valueOf(timestamp));
+        params.put("mid", mid);
+        params.put("clientver", "312");
+        params.put("data", "[{\"video_hash\":\"" + hash + "\"}]");
+        params.put("key", "");
+        params.put("appid", "1155");
+        String response = HttpClientUtil.doGet(KUGOU_MV_DETAIL_SERVER_URL, HeaderUtil.getKugouPublicHeader(null, cookie), params);
+        if (StringUtils.hasLength(response)) {
+            return formatRespData(GET_DATA_SUCCESS, GsonUtil.toBean(response, Object.class));
+        }
+        return formatRespData(GET_INFO_ERROR, null);
+    }
+
+    @HttpRequestRecorder
     @GetMapping(value = "download/music/short", produces = "application/json;charset=UTF-8")
     public void downloadMusic(@RequestParam(required = false) String key, @RequestParam(value = "quality", required = false, defaultValue = "default") String quality, HttpServletRequest request, HttpServletResponse response) {
         try {
