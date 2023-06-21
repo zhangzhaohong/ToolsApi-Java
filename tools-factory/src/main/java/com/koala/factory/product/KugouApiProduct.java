@@ -6,13 +6,9 @@ import com.koala.data.models.kugou.AlbumMusicInfo.custom.KugouAlbumCustomMusicIn
 import com.koala.data.models.kugou.AlbumMusicInfo.pattern.KugouAlbumMusicItemPatternInfoDataModel;
 import com.koala.data.models.kugou.KugouMusicDataRespModel;
 import com.koala.service.data.redis.service.RedisService;
-import com.koala.service.utils.GsonUtil;
-import com.koala.service.utils.HeaderUtil;
-import com.koala.service.utils.HttpClientUtil;
-import com.koala.service.utils.PatternUtil;
+import com.koala.service.utils.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
@@ -25,6 +21,8 @@ import java.util.Objects;
 import static com.koala.factory.extra.kugou.KugouMusicInfoDataGenerator.generateMusicInfoData;
 import static com.koala.factory.path.KugouWebPathCollector.KUGOU_ALBUM_DETAIL_SERVER_URL;
 import static com.koala.factory.path.KugouWebPathCollector.KUGOU_ALBUM_MUSIC_DETAIL_SERVER_URL;
+import static com.koala.service.data.redis.RedisKeyPrefix.NETEASE_ALBUM_DATA_KEY_PREFIX;
+import static com.koala.service.data.redis.RedisKeyPrefix.NETEASE_ALBUM_MUSIC_DATA_KEY_PREFIX;
 
 /**
  * @author koala
@@ -35,7 +33,8 @@ import static com.koala.factory.path.KugouWebPathCollector.KUGOU_ALBUM_MUSIC_DET
 public class KugouApiProduct {
     private static final Logger logger = LoggerFactory.getLogger(KugouApiProduct.class);
     private final static Long EXPIRE_TIME = 12 * 60 * 60L;
-    private final static Long DIRECT_EXPIRE_TIME = 3 * 24 * 60 * 60L;
+    private final static Long ALBUM_EXPIRE_TIME = 3 * 24 * 60 * 60L;
+    private final static Long ALBUM_MUSIC_EXPIRE_TIME = 3 * 24 * 60 * 60L;
     private String hash;
     private String albumId;
     private Integer version = 4;
@@ -85,6 +84,15 @@ public class KugouApiProduct {
         if (checkNotNullHashAndAlbumId()) {
             return;
         }
+        String key = NETEASE_ALBUM_DATA_KEY_PREFIX + ShortKeyGenerator.getKey(this.url);
+        String tmp = redisService.get(key);
+        if (StringUtils.hasLength(tmp)) {
+            this.albumInfoData = GsonUtil.toBean(tmp, KugouAlbumInfoRespDataModel.class);
+            logger.info("[KugouApiProduct]({}) get album info from redis: {}", this.hash, tmp);
+            if (!Objects.isNull(this.albumInfoData)) {
+                return;
+            }
+        }
         HashMap<String, String> params = new HashMap<>();
         params.put("data", getAlbumRequestPayload());
         String response = HttpClientUtil.doGet(KUGOU_ALBUM_DETAIL_SERVER_URL, HeaderUtil.getKugouPublicHeader(null, this.customParams.get("kg_mid_cookie").toString()), params);
@@ -93,6 +101,10 @@ public class KugouApiProduct {
             this.albumInfoData = GsonUtil.toBean(response, KugouAlbumInfoRespDataModel.class);
         } catch (Exception e) {
             e.printStackTrace();
+            return;
+        }
+        if (StringUtils.hasLength(response)) {
+            redisService.set(key, response, ALBUM_EXPIRE_TIME);
         }
     }
 
@@ -107,16 +119,30 @@ public class KugouApiProduct {
         if (checkNotNullHashAndAlbumId()) {
             return null;
         }
+        KugouAlbumMusicInfoRespDataModel<?> result = null;
+        String key = NETEASE_ALBUM_MUSIC_DATA_KEY_PREFIX + ShortKeyGenerator.getKey(this.url);
+        String tmp = redisService.get(key);
+        if (StringUtils.hasLength(tmp)) {
+            result = GsonUtil.toBean(tmp, KugouAlbumMusicInfoRespDataModel.class);
+            logger.info("[KugouApiProduct]({}) get album music info from redis: {}", this.hash, tmp);
+            if (!Objects.isNull(result)) {
+                return result;
+            }
+        }
         HashMap<String, String> params = new HashMap<>();
         params.put("data", getAlbumRequestPayload());
         String response = HttpClientUtil.doGet(KUGOU_ALBUM_MUSIC_DETAIL_SERVER_URL, HeaderUtil.getKugouPublicHeader(null, this.customParams.get("kg_mid_cookie").toString()), params);
         logger.info("[KugouApiProduct]({}) album music info: {}", this.hash, response);
         try {
-            return GsonUtil.toBean(response, KugouAlbumMusicInfoRespDataModel.class);
+            result = GsonUtil.toBean(response, KugouAlbumMusicInfoRespDataModel.class);
         } catch (Exception e) {
             e.printStackTrace();
+            return null;
         }
-        return null;
+        if (StringUtils.hasLength(response)) {
+            redisService.set(key, response, ALBUM_MUSIC_EXPIRE_TIME);
+        }
+        return result;
     }
 
     public void generatePlayInfo() throws IOException, URISyntaxException {
