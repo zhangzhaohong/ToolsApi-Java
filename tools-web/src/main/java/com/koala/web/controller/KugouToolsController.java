@@ -97,12 +97,14 @@ public class KugouToolsController {
         if (!StringUtils.hasLength(link) && (!StringUtils.hasLength(hash) && !StringUtils.hasLength(albumId))) {
             return formatRespData(UNSUPPORTED_PARAMS, null);
         }
-        String url;
-        Optional<String> optional = Arrays.stream(link.split(" ")).filter(item -> item.contains("kugou.com/")).findFirst();
-        if (optional.isPresent()) {
-            url = optional.get().trim();
-        } else {
-            return formatRespData(INVALID_LINK, null);
+        String url = null;
+        if (StringUtils.hasLength(link)) {
+            Optional<String> optional = Arrays.stream(link.split(" ")).filter(item -> item.contains("kugou.com/")).findFirst();
+            if (optional.isPresent()) {
+                url = optional.get().trim();
+            } else {
+                return formatRespData(INVALID_LINK, null);
+            }
         }
         KugouProductConfigModel config = new KugouProductConfigModel(
                 "true".equals(albumInfo),
