@@ -131,7 +131,10 @@ public class KugouToolsController {
                     }
                 }
                 case DOWNLOAD -> {
-                    // todo download
+                    String defaultPath = publicData.getMockDownloadPath().get(KugouRequestQualityEnums.QUALITY_DEFAULT.getType());
+                    if (StringUtils.hasLength(defaultPath)) {
+                        redirectStrategy.sendRedirect(request, response, defaultPath);
+                    }
                 }
                 default -> {
                     return formatRespData(UNSUPPORTED_TYPE, null);
