@@ -21,8 +21,8 @@ import java.util.Objects;
 import static com.koala.factory.extra.kugou.KugouMusicInfoDataGenerator.generateMusicInfoData;
 import static com.koala.factory.path.KugouWebPathCollector.KUGOU_ALBUM_DETAIL_SERVER_URL;
 import static com.koala.factory.path.KugouWebPathCollector.KUGOU_ALBUM_MUSIC_DETAIL_SERVER_URL;
-import static com.koala.service.data.redis.RedisKeyPrefix.NETEASE_ALBUM_DATA_KEY_PREFIX;
-import static com.koala.service.data.redis.RedisKeyPrefix.NETEASE_ALBUM_MUSIC_DATA_KEY_PREFIX;
+import static com.koala.service.data.redis.RedisKeyPrefix.KUGOU_ALBUM_DATA_KEY_PREFIX;
+import static com.koala.service.data.redis.RedisKeyPrefix.KUGOU_ALBUM_MUSIC_DATA_KEY_PREFIX;
 
 /**
  * @author koala
@@ -84,7 +84,7 @@ public class KugouApiProduct {
         if (checkNotNullHashAndAlbumId()) {
             return;
         }
-        String key = NETEASE_ALBUM_DATA_KEY_PREFIX + ShortKeyGenerator.getKey(this.url);
+        String key = KUGOU_ALBUM_DATA_KEY_PREFIX + ShortKeyGenerator.getKey(this.url);
         String tmp = redisService.get(key);
         if (StringUtils.hasLength(tmp)) {
             this.albumInfoData = GsonUtil.toBean(tmp, KugouAlbumInfoRespDataModel.class);
@@ -120,7 +120,7 @@ public class KugouApiProduct {
             return null;
         }
         KugouAlbumMusicInfoRespDataModel<?> result = null;
-        String key = NETEASE_ALBUM_MUSIC_DATA_KEY_PREFIX + ShortKeyGenerator.getKey(this.url);
+        String key = KUGOU_ALBUM_MUSIC_DATA_KEY_PREFIX + ShortKeyGenerator.getKey(this.url);
         String tmp = redisService.get(key);
         if (StringUtils.hasLength(tmp)) {
             result = GsonUtil.toBean(tmp, KugouAlbumMusicInfoRespDataModel.class);
