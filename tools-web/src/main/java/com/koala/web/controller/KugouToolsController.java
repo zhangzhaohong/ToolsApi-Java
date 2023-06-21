@@ -1,9 +1,12 @@
 package com.koala.web.controller;
 
+import com.koala.base.enums.KugouMvRequestQualityEnums;
 import com.koala.base.enums.KugouRequestQualityEnums;
 import com.koala.base.enums.KugouRequestTypeEnums;
 import com.koala.data.models.kugou.KugouMusicDataRespModel;
 import com.koala.data.models.kugou.config.KugouProductConfigModel;
+import com.koala.data.models.kugou.mvInfo.KugouMvInfoRespDataModel;
+import com.koala.data.models.kugou.mvInfo.custom.PlayInfoModel;
 import com.koala.data.models.kugou.playInfo.KugouPlayInfoRespDataModel;
 import com.koala.data.models.shortUrl.ShortKugouItemDataModel;
 import com.koala.factory.builder.ConcreteKugouApiBuilder;
@@ -30,6 +33,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.URISyntaxException;
 import java.util.*;
 
@@ -176,7 +180,7 @@ public class KugouToolsController {
 
     @HttpRequestRecorder
     @GetMapping(value = "api/mv/detail", produces = {"application/json;charset=utf-8"})
-    public String mvDetail(@RequestParam(required = false) String hash) throws IOException, URISyntaxException {
+    public String mvDetail(@RequestParam(required = false) String hash, @RequestParam(required = false, defaultValue = "false") String generateInfo) throws IOException, URISyntaxException {
         if (!StringUtils.hasLength(hash)) {
             return formatRespData(UNSUPPORTED_PARAMS, null);
         }
@@ -192,7 +196,27 @@ public class KugouToolsController {
         params.put("appid", "1155");
         String response = HttpClientUtil.doGet(KUGOU_MV_DETAIL_SERVER_URL, HeaderUtil.getKugouPublicHeader(null, cookie), params);
         if (StringUtils.hasLength(response)) {
-            return formatRespData(GET_DATA_SUCCESS, GsonUtil.toBean(response, Object.class));
+            try {
+                KugouMvInfoRespDataModel<?> respData = GsonUtil.toBean(response, KugouMvInfoRespDataModel.class);
+                if ("true".equals(generateInfo)) {
+                    respData.setMvInfoData(new LinkedHashMap<>());
+                    ArrayList<?> tmp1 = (ArrayList<?>) respData.getData();
+                    if (tmp1.isEmpty())
+                        return formatRespData(GET_INFO_ERROR, null);
+                    Map<String, Object> tmp = GsonUtil.toMaps(GsonUtil.toString(tmp1.get(0)));
+                    Arrays.stream(KugouMvRequestQualityEnums.values()).forEach(qualityEnum -> {
+                        respData.getMvInfoData().put(qualityEnum.getType(), new PlayInfoModel(
+                                getLongDataFromMap(qualityEnum.getBitrateKey(), tmp),
+                                getDataFromMap(qualityEnum.getHashKey(), tmp),
+                                getLongDataFromMap(qualityEnum.getFilesizeKey(), tmp)
+                        ));
+                    });
+                }
+                return formatRespData(GET_DATA_SUCCESS, respData);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return formatRespData(GET_INFO_ERROR, null);
+            }
         }
         return formatRespData(GET_INFO_ERROR, null);
     }
@@ -227,6 +251,20 @@ public class KugouToolsController {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private static String getDataFromMap(String key, Map<String, Object> data) {
+        if (StringUtils.hasLength(key)) {
+            return String.valueOf(data.get(key));
+        }
+        return null;
+    }
+
+    private static Long getLongDataFromMap(String key, Map<String, Object> data) {
+        if (StringUtils.hasLength(key)) {
+            return BigDecimal.valueOf(Double.parseDouble(String.valueOf(data.get(key)))).longValue();
+        }
+        return 0L;
     }
 
 }
