@@ -80,6 +80,7 @@ public class KugouPlayerController {
                     }
                     model.addAttribute("type", "audio/" + respData.getExtName());
                     model.addAttribute("media", GsonUtil.toString(respData.getUrl()));
+                    model.addAttribute("thumb", tmp.getMusicInfo().getAlbumInfo().getSizableCover());
                     if ("1".equals(version)) {
                         return "music/dplayer/kugou/index";
                     }
