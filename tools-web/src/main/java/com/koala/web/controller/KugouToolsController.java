@@ -113,7 +113,7 @@ public class KugouToolsController {
         }
         String url = null;
         if (StringUtils.hasLength(link)) {
-            Optional<String> optional = Arrays.stream(link.split(" ")).filter(item -> item.contains("kugou.com/")).findFirst();
+            Optional<String> optional = Arrays.stream(link.replaceFirst("http://", " http://").replaceFirst("https://", " https://").split(" ")).filter(item -> item.contains("kugou.com/")).findFirst();
             if (optional.isPresent()) {
                 url = optional.get().trim();
             } else {
