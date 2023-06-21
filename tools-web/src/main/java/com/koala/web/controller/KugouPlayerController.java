@@ -79,9 +79,9 @@ public class KugouPlayerController {
                         return "404/index";
                     }
                     model.addAttribute("type", "audio/" + respData.getExtName());
-                    model.addAttribute("media", respData.getUrl());
+                    model.addAttribute("media", GsonUtil.toString(respData.getUrl()));
                     if ("1".equals(version)) {
-                        return "music/plyr/kugou/index";
+                        return "music/dplayer/kugou/index";
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
