@@ -1,6 +1,7 @@
 package com.koala.web.controller;
 
 import com.koala.base.enums.KugouMvRequestQualityEnums;
+import com.koala.base.enums.KugouNewSongEnums;
 import com.koala.base.enums.KugouRequestQualityEnums;
 import com.koala.base.enums.KugouRequestTypeEnums;
 import com.koala.data.models.kugou.KugouMusicDataRespModel;
@@ -293,6 +294,26 @@ public class KugouToolsController {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @HttpRequestRecorder
+    @GetMapping(value = "song/new", produces = {"application/json;charset=utf-8"})
+    public String newSong(@RequestParam(required = false) String configId, @RequestParam(required = false, defaultValue = "1") Long page, @RequestParam(required = false, defaultValue = "30") Long limit) throws IOException, URISyntaxException {
+        if (Objects.isNull(KugouNewSongEnums.getEnumsByType(configId))) {
+            return formatRespData(UNSUPPORTED_PARAMS, null);
+        }
+        HashMap<String, String> params = new HashMap<>();
+        params.put("version", "9108");
+        params.put("plat", "0");
+        params.put("with_cover", "1");
+        params.put("page", page.toString());
+        params.put("pagesize", limit.toString());
+        params.put("type", configId);
+        String response = HttpClientUtil.doGet(KUGOU_NEW_SONG_SERVER_URL, HeaderUtil.getKugouPublicHeader(null, null), params);
+        if (StringUtils.hasLength(response)) {
+            return formatRespData(GET_DATA_SUCCESS, GsonUtil.toBean(response, Object.class));
+        }
+        return formatRespData(GET_INFO_ERROR, null);
     }
 
     private static String getDataFromMap(String key, Map<String, Object> data) {

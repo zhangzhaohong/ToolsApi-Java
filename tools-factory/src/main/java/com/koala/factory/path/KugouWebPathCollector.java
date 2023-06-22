@@ -18,4 +18,5 @@ public class KugouWebPathCollector {
     public static final String KUGOU_ALBUM_MUSIC_DETAIL_SERVER_URL = "http://kmr.service.kugou.com/v2/album_audio/audio";
     public static  final String KUGOU_SEARCH_LYRIC_SERVER_URL = "http://krcs.kugou.com/search";
     public static  final String KUGOU_LYRIC_DETAIL_SERVER_URL = "http://lyrics.kugou.com/download";
+    public static  final String KUGOU_NEW_SONG_SERVER_URL = "http://mobilecdnbj.kugou.com/api/v3/rank/newsong";
 }
