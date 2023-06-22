@@ -125,7 +125,7 @@ public class KugouApiProduct {
             return null;
         }
         KugouAlbumMusicInfoRespDataModel<?> result = null;
-        String key = KUGOU_ALBUM_MUSIC_DATA_KEY_PREFIX + ShortKeyGenerator.getKey(this.url);
+        String key = KUGOU_ALBUM_MUSIC_DATA_KEY_PREFIX + ShortKeyGenerator.getKey(this.hash);
         String tmp = redisService.get(key);
         if (StringUtils.hasLength(tmp)) {
             result = GsonUtil.toBean(tmp, KugouAlbumMusicInfoRespDataModel.class);
@@ -178,6 +178,15 @@ public class KugouApiProduct {
         if (checkNotNullHashAndAlbumId()) {
             return;
         }
+        String key = KUGOU_LYRIC_DATA_KEY_PREFIX + ShortKeyGenerator.getKey(this.hash);
+        String tmp = redisService.get(key);
+        if (StringUtils.hasLength(tmp)) {
+            this.lyricInfoData = tmp;
+            logger.info("[KugouApiProduct]({}) get music lyric info from redis: {}", this.hash, tmp);
+            if (!Objects.isNull(GsonUtil.toMaps(tmp))) {
+                return;
+            }
+        }
         try {
             HashMap<String, String> lyricInfoListParams = new HashMap<>();
             lyricInfoListParams.put("ver", "1");
@@ -187,13 +196,13 @@ public class KugouApiProduct {
             lyricInfoListParams.put("album_audio_id", "");
             String lyricInfoListResponse = HttpClientUtil.doGet(KUGOU_SEARCH_LYRIC_SERVER_URL, HeaderUtil.getKugouPublicHeader(null, null), lyricInfoListParams);
             if (StringUtils.hasLength(lyricInfoListResponse)) {
-                ArrayList<?> tmp = (ArrayList<?>) GsonUtil.toMaps(lyricInfoListResponse).get("candidates");
-                if (tmp.isEmpty()) {
+                ArrayList<?> lyricInfoListTmp = (ArrayList<?>) GsonUtil.toMaps(lyricInfoListResponse).get("candidates");
+                if (lyricInfoListTmp.isEmpty()) {
                     return;
                 }
-                Map<String, Object> candidate = GsonUtil.toMaps(GsonUtil.toString(tmp.get(0)));
+                Map<String, Object> candidate = GsonUtil.toMaps(GsonUtil.toString(lyricInfoListTmp.get(0)));
                 String lyricId = (String) candidate.get("id");
-                String lyricAccessKey = (String) candidate.get("accessKey");
+                String lyricAccessKey = (String) candidate.get("accesskey");
                 HashMap<String, String> lyricParams = new HashMap<>();
                 lyricParams.put("ver", "1");
                 lyricParams.put("client", "pc");
