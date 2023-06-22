@@ -115,7 +115,7 @@ public class KugouToolsController {
 
     @HttpRequestRecorder
     @GetMapping(value = "api", produces = {"application/json;charset=utf-8"})
-    public String api(@RequestParam(required = false) String link, @RequestParam(required = false) String hash, @RequestParam(required = false) String albumId, @RequestParam(required = false, name = "type", defaultValue = "info") String type, @RequestParam(required = false, defaultValue = "1") Integer version, @RequestParam(required = false, defaultValue = "false") String albumInfo, @RequestParam(required = false, defaultValue = "false") String albumMusicInfo, @RequestParam(required = false, defaultValue = "false") String musicInfo, HttpServletRequest request, HttpServletResponse response) throws IOException, URISyntaxException {
+    public String api(@RequestParam(required = false) String link, @RequestParam(required = false) String hash, @RequestParam(required = false) String albumId, @RequestParam(required = false, name = "type", defaultValue = "info") String type, @RequestParam(required = false, defaultValue = "1") Integer version, @RequestParam(required = false, defaultValue = "false") String albumInfo, @RequestParam(required = false, defaultValue = "false") String albumMusicInfo, @RequestParam(required = false, defaultValue = "false") String musicInfo, @RequestParam(required = false, defaultValue = "false") String lyricInfo, HttpServletRequest request, HttpServletResponse response) throws IOException, URISyntaxException {
         if (!StringUtils.hasLength(link) && (!StringUtils.hasLength(hash) && !StringUtils.hasLength(albumId))) {
             return formatRespData(UNSUPPORTED_PARAMS, null);
         }
@@ -131,7 +131,8 @@ public class KugouToolsController {
         KugouProductConfigModel config = new KugouProductConfigModel(
                 "true".equals(albumInfo),
                 "true".equals(albumMusicInfo),
-                "true".equals(musicInfo)
+                "true".equals(musicInfo),
+                "true".equals(lyricInfo)
         );
         KugouApiBuilder builder = new ConcreteKugouApiBuilder();
         KugouApiManager manager = new KugouApiManager(builder);
@@ -142,7 +143,7 @@ public class KugouToolsController {
             e.printStackTrace();
             return formatRespData(FAILURE, null);
         }
-        KugouMusicDataRespModel publicData = product.generateItemInfoRespData();
+        KugouMusicDataRespModel<?> publicData = product.generateItemInfoRespData();
         try {
             switch (Objects.requireNonNull(KugouRequestTypeEnums.getEnumsByType(type))) {
                 case INFO -> {

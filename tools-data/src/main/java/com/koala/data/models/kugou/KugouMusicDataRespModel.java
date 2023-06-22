@@ -9,6 +9,7 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * @author koala
@@ -18,13 +19,15 @@ import java.util.LinkedHashMap;
  */
 @Data
 @AllArgsConstructor
-public class KugouMusicDataRespModel implements Serializable {
+public class KugouMusicDataRespModel<Object extends Serializable> implements Serializable {
     @SerializedName("album_info")
     private KugouAlbumInfoRespDataModel<?> albumInfo;
     @SerializedName("album_music_info")
     private KugouAlbumMusicInfoRespDataModel<?> albumMusicInfo;
     @SerializedName("music_info_data")
     private KugouAlbumCustomMusicInfoModel musicInfoData;
+    @SerializedName("lyric_info_data")
+    private Map<String, Object> lyricInfoData;
     @SerializedName("mock_preview_path")
     private LinkedHashMap<String, String> mockPreviewPath = null;
     @SerializedName("mock_download_path")

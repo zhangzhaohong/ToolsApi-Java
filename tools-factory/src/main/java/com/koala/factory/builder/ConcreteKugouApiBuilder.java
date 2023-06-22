@@ -72,4 +72,10 @@ public class ConcreteKugouApiBuilder extends KugouApiBuilder {
         product.generatePlayInfo();
         return this;
     }
+
+    @Override
+    public KugouApiBuilder getLyricInfo() {
+        product.getLyricInfo();
+        return this;
+    }
 }

@@ -22,8 +22,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import static com.koala.factory.extra.kugou.KugouMusicInfoDataGenerator.generateMusicInfoData;
-import static com.koala.factory.path.KugouWebPathCollector.KUGOU_ALBUM_DETAIL_SERVER_URL;
-import static com.koala.factory.path.KugouWebPathCollector.KUGOU_ALBUM_MUSIC_DETAIL_SERVER_URL;
+import static com.koala.factory.path.KugouWebPathCollector.*;
 import static com.koala.service.data.redis.RedisKeyPrefix.*;
 
 /**
@@ -48,6 +47,7 @@ public class KugouApiProduct {
     private KugouAlbumInfoRespDataModel<?> albumInfoData = null;
     private KugouAlbumMusicInfoRespDataModel<?> albumMusicInfoData = null;
     private KugouAlbumCustomMusicInfoModel musicInfoData = null;
+    private String lyricInfoData;
 
     public void setUrl(String url) {
         this.url = url;
@@ -172,11 +172,49 @@ public class KugouApiProduct {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
-    public KugouMusicDataRespModel generateItemInfoRespData() {
-        KugouMusicDataRespModel respData = new KugouMusicDataRespModel(this.albumInfoData, this.albumMusicInfoData, this.musicInfoData, new LinkedHashMap<>(), new LinkedHashMap<>());
+    public void getLyricInfo() {
+        if (checkNotNullHashAndAlbumId()) {
+            return;
+        }
+        try {
+            HashMap<String, String> lyricInfoListParams = new HashMap<>();
+            lyricInfoListParams.put("ver", "1");
+            lyricInfoListParams.put("client", "mobi");
+            lyricInfoListParams.put("duration", "");
+            lyricInfoListParams.put("hash", this.hash);
+            lyricInfoListParams.put("album_audio_id", "");
+            String lyricInfoListResponse = HttpClientUtil.doGet(KUGOU_SEARCH_LYRIC_SERVER_URL, HeaderUtil.getKugouPublicHeader(null, null), lyricInfoListParams);
+            if (StringUtils.hasLength(lyricInfoListResponse)) {
+                ArrayList<?> tmp = (ArrayList<?>) GsonUtil.toMaps(lyricInfoListResponse).get("candidates");
+                if (tmp.isEmpty()) {
+                    return;
+                }
+                Map<String, Object> candidate = GsonUtil.toMaps(GsonUtil.toString(tmp.get(0)));
+                String lyricId = (String) candidate.get("id");
+                String lyricAccessKey = (String) candidate.get("accessKey");
+                HashMap<String, String> lyricParams = new HashMap<>();
+                lyricParams.put("ver", "1");
+                lyricParams.put("client", "pc");
+                lyricParams.put("id", lyricId);
+                lyricParams.put("accesskey", lyricAccessKey);
+                lyricParams.put("fmt", "lrc");
+                lyricParams.put("charset", "utf8");
+                String response = HttpClientUtil.doGet(KUGOU_LYRIC_DETAIL_SERVER_URL, HeaderUtil.getKugouPublicHeader(null, null), lyricParams);
+                if (StringUtils.hasLength(response)) {
+                    Map<String, Object> lyricData = GsonUtil.toMaps(response);
+                    lyricData.put("decode_content", Base64Utils.decode(lyricData.get("content").toString()));
+                    this.lyricInfoData = GsonUtil.toString(lyricData);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public KugouMusicDataRespModel<?> generateItemInfoRespData() {
+        KugouMusicDataRespModel<?> respData = new KugouMusicDataRespModel<>(this.albumInfoData, this.albumMusicInfoData, this.musicInfoData, GsonUtil.toMaps(this.lyricInfoData), new LinkedHashMap<>(), new LinkedHashMap<>());
         try {
             if ("1".equals(version.toString())) {
                 String key = ShortKeyGenerator.getKey(null);

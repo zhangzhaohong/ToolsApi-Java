@@ -40,6 +40,9 @@ public class KugouApiManager {
         if (config.getMusicInfo()) {
             builder.generatePlayInfo();
         }
+        if (config.getLyricInfo()) {
+            builder.getLyricInfo();
+        }
         return builder.getProduct();
     }
 }
