@@ -31,6 +31,14 @@ public class Base64Utils {
         return base64.encodeToString(src);
     }
 
+    public static String encode(byte[] src) {
+        if (StringUtils.isBlank(new String(src))) {
+            return new String(src);
+        }
+        return base64.encodeToString(src);
+    }
+
+
     /**
      * 2. text的Base64字符串 转 明文
      *
@@ -46,6 +54,17 @@ public class Base64Utils {
             }
         }
         return base64.decode(base64Str);
+    }
+
+    public static String decode(String base64Str) {
+        if (StringUtils.isBlank(base64Str)) {
+            try {
+                return new String(base64Str.getBytes(CODE_FORMATE));
+            } catch (UnsupportedEncodingException e) {
+                return new String(new byte[0]);
+            }
+        }
+        return new String(base64.decode(base64Str));
     }
 
 }

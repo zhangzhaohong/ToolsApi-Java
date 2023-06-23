@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${title}"></title>
+    <link href="../assets/css/custom-player.css" th:href="@{/assets/css/custom-player.css}" rel="stylesheet">
+    <script src="../assets/js/DPlayer.min.js" th:src="@{/assets/js/DPlayer.min.js}"></script>
+</head>
+<body class="custom-container">
+<div id="video-player" class="dk-video-player-custom" th:data-media="${media}" th:data-thumb="${thumb}">
+    <meta name="referrer" content="never">
+</div>
+<script>
+    const videoElement = document.getElementById('video-player');
+    const media = videoElement.getAttribute("data-media");
+    const thumb = videoElement.getAttribute("data-thumb");
+    const qualityList = [];
+    if (media != null) {
+        Array.from(JSON.parse(media)).forEach((value, index) => {
+            qualityList.push({
+                name: '线路 - ' + (index + 1),
+                url: value.trim(),
+                type: 'auto',
+            });
+        });
+    }
+    const dp = new DPlayer({
+        container: videoElement,
+        video: {
+            pic: thumb,
+            quality: qualityList,
+            defaultQuality: 0,
+        },
+        autoplay: true,
+        hotkey: true,
+        airplay: true,
+        controls: true
+    });
+</script>
+</body>

@@ -137,6 +137,7 @@ public class NeteaseApiProduct {
                 this.itemDetailInfoData = GsonUtil.toBean(itemDetailInfoResponse, NeteaseMusicItemDetailInfoRespModel.class);
             } catch (Exception e) {
                 e.printStackTrace();
+                return;
             }
             if (StringUtils.hasLength(itemDetailInfoResponse)) {
                 redisService.set(key, itemDetailInfoResponse, DETAIL_EXPIRE_TIME);
@@ -167,6 +168,7 @@ public class NeteaseApiProduct {
                 this.itemLyricInfoData = GsonUtil.toBean(itemLyricInfoResponse, NeteaseMusicLyricInfoRespModel.class);
             } catch (Exception e) {
                 e.printStackTrace();
+                return;
             }
             if (StringUtils.hasLength(itemLyricInfoResponse)) {
                 redisService.set(key, itemLyricInfoResponse, LYRIC_EXPIRE_TIME);

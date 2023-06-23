@@ -13,7 +13,7 @@ import com.koala.data.models.shortUrl.ShortNeteaseMvItemDataModel;
 import com.koala.factory.builder.ConcreteNeteaseApiBuilder;
 import com.koala.factory.builder.NeteaseApiBuilder;
 import com.koala.factory.director.NeteaseApiManager;
-import com.koala.factory.extra.NeteaseCookieUtil;
+import com.koala.factory.extra.netease.NeteaseCookieUtil;
 import com.koala.factory.path.NeteaseWebPathCollector;
 import com.koala.factory.product.NeteaseApiProduct;
 import com.koala.service.custom.http.annotation.HttpRequestRecorder;
@@ -176,7 +176,7 @@ public class NeteaseToolsController {
     public void downloadMv(@RequestParam(required = false) String key, @RequestParam(required = false, defaultValue = "sd2") String quality, HttpServletRequest request, HttpServletResponse response) {
         try {
             String itemKey = "".equals(key) ? "" : new String(Base64Utils.decodeFromUrlSafeString(key));
-            logger.info("[musicPlayer] itemKey: {}, Sec-Fetch-Dest: {}", itemKey, request.getHeader("Sec-Fetch-Dest"));
+            logger.info("[videoPlayer] itemKey: {}, Sec-Fetch-Dest: {}", itemKey, request.getHeader("Sec-Fetch-Dest"));
             if (StringUtils.hasLength(itemKey)) {
                 ShortNeteaseMvItemDataModel tmp = GsonUtil.toBean(redisService.get(NETEASE_MV_DATA_KEY_PREFIX + itemKey), ShortNeteaseMvItemDataModel.class);
                 String fileName = (StringUtils.hasLength(tmp.getTitle()) ? tmp.getTitle() : UUID.randomUUID().toString().replace("-", "")) + "(" + quality + ")";
@@ -296,7 +296,7 @@ public class NeteaseToolsController {
 
     @HttpRequestRecorder
     @GetMapping(value = "api/playlist", produces = "application/json;charset=UTF-8")
-    public String playList(@RequestParam(required = false) String id, @RequestParam(required = false) String configId) {
+    public String playList(@RequestParam(required = false) String id, @RequestParam(required = false) String configId, @RequestParam(required = false, defaultValue = "2") String version) {
         String rankId = null;
         if (StringUtils.hasLength(configId)) {
             NeteaseRankIdEnums enums = NeteaseRankIdEnums.getEnumsById(configId);
@@ -311,17 +311,21 @@ public class NeteaseToolsController {
         Map<String, String> params = new HashMap<>();
         params.put("id", rankId);
         String response = null;
-        int retry = 0;
         try {
-            while (retry < 10) {
-                response = HttpClientUtil.doPost(NeteaseWebPathCollector.NETEASE_PLAY_LIST_SERVER_URL, HeaderUtil.getNeteasePublicWithOutCookieHeader(), params);
-                retry++;
-                if (StringUtils.hasLength(response)) {
-                    NeteaseMusicPlayListInfoRespModel<?> data = GsonUtil.toBean(response, NeteaseMusicPlayListInfoRespModel.class);
-                    if (data.getCode() == 200) {
-                        return formatRespData(GET_DATA_SUCCESS, data);
-                    } else if (data.getCode() != -447) {
-                        return formatRespData(GET_INFO_ERROR, GsonUtil.toBean(response, Object.class));
+            if ("2".equals(version)) {
+                response = HttpClientUtil.doPost(NeteaseWebPathCollector.NETEASE_PLAY_LIST_SERVER_URL_V2, HeaderUtil.getNeteasePublicWithOutCookieHeader(), params);
+            } else if ("1".equals(version)) {
+                int retry = 0;
+                while (retry < 10) {
+                    response = HttpClientUtil.doPost(NeteaseWebPathCollector.NETEASE_PLAY_LIST_SERVER_URL_V1, HeaderUtil.getNeteasePublicWithOutCookieHeader(), params);
+                    retry++;
+                    if (StringUtils.hasLength(response)) {
+                        NeteaseMusicPlayListInfoRespModel<?> data = GsonUtil.toBean(response, NeteaseMusicPlayListInfoRespModel.class);
+                        if (data.getCode() == 200) {
+                            return formatRespData(GET_DATA_SUCCESS, data);
+                        } else if (data.getCode() != -447) {
+                            return formatRespData(GET_INFO_ERROR, GsonUtil.toBean(response, Object.class));
+                        }
                     }
                 }
             }
