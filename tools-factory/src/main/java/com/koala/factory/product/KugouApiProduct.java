@@ -74,7 +74,12 @@ public class KugouApiProduct {
     public void prepareItemIdByShareUrl() throws IOException, URISyntaxException {
         if (StringUtils.hasLength(this.url)) {
             String redirectLocation = HttpClientUtil.doGetRedirectLocation(this.url);
-            String response = HttpClientUtil.doGet(redirectLocation, HeaderUtil.getKugouPublicHeader(null, null), null);
+            String response;
+            if (StringUtils.hasLength(redirectLocation)) {
+                response = HttpClientUtil.doGet(redirectLocation, HeaderUtil.getKugouPublicHeader(null, null), null);
+            } else {
+                response = HttpClientUtil.doGet(this.url, HeaderUtil.getKugouPublicHeader(null, null), null);
+            }
             if (StringUtils.hasLength(response)) {
                 this.title = UnicodeUtils.unicodeToString(PatternUtil.matchData("\"song_name\":\"(.*?)\"", response));
                 this.authorName = UnicodeUtils.unicodeToString(PatternUtil.matchData("\"author_name\":\"(.*?)\"", response));
