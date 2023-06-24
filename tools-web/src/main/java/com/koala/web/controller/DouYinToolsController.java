@@ -196,7 +196,7 @@ public class DouYinToolsController {
     @HttpRequestRecorder
     @GetMapping(value = "api/feed", produces = {"application/json;charset=utf-8"})
     public String getFeed(@RequestParam(value = "count", required = false, defaultValue = "10") Integer count) throws IOException, URISyntaxException {
-        String response = doGetXbogusRequest("https://www.douyin.com/aweme/v1/web/tab/feed/?count=" + count + "&device_platform=webapp&aid=6383&live_insert_type=&video_type_select=1");
+        String response = doGetXbogusRequest("https://www.douyin.com/aweme/v1/web/tab/feed/?count=" + count + "&device_platform=webapp&aid=6383&refresh_index=1&live_insert_type=&video_type_select=1");
         return formatRespData(GET_DATA_SUCCESS, GsonUtil.toBean(response, Object.class));
     }
 
