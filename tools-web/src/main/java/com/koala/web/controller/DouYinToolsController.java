@@ -2,6 +2,7 @@ package com.koala.web.controller;
 
 import com.koala.base.enums.DouYinRequestTypeEnums;
 import com.koala.base.enums.DouYinTypeEnums;
+import com.koala.data.models.xbogus.XbogusDataModel;
 import com.koala.factory.builder.ConcreteDouYinApiBuilder;
 import com.koala.factory.builder.DouYinApiBuilder;
 import com.koala.factory.director.DouYinApiManager;
@@ -13,15 +14,13 @@ import com.koala.data.models.douyin.v1.itemInfo.ItemInfoRespModel;
 import com.koala.data.models.douyin.v1.musicInfo.MusicInfoRespModel;
 import com.koala.data.models.douyin.v1.roomInfoData.RoomInfoDataRespModel;
 import com.koala.service.data.redis.service.RedisService;
-import com.koala.service.utils.HeaderUtil;
-import com.koala.service.utils.HttpClientUtil;
+import com.koala.service.utils.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.web.DefaultRedirectStrategy;
 import org.springframework.security.web.RedirectStrategy;
-import com.koala.service.utils.Base64Utils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.annotation.Resource;
+
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
@@ -52,6 +52,8 @@ import static com.koala.service.utils.RespUtil.formatRespData;
 public class DouYinToolsController {
 
     private static final Logger logger = LoggerFactory.getLogger(DouYinToolsController.class);
+
+    private static final Integer MAX_RETRY_TIMES = 10;
 
     private final RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
 
@@ -191,11 +193,38 @@ public class DouYinToolsController {
         return formatRespData(GET_INFO_ERROR, null);
     }
 
+    @HttpRequestRecorder
+    @GetMapping(value = "api/feed", produces = {"application/json;charset=utf-8"})
+    public String getFeed(@RequestParam(value = "count", required = false, defaultValue = "10") Integer count) throws IOException, URISyntaxException {
+        String response = doGetXbogusRequest("https://www.douyin.com/aweme/v1/web/tab/feed/?count=" + count + "&device_platform=webapp&aid=6383&live_insert_type=&video_type_select=1");
+        return formatRespData(GET_DATA_SUCCESS, GsonUtil.toBean(response, Object.class));
+    }
+
     private Boolean checkCanDownload(Integer itemTypeId) {
         return itemTypeId.equals(VIDEO_TYPE.getCode());
     }
 
     private Boolean checkCanPreview(Integer itemTypeId) {
         return itemTypeId.equals(VIDEO_TYPE.getCode()) || itemTypeId.equals(LIVE_TYPE_1.getCode()) || itemTypeId.equals(LIVE_TYPE_2.getCode()) || itemTypeId.equals(MUSIC_TYPE.getCode());
+    }
+
+    private String doGetXbogusRequest(String inputUrl) throws IOException, URISyntaxException {
+        XbogusDataModel xbogusDataModel = XbogusUtil.encrypt(inputUrl);
+        if (Objects.isNull(xbogusDataModel) || ObjectUtils.isEmpty(xbogusDataModel.getUrl())) {
+            logger.error("[DouYinApi] encrypt error, encryptResult: {}", xbogusDataModel);
+            throw new NullPointerException("encrypt error");
+        }
+        logger.info("[DouYinApi] encryptResult: {}", xbogusDataModel);
+        int retryTime = 0;
+        String response;
+        while (retryTime < MAX_RETRY_TIMES) {
+            response = HttpClientUtil.doGet(xbogusDataModel.getUrl(), HeaderUtil.getDouYinSpecialHeader(xbogusDataModel.getMstoken(), xbogusDataModel.getTtwid()), null);
+            if (StringUtils.hasLength(response)) {
+                return response;
+            }
+            retryTime++;
+            logger.info("[DouYinApi] Get data error, retry time: {}", retryTime);
+        }
+        return null;
     }
 }
