@@ -297,7 +297,7 @@ public class KugouToolsController {
     }
 
     @HttpRequestRecorder
-    @GetMapping(value = "song/new", produces = {"application/json;charset=utf-8"})
+    @GetMapping(value = "api/song/new", produces = {"application/json;charset=utf-8"})
     public String newSong(@RequestParam(required = false) String configId, @RequestParam(required = false, defaultValue = "1") Long page, @RequestParam(required = false, defaultValue = "30") Long limit) throws IOException, URISyntaxException {
         if (Objects.isNull(KugouNewSongEnums.getEnumsByType(configId))) {
             return formatRespData(UNSUPPORTED_PARAMS, null);
@@ -310,6 +310,121 @@ public class KugouToolsController {
         params.put("pagesize", limit.toString());
         params.put("type", configId);
         String response = HttpClientUtil.doGet(KUGOU_NEW_SONG_SERVER_URL, HeaderUtil.getKugouPublicHeader(null, null), params);
+        if (StringUtils.hasLength(response)) {
+            return formatRespData(GET_DATA_SUCCESS, GsonUtil.toBean(response, Object.class));
+        }
+        return formatRespData(GET_INFO_ERROR, null);
+    }
+
+    @HttpRequestRecorder
+    @GetMapping(value = "api/singer/hot/config", produces = {"application/json;charset=utf-8"})
+    public String hotSingerConfig() throws IOException, URISyntaxException {
+        HashMap<String, String> params = new HashMap<>();
+        params.put("sextype", "0");
+        params.put("type", "0");
+        params.put("page", "1");
+        params.put("pagesize", "1");
+        String response = HttpClientUtil.doGet(KUGOU_SINGER_HOT_SERVER_URL, HeaderUtil.getKugouPublicHeader(null, null), params);
+        if (StringUtils.hasLength(response)) {
+            return formatRespData(GET_DATA_SUCCESS, GsonUtil.toMaps(GsonUtil.toString(GsonUtil.toMaps(response).get("data"))).get("enu_list"));
+        }
+        return formatRespData(GET_INFO_ERROR, null);
+    }
+
+    @HttpRequestRecorder
+    @GetMapping(value = "api/singer/hot", produces = {"application/json;charset=utf-8"})
+    public String hotSinger(@RequestParam(required = false, defaultValue = "1") Long page, @RequestParam(required = false, defaultValue = "30") Long limit, @RequestParam(required = false, defaultValue = "0") String sexType, @RequestParam(required = false, defaultValue = "0") String type) throws IOException, URISyntaxException {
+        HashMap<String, String> params = new HashMap<>();
+        params.put("sextype", sexType);
+        params.put("type", type);
+        params.put("page", page.toString());
+        params.put("pagesize", limit.toString());
+        params.put("sort", "1");
+        String response = HttpClientUtil.doGet(KUGOU_SINGER_HOT_SERVER_URL, HeaderUtil.getKugouPublicHeader(null, null), params);
+        if (StringUtils.hasLength(response)) {
+            return formatRespData(GET_DATA_SUCCESS, GsonUtil.toBean(response, Object.class));
+        }
+        return formatRespData(GET_INFO_ERROR, null);
+    }
+
+    @HttpRequestRecorder
+    @GetMapping(value = "api/singer/soar", produces = {"application/json;charset=utf-8"})
+    public String soarSinger(@RequestParam(required = false, defaultValue = "1") Long page, @RequestParam(required = false, defaultValue = "30") Long limit, @RequestParam(required = false, defaultValue = "0") String sexType, @RequestParam(required = false, defaultValue = "0") String type) throws IOException, URISyntaxException {
+        HashMap<String, String> params = new HashMap<>();
+        params.put("sextype", sexType);
+        params.put("type", type);
+        params.put("page", page.toString());
+        params.put("pagesize", limit.toString());
+        params.put("sort", "2");
+        String response = HttpClientUtil.doGet(KUGOU_SINGER_SOARED_SERVER_URL, HeaderUtil.getKugouPublicHeader(null, null), params);
+        if (StringUtils.hasLength(response)) {
+            return formatRespData(GET_DATA_SUCCESS, GsonUtil.toBean(response, Object.class));
+        }
+        return formatRespData(GET_INFO_ERROR, null);
+    }
+
+    @HttpRequestRecorder
+    @GetMapping(value = "api/singer/info", produces = {"application/json;charset=utf-8"})
+    public String singerInfo(@RequestParam(required = false) String singerId) throws IOException, URISyntaxException {
+        if (!StringUtils.hasLength(singerId)) {
+            return formatRespData(UNSUPPORTED_PARAMS, null);
+        }
+        HashMap<String, String> params = new HashMap<>();
+        params.put("singerid", singerId);
+        String response = HttpClientUtil.doGet(KUGOU_SINGER_INFO_SERVER_URL, HeaderUtil.getKugouPublicHeader(null, null), params);
+        if (StringUtils.hasLength(response)) {
+            return formatRespData(GET_DATA_SUCCESS, GsonUtil.toBean(response, Object.class));
+        }
+        return formatRespData(GET_INFO_ERROR, null);
+    }
+
+    @HttpRequestRecorder
+    @GetMapping(value = "api/singer/song", produces = {"application/json;charset=utf-8"})
+    public String singerSong(@RequestParam(required = false, defaultValue = "1") Long page, @RequestParam(required = false, defaultValue = "30") Long limit, @RequestParam(required = false) String singerId) throws IOException, URISyntaxException {
+        if (!StringUtils.hasLength(singerId)) {
+            return formatRespData(UNSUPPORTED_PARAMS, null);
+        }
+        HashMap<String, String> params = new HashMap<>();
+        params.put("sorttype", "2");
+        params.put("singerid", singerId);
+        params.put("page", page.toString());
+        params.put("pagesize", limit.toString());
+        String response = HttpClientUtil.doGet(KUGOU_SINGER_SONG_SERVER_URL, HeaderUtil.getKugouPublicHeader(null, null), params);
+        if (StringUtils.hasLength(response)) {
+            return formatRespData(GET_DATA_SUCCESS, GsonUtil.toBean(response, Object.class));
+        }
+        return formatRespData(GET_INFO_ERROR, null);
+    }
+
+    @HttpRequestRecorder
+    @GetMapping(value = "api/singer/album", produces = {"application/json;charset=utf-8"})
+    public String singerAlbum(@RequestParam(required = false, defaultValue = "1") Long page, @RequestParam(required = false, defaultValue = "30") Long limit, @RequestParam(required = false) String singerId) throws IOException, URISyntaxException {
+        if (!StringUtils.hasLength(singerId)) {
+            return formatRespData(UNSUPPORTED_PARAMS, null);
+        }
+        HashMap<String, String> params = new HashMap<>();
+        params.put("show_album_tag", "0");
+        params.put("singerid", singerId);
+        params.put("page", page.toString());
+        params.put("pagesize", limit.toString());
+        String response = HttpClientUtil.doGet(KUGOU_SINGER_ALBUM_SERVER_URL, HeaderUtil.getKugouPublicHeader(null, null), params);
+        if (StringUtils.hasLength(response)) {
+            return formatRespData(GET_DATA_SUCCESS, GsonUtil.toBean(response, Object.class));
+        }
+        return formatRespData(GET_INFO_ERROR, null);
+    }
+
+    @HttpRequestRecorder
+    @GetMapping(value = "api/singer/mv", produces = {"application/json;charset=utf-8"})
+    public String singerMv(@RequestParam(required = false, defaultValue = "1") Long page, @RequestParam(required = false, defaultValue = "30") Long limit, @RequestParam(required = false) String singerId) throws IOException, URISyntaxException {
+        if (!StringUtils.hasLength(singerId)) {
+            return formatRespData(UNSUPPORTED_PARAMS, null);
+        }
+        HashMap<String, String> params = new HashMap<>();
+        params.put("singerid", singerId);
+        params.put("page", page.toString());
+        params.put("pagesize", limit.toString());
+        String response = HttpClientUtil.doGet(KUGOU_SINGER_MV_SERVER_URL, HeaderUtil.getKugouPublicHeader(null, null), params);
         if (StringUtils.hasLength(response)) {
             return formatRespData(GET_DATA_SUCCESS, GsonUtil.toBean(response, Object.class));
         }
