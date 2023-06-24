@@ -317,8 +317,8 @@ public class KugouToolsController {
     }
 
     @HttpRequestRecorder
-    @GetMapping(value = "api/singer/hot/config", produces = {"application/json;charset=utf-8"})
-    public String hotSingerConfig() throws IOException, URISyntaxException {
+    @GetMapping(value = "api/singer/config", produces = {"application/json;charset=utf-8"})
+    public String singerConfig() throws IOException, URISyntaxException {
         HashMap<String, String> params = new HashMap<>();
         params.put("sextype", "0");
         params.put("type", "0");
