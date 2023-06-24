@@ -25,4 +25,5 @@ public class KugouWebPathCollector {
     public static final String KUGOU_SINGER_SONG_SERVER_URL = "http://mobilecdnbj.kugou.com/api/v3/singer/song";
     public static final String KUGOU_SINGER_ALBUM_SERVER_URL = "http://mobilecdnbj.kugou.com/api/v3/singer/album";
     public static final String KUGOU_SINGER_MV_SERVER_URL = "http://mobilecdnbj.kugou.com/api/v3/singer/mv";
+    public static final String KUGOU_ALBUM_MUSIC_INFO_SERVER_URL = "http://mobilecdn.kugou.com/api/v3/album/song";
 }

@@ -431,6 +431,24 @@ public class KugouToolsController {
         return formatRespData(GET_INFO_ERROR, null);
     }
 
+    @HttpRequestRecorder
+    @GetMapping(value = "api/album/music/info", produces = {"application/json;charset=utf-8"})
+    public String albumMusicInfo(@RequestParam(required = false, defaultValue = "1") Long page, @RequestParam(required = false, defaultValue = "30") Long limit, @RequestParam(required = false) String albumId) throws IOException, URISyntaxException {
+        if (!StringUtils.hasLength(albumId)) {
+            return formatRespData(UNSUPPORTED_PARAMS, null);
+        }
+        HashMap<String, String> params = new HashMap<>();
+        params.put("albumid", albumId);
+        params.put("page", page.toString());
+        params.put("pagesize", limit.toString());
+        String response = HttpClientUtil.doGet(KUGOU_ALBUM_MUSIC_INFO_SERVER_URL, HeaderUtil.getKugouPublicHeader(null, null), params);
+        if (StringUtils.hasLength(response)) {
+            return formatRespData(GET_DATA_SUCCESS, GsonUtil.toBean(response, Object.class));
+        }
+        return formatRespData(GET_INFO_ERROR, null);
+    }
+
+
     private static String getDataFromMap(String key, Map<String, Object> data) {
         if (StringUtils.hasLength(key)) {
             return String.valueOf(data.get(key));
