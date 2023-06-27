@@ -3,6 +3,7 @@ package com.koala.service.custom.interceptor;
 import com.koala.service.data.redis.RedisLockUtil;
 import com.koala.service.utils.MD5Utils;
 import com.koala.service.utils.RemoteIpUtils;
+import com.koala.service.utils.UnicodeUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
@@ -63,8 +64,8 @@ public class FirewallInterceptor implements HandlerInterceptor {
             final String requestKey = request.getHeader("request-key");
             if (StringUtils.hasLength(requestKey)) {
                 try {
-                    final String requestId = MD5Utils.convertMD5(request.getHeader("request-id"));
-                    final String requestTime = MD5Utils.convertMD5(request.getHeader("request-time"));
+                    final String requestId = UnicodeUtils.unicodeToString(MD5Utils.convertMD5(request.getHeader("request-id")));
+                    final String requestTime = UnicodeUtils.unicodeToString(MD5Utils.convertMD5(request.getHeader("request-time")));
                     if (requestInfo.equals(MD5Utils.md5(requestId + "mobile" + requestTime))) {
                         if (requestKey.equals(MD5Utils.md5(requestId + request.getRequestURI() + requestTime))) {
                             Boolean isNotOutdated = addIpRequestKeyLockAndCheckIsNotOutdated(requestKey, redisLockUtil);

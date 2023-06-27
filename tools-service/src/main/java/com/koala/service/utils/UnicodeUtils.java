@@ -67,7 +67,7 @@ public class UnicodeUtils {
         if (s == null || s.equals("")) {
             return null;
         }
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         try {
             char c;
             for (int i = 0; i < s.length(); i++) {
