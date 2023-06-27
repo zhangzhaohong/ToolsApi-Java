@@ -1,9 +1,10 @@
 package com.koala.service.custom.interceptor;
 
 import com.koala.service.data.redis.RedisLockUtil;
+import com.koala.service.utils.Base64Utils;
 import com.koala.service.utils.MD5Utils;
 import com.koala.service.utils.RemoteIpUtils;
-import com.koala.service.utils.UnicodeUtils;
+import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
@@ -13,8 +14,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.HandlerInterceptor;
-
-import jakarta.annotation.Resource;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -59,13 +58,13 @@ public class FirewallInterceptor implements HandlerInterceptor {
     public boolean preHandle(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull Object handler) {
         final String ip = RemoteIpUtils.getRemoteIpByServletRequest(request, true);
         log.info("[FirewallInterceptor] request请求地址uri={},ip={}", request.getRequestURI(), ip);
-        final String requestInfo = request.getHeader("request-info");
+        final String requestInfo = request.getHeader("Request-Info");
         if (StringUtils.hasLength(requestInfo)) {
-            final String requestKey = request.getHeader("request-key");
+            final String requestKey = request.getHeader("Request-Key");
             if (StringUtils.hasLength(requestKey)) {
                 try {
-                    final String requestId = UnicodeUtils.unicodeToString(MD5Utils.convertMD5(request.getHeader("request-id")));
-                    final String requestTime = UnicodeUtils.unicodeToString(MD5Utils.convertMD5(request.getHeader("request-time")));
+                    final String requestId = MD5Utils.convertMD5(Base64Utils.decode(request.getHeader("Request-Id")));
+                    final String requestTime = MD5Utils.convertMD5(Base64Utils.decode(request.getHeader("Request-Time")));
                     if (requestInfo.equals(MD5Utils.md5(requestId + "mobile" + requestTime))) {
                         if (requestKey.equals(MD5Utils.md5(requestId + request.getRequestURI() + requestTime))) {
                             Boolean isNotOutdated = addIpRequestKeyLockAndCheckIsNotOutdated(requestKey, redisLockUtil);
