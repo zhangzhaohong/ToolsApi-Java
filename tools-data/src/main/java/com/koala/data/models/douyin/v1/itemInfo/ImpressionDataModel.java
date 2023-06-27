@@ -13,7 +13,7 @@ import java.util.List;
  * @description
  */
 @Data
-public class ImpressionDataModel implements Serializable {
+public class ImpressionDataModel<Object extends Serializable> implements Serializable {
     @SerializedName("group_id_list_a")
     private List<String> groupIdListA;
     @SerializedName("group_id_list_b")
@@ -21,7 +21,7 @@ public class ImpressionDataModel implements Serializable {
     @SerializedName("group_id_list_c")
     private List<Long> groupIdListC;
     @SerializedName("similar_id_list_a")
-    private String similarIdListA;
+    private Object similarIdListA;
     @SerializedName("similar_id_list_b")
     private List<Long> similarIdListB;
 }
