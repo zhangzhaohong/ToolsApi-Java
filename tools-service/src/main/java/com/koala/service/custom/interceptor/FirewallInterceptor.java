@@ -62,24 +62,30 @@ public class FirewallInterceptor implements HandlerInterceptor {
         if (StringUtils.hasLength(requestInfo)) {
             final String requestKey = request.getHeader("request-key");
             if (StringUtils.hasLength(requestKey)) {
-                final String requestId = request.getHeader("request-id");
-                final String requestTime = request.getHeader("request-time");
-                if (requestInfo.equals(MD5Utils.md5(requestId + "mobile" + requestTime))) {
-                    if (requestKey.equals(MD5Utils.md5(requestId + request.getRequestURI() + requestTime))) {
-                        Boolean isNotOutdated = addIpRequestKeyLockAndCheckIsNotOutdated(requestKey, redisLockUtil);
-                        if (isNotOutdated) {
-                            log.info("[FirewallInterceptor] 客户端请求，key校验成功，自动放过={}", ip);
-                            return true;
+                try {
+                    final String requestId = MD5Utils.convertMD5(request.getHeader("request-id"));
+                    final String requestTime = MD5Utils.convertMD5(request.getHeader("request-time"));
+                    if (requestInfo.equals(MD5Utils.md5(requestId + "mobile" + requestTime))) {
+                        if (requestKey.equals(MD5Utils.md5(requestId + request.getRequestURI() + requestTime))) {
+                            Boolean isNotOutdated = addIpRequestKeyLockAndCheckIsNotOutdated(requestKey, redisLockUtil);
+                            if (isNotOutdated) {
+                                log.info("[FirewallInterceptor] 客户端请求，key校验成功，自动放过={}", ip);
+                                return true;
+                            } else {
+                                log.info("[FirewallInterceptor] 客户端请求，过期的key，访问被禁止={}", ip);
+                                returnErrorPage(response, HttpStatus.FORBIDDEN.value(), formatRespDataWithCustomMsg(403, "key校验失败", null), "key校验失败");
+                                return false;
+                            }
                         } else {
-                            log.info("[FirewallInterceptor] 客户端请求，过期的key，访问被禁止={}", ip);
+                            log.info("[FirewallInterceptor] 客户端请求，key校验失败，访问被禁止={}", ip);
                             returnErrorPage(response, HttpStatus.FORBIDDEN.value(), formatRespDataWithCustomMsg(403, "key校验失败", null), "key校验失败");
                             return false;
                         }
-                    } else {
-                        log.info("[FirewallInterceptor] 客户端请求，key校验失败，访问被禁止={}", ip);
-                        returnErrorPage(response, HttpStatus.FORBIDDEN.value(), formatRespDataWithCustomMsg(403, "key校验失败", null), "key校验失败");
-                        return false;
                     }
+                } catch (Exception e) {
+                    log.info("[FirewallInterceptor] 客户端请求，key校验失败，访问被禁止={}", ip);
+                    returnErrorPage(response, HttpStatus.FORBIDDEN.value(), formatRespDataWithCustomMsg(403, "key校验失败", null), "key校验失败");
+                    return false;
                 }
             }
         }
