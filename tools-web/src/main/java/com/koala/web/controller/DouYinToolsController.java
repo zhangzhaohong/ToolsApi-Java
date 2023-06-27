@@ -32,6 +32,7 @@ import jakarta.annotation.Resource;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Objects;
@@ -195,8 +196,8 @@ public class DouYinToolsController {
 
     @HttpRequestRecorder
     @GetMapping(value = "api/feed", produces = {"application/json;charset=utf-8"})
-    public String getFeed(@RequestParam(value = "count", required = false, defaultValue = "10") Integer count) throws IOException, URISyntaxException {
-        String response = doGetXbogusRequest("https://www.douyin.com/aweme/v1/web/wallpaper/feed?device_platform=webapp&aid=6383&channel=channel_pc_web&count=" + count + "&video_type_select=0&pc_client_type=1&version_code=170400&version_name=17.4.0&cookie_enabled=true&screen_width=1920&screen_height=1080&browser_language=zh-CN&browser_platform=MacIntel&browser_name=Chrome&browser_version=114.0.0.0&browser_online=true&engine_name=Blink&engine_version=114.0.0.0&os_name=Mac+OS&os_version=10.15.7&cpu_core_num=16&device_memory=8&platform=PC&downlink=9.6&effective_type=4g&round_trip_time=100&webid=7198450121436202500&msToken=bEscmNIzuXlcNgRHu1Rz0C-KOtkRqgDBrHFYWCg8aKSSXbE8PZbp96rBIAk3iEj3gKzDoydVWTkswsfpyMCtmYVf5iJPHtae001guVNxHPEUdnjxJ1Fq1A==");
+    public String getFeed(@RequestParam(value = "count", required = false, defaultValue = "12") Integer count) throws IOException, URISyntaxException {
+        String response = doGetXbogusRequest("https://www.douyin.com/aweme/v1/web/tab/feed/?" + URLEncoder.encode("device_platform=webapp&aid=6383&channel=channel_pc_web&tag_id=&share_aweme_id=&live_insert_type=&count=" + count + "&refresh_index=2&video_type_select=1&aweme_pc_rec_raw_data=%7B%22videoPrefer%22:%7B%22fsn%22:\\[%227242252960749735168%22,%2259301303675%22\\],%22like%22:\\[\\],%22halfMin%22:\\[\\],%22min%22:\\[\\]%7D,%22seo_info%22:%22https:%2F%2Fwww.douyin.com%2F%22,%22is_client%22:false,%22ff_danmaku_status%22:1,%22danmaku_switch_status%22:1%7D&globalwid=&pull_type=2&min_window=0&ug_source=&creative_id=&pc_client_type=1&version_code=170400&version_name=17.4.0&cookie_enabled=true&screen_width=1920&screen_height=1080&browser_language=zh-CN&browser_platform=MacIntel&browser_name=Chrome&browser_version=114.0.0.0&browser_online=true&engine_name=Blink&engine_version=114.0.0.0&os_name=Mac+OS&os_version=10.15.7&cpu_core_num=16&device_memory=8&platform=PC&downlink=9.6&effective_type=4g&round_trip_time=100&webid=7198450121436202500&msToken=XBdwzLkSfRTOTbEZ-sslL89QsR15Vbzz2_ln4Vqxj2gX-Twb967ymNYWIlZtlVYpnqdmezXad-dvWjHkX6kBl6p9uWr7Xpf4-I-MXY4XTDiZHZE3PtmVSg==", StandardCharsets.UTF_8));
         return formatRespData(GET_DATA_SUCCESS, GsonUtil.toBean(response, Object.class));
     }
 
