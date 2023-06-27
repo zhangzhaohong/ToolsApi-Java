@@ -194,6 +194,17 @@ public class HeaderUtil {
         return header;
     }
 
+    public static Map<String, String> getDouYinFeedSpecialHeader(String token, String ticket) {
+        HashMap<String, String> header = new HashMap<>(0);
+        header.put("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36");
+        header.put("Accept-Encoding", "application/json, text/plain, */*");
+        header.put("referer", "https://www.douyin.com/");
+        header.put("Cookie", "msToken=" + token + "; ttwid=" + ticket + "; odin_tt=7d837dd8df64c7bf34936682e006d27c4eea36e7691d75464d10eed973cbcac4b59a61eceb67eab0e992f916196618584386a704b48b2114fce1f9e7258a333f243689d39cb05f330655d332dcdbcb72; passport_csrf_token=12bef27c9899a951310540d6850e2b18; __ac_nonce=0649ab3e200b5bf389ea9; __ac_signature=_02B4Z6wo00f01kkw7dwAAIDDt3yR7m1HmipJEOlAAPblD7GyB5uPIU.dG.6--abJ1euLwdCwL0M1SAQj3ah8auaFhDSLoIAA9nZDrZ0Stxxjl2RIFHPGyO-CGaDiLz1EdiMvIzEN8mnGEX-w4f; douyin.com; device_web_cpu_core=16; device_web_memory_size=8;");
+        header.put("X-FORWARDED-FOR", getRandomIpAddress());
+        header.put("CLIENT-IP", getRandomIpAddress());
+        return header;
+    }
+
     public static Map<String, String> getDouYinWebRequestSpecialHeader(String ticket) {
         HashMap<String, String> header = new HashMap<>(0);
         header.put("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36");

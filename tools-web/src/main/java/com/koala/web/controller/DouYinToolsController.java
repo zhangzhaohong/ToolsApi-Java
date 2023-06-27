@@ -196,7 +196,7 @@ public class DouYinToolsController {
     @HttpRequestRecorder
     @GetMapping(value = "api/feed", produces = {"application/json;charset=utf-8"})
     public String getFeed(@RequestParam(value = "count", required = false, defaultValue = "10") Integer count) throws IOException, URISyntaxException {
-        String response = doGetXbogusRequest("https://www.douyin.com/aweme/v1/web/tab/feed/?count=" + count + "&device_platform=webapp&aid=6383&refresh_index=1&live_insert_type=&video_type_select=1");
+        String response = doGetXbogusRequest("https://www.douyin.com/aweme/v1/web/wallpaper/feed?device_platform=webapp&aid=6383&channel=channel_pc_web&count=" + count + "&video_type_select=0&pc_client_type=1&version_code=170400&version_name=17.4.0&cookie_enabled=true&screen_width=1920&screen_height=1080&browser_language=zh-CN&browser_platform=MacIntel&browser_name=Chrome&browser_version=114.0.0.0&browser_online=true&engine_name=Blink&engine_version=114.0.0.0&os_name=Mac+OS&os_version=10.15.7&cpu_core_num=16&device_memory=8&platform=PC&downlink=9.6&effective_type=4g&round_trip_time=100&webid=7198450121436202500&msToken=bEscmNIzuXlcNgRHu1Rz0C-KOtkRqgDBrHFYWCg8aKSSXbE8PZbp96rBIAk3iEj3gKzDoydVWTkswsfpyMCtmYVf5iJPHtae001guVNxHPEUdnjxJ1Fq1A==");
         return formatRespData(GET_DATA_SUCCESS, GsonUtil.toBean(response, Object.class));
     }
 
@@ -218,7 +218,7 @@ public class DouYinToolsController {
         int retryTime = 0;
         String response;
         while (retryTime < MAX_RETRY_TIMES) {
-            response = HttpClientUtil.doGet(xbogusDataModel.getUrl(), HeaderUtil.getDouYinSpecialHeader(xbogusDataModel.getMstoken(), xbogusDataModel.getTtwid()), null);
+            response = HttpClientUtil.doGet(xbogusDataModel.getUrl(), HeaderUtil.getDouYinFeedSpecialHeader(xbogusDataModel.getMstoken(), xbogusDataModel.getTtwid()), null);
             if (StringUtils.hasLength(response)) {
                 return response;
             }
