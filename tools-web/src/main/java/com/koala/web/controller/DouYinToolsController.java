@@ -197,12 +197,11 @@ public class DouYinToolsController {
     public String getFeed() throws IOException, URISyntaxException {
         String url = "https://aweme-hl.snssdk.com/aweme/v1/feed/";
         Map<String, String> params = new HashMap<>();
-        params.put("pull_type", "2");
-        params.put("device_type", "HD1900");
+        params.put("cached_item_num", "0");
+        params.put("device_type", "MI 5s");
         params.put("device_platform", "android");
         params.put("version_code", "290");
         params.put("app_name", "douyin_lite");
-        params.put("cdid", UUID.randomUUID().toString());
         params.put("os_version", "12.0.0");
         params.put("channel", "tengxun");
         String response = HttpClientUtil.doGet(url, HeaderUtil.getDouYinFeedSpecialHeader(), params);
