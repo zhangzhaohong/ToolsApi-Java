@@ -2,6 +2,7 @@ package com.koala.service.utils;
 
 import org.springframework.util.StringUtils;
 
+import javax.annotation.Nullable;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -246,6 +247,19 @@ public class HeaderUtil {
         HashMap<String, String> header = new HashMap<>(0);
         header.put("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Safari/537.36 Chrome/91.0.4472.164 NeteaseMusicDesktop/2.10.2.200154");
         header.put("Referer", "");
+        header.put("X-FORWARDED-FOR", getRandomIpAddress());
+        header.put("CLIENT-IP", getRandomIpAddress());
+        return header;
+    }
+
+    public static Map<String, String> getNeteaseHttpHeader(@Nullable String cookies) {
+        HashMap<String, String> header = new HashMap<>(0);
+        header.put("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:46.0) Gecko/20100101 Firefox/46.0");
+        header.put("Referer", "http://music.163.com");
+        header.put("Host", "music.163.com");
+        if (StringUtils.hasLength(cookies)) {
+            header.put("Cookie", cookies);
+        }
         header.put("X-FORWARDED-FOR", getRandomIpAddress());
         header.put("CLIENT-IP", getRandomIpAddress());
         return header;

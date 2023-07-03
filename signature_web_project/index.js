@@ -7,6 +7,95 @@ const cryptoJs = require('crypto-js');
 const app = express();
 app.use(express.json());
 
+app.post("/netease/generator", async (req, res) => {
+
+    const iv = Buffer.from('0102030405060708');
+    const presetKey = Buffer.from('0CoJUm6Qyw8W8jud');
+    const linuxapiKey = Buffer.from('rFgB&h#%2?^eDg:Q');
+    const base62 = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    const publicKey =
+        '-----BEGIN PUBLIC KEY-----\nMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDgtQn2JZ34ZC28NWYpAUd98iZ37BUrX/aKzmFbt7clFSs6sXqHauqKWqdtLkF2KexO40H1YTX8z2lSgBBOAxLsvaklV8k4cBFK9snQXE9/DDaFt6Rr7iVZMldczhC0JNgTz+SHXT6CBHuX3e9SdB1Ua44oncaTWz7OBGLbCiK45wIDAQAB\n-----END PUBLIC KEY-----';
+    const eapiKey = 'e82ckenh8dichen8';
+
+    const aesEncrypt = (buffer, mode, key, iv) => {
+        const cipher = crypto.createCipheriv('aes-128-' + mode, key, iv);
+        return Buffer.concat([cipher.update(buffer), cipher.final()]);
+    };
+
+    const rsaEncrypt = (buffer, key) => {
+        buffer = Buffer.concat([Buffer.alloc(128 - buffer.length), buffer]);
+        return crypto.publicEncrypt(
+            {key: key, padding: crypto.constants.RSA_NO_PADDING},
+            buffer
+        );
+    };
+
+
+    try {
+        const {encryptType, params, url} = req.body;
+
+        if (!params) {
+            throw new Error("Missing required parameters.");
+        }
+
+        console.info({
+            type: encryptType,
+            params: params,
+            url: url
+        });
+
+        if (encryptType === "weapi") {
+            const secretKey = crypto
+                .randomBytes(16)
+                .map(n => base62.charAt(n % 62).charCodeAt(0));
+
+            res.status(200).json({
+                code: 200,
+                msg: "success",
+                data: {
+                    params: aesEncrypt(
+                        Buffer.from(
+                            aesEncrypt(Buffer.from(params), 'cbc', presetKey, iv).toString('base64')
+                        ),
+                        'cbc',
+                        secretKey,
+                        iv
+                    ).toString('base64'),
+                    encSecKey: rsaEncrypt(secretKey.reverse(), publicKey).toString('hex')
+                }
+            });
+        } else if (encryptType === "linuxapi") {
+            res.status(200).json({
+                code: 200,
+                msg: "success",
+                data: {
+                    eparams: aesEncrypt(Buffer.from(params), 'ecb', linuxapiKey, '')
+                        .toString('hex')
+                        .toUpperCase()
+                }
+            });
+        } else if (encryptType === "eapi" && url) {
+            const message = `nobody${url}use${params}md5forencrypt`;
+            const digest = crypto
+                .createHash('md5')
+                .update(message)
+                .digest('hex');
+            const data = `${url}-36cd479b6b5-${params}-36cd479b6b5-${digest}`;
+            return {
+                params: aesEncrypt(Buffer.from(data), 'ecb', eapiKey, '')
+                    .toString('hex')
+                    .toUpperCase()
+            };
+        } else {
+            res.status(400).json({code: 500, msg: "unsupported type"});
+        }
+
+    } catch (err) {
+        console.error(err);
+        res.status(400).json({code: 201, msg: err.message});
+    }
+});
+
 app.post("/kugou/v1", async (req, res) => {
     try {
         const {params} = req.body;
@@ -49,7 +138,7 @@ app.post("/kugou/v2", async (req, res) => {
             code: 200,
             msg: "success",
             data: {
-                key:cryptoJs.MD5(params).toString(),
+                key: cryptoJs.MD5(params).toString(),
                 params: params
             }
         });
