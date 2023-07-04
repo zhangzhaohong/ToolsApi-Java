@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static com.koala.service.utils.IpUtil.getRandomIpAddress;
+
 public class RestTemplateUtil {
 
     /**
@@ -59,6 +61,8 @@ public class RestTemplateUtil {
         headers.add(HttpHeaders.HOST, "music.163.com");
         headers.put(HttpHeaders.COOKIE, cookies);
         headers.add(HttpHeaders.USER_AGENT, getUserAgent());
+        headers.add("X-FORWARDED-FOR", getRandomIpAddress());
+        headers.add("CLIENT-IP", getRandomIpAddress());
         return headers;
     }
 

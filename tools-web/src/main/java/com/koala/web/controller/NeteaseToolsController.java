@@ -348,14 +348,14 @@ public class NeteaseToolsController {
     @HttpRequestRecorder
     @GetMapping("/login/cellphone")
     public void doLogin(@RequestParam String phone, @RequestParam String password, HttpServletRequest request, HttpServletResponse response) {
-        ResponseEntity<String> loginData = baseService.doRequest(request);
+        ResponseEntity<String> responseEntity = baseService.doRequest(request);
         PrintWriter writer = null;
         response.setCharacterEncoding("UTF-8");
         response.setContentType("text/html;charset=utf-8");
         try {
             writer = response.getWriter();
-            CookieUtil.setCookie(loginData.getHeaders(), response);
-            writer.print(loginData.getBody());
+            CookieUtil.setCookie(responseEntity.getHeaders(), response);
+            writer.print(responseEntity.getBody());
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
@@ -363,6 +363,26 @@ public class NeteaseToolsController {
             writer.close();
         }
     }
+
+    @HttpRequestRecorder
+    @GetMapping("/login/token/refresh")
+    public void doLoginTokenRefresh(HttpServletRequest request, HttpServletResponse response) {
+        ResponseEntity<String> responseEntity = baseService.doRequest(request);
+        PrintWriter writer = null;
+        response.setCharacterEncoding("UTF-8");
+        response.setContentType("text/html;charset=utf-8");
+        try {
+            writer = response.getWriter();
+            CookieUtil.setCookie(responseEntity.getHeaders(), response);
+            writer.print(responseEntity.getBody());
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            assert writer != null;
+            writer.close();
+        }
+    }
+
 
     private String getMvUrl(String url) {
         if (StringUtils.hasLength(url)) {
