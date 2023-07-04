@@ -14,7 +14,6 @@ import com.koala.factory.builder.ConcreteNeteaseApiBuilder;
 import com.koala.factory.builder.NeteaseApiBuilder;
 import com.koala.factory.director.NeteaseApiManager;
 import com.koala.factory.extra.netease.NeteaseCookieUtil;
-import com.koala.factory.http.NeteaseHttpManager;
 import com.koala.factory.path.NeteaseWebPathCollector;
 import com.koala.factory.product.NeteaseApiProduct;
 import com.koala.factory.service.netease.BaseService;
@@ -34,7 +33,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
@@ -381,6 +379,33 @@ public class NeteaseToolsController {
             assert writer != null;
             writer.close();
         }
+    }
+
+    @HttpRequestRecorder
+    @PostMapping("/login/token/refresh/generator")
+    public Map<String, Object> doLoginTokenRefreshGenerator(HttpServletRequest request, HttpServletResponse response) {
+        ResponseEntity<String> responseEntity = baseService.doRequest(request);
+        Map<String, Object> resp = new HashMap<>();
+        try {
+            String body = responseEntity.getBody();
+            if (StringUtils.hasLength(body)) {
+                Object code = GsonUtil.toMaps(body).get("code");
+                resp.put("code", (int) Math.round((Double) code));
+                if ((Double) code == 200){
+                    StringBuilder cookieString = new StringBuilder();
+                    Objects.requireNonNull(responseEntity.getHeaders().get("Set-Cookie")).forEach(item -> {
+                        cookieString.append(" ").append(item).append(";");
+                    });
+                    cookieString.append(" appver=8.9.75;");
+                    resp.put("cookie", cookieString.toString().trim());
+                }
+            } else {
+                resp.put("code", -1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return resp;
     }
 
 

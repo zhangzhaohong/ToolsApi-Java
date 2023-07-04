@@ -1,13 +1,11 @@
 package com.koala.factory.http;
 
-import com.google.gson.Gson;
 import com.koala.data.models.RespModel;
 import com.koala.service.data.redis.RedisKeyPrefix;
 import com.koala.service.data.redis.service.RedisService;
 import com.koala.service.utils.GsonUtil;
 import com.koala.service.utils.HeaderUtil;
 import com.koala.service.utils.HttpClientUtil;
-import com.koala.service.utils.XbogusUtil;
 import org.apache.hc.client5.http.cookie.Cookie;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -16,7 +14,10 @@ import org.springframework.util.StringUtils;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Optional;
 
 import static com.koala.service.utils.HeaderUtil.getNeteaseHttpHeader;
 

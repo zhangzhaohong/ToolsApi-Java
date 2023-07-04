@@ -50,7 +50,7 @@ public class RandomUserAgentGenerator {
         return "KugouMusic/3.1.2 (Mac OS X ban ben13.5(ban hao22G5048d))";
     }
 
-    static String getNeteaseUserAgent(String ua) {
+    public static String getNeteaseUserAgent(String ua) {
         double index;
         if (ua.isEmpty())
             index = Math.floor(Math.random() * neteaseUserAgentList.length);
