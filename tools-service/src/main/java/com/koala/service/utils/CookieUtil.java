@@ -51,16 +51,13 @@ public class CookieUtil {
                 List<String> entry = CharSequenceUtil.split(string, ";");
                 if (entry.size() > 0) {
                     List<String> cookieItem = CharSequenceUtil.split(entry.get(0).trim(), "=");
-                    if (cookieItem.size() == 2) {
-                        if (StringUtils.hasLength(cookieItem.get(1).trim())) {
+                    if (cookieItem.size() == 2 && (StringUtils.hasLength(cookieItem.get(1).trim()))) {
                             Cookie cookie = new Cookie(cookieItem.get(0).trim(), cookieItem.get(1).trim());
                             cookie.setPath("/");
                             cookie.setMaxAge(14 * 24 * 60 * 60);
                             response.addCookie(cookie);
-                        }
                     }
                 }
-
             }
         }
     }
