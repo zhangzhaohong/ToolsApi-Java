@@ -76,7 +76,7 @@ public class NeteaseCookieUtil {
         Map<String, String> headers = new HashMap<>();
         headers.put("Cookie", Optional.ofNullable(cookie).orElse(getLocalNeteaseCookie()));
         headers.put("User-Agent", RandomUserAgentGenerator.getNeteaseUserAgent("pc"));
-        String response = HttpClientUtil.doPost(host + "tools/Netease/login/token/refresh", headers, null);
+        String response = HttpClientUtil.doPost(host + "tools/Netease/login/token/refresh/generator", headers, null);
         if (StringUtils.hasLength(response)) {
             Map<String, Object> data = GsonUtil.toMaps(response);
             if ((Double) data.get("code") == 200) {

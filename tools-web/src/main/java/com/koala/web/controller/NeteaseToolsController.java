@@ -54,6 +54,8 @@ public class NeteaseToolsController {
 
     private static final Long EXPIRE_TIME = 12 * 60 * 60L;
 
+    private static final String[] WHITE_LIST_COOKIE_NAME = new String[]{"MUSIC_A_T", "MUSIC_R_T", "MUSIC_U", "__csrf"};
+
     private final RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
 
     @Resource(name = "getHost")
@@ -393,9 +395,17 @@ public class NeteaseToolsController {
                 resp.put("code", (int) Math.round((Double) code));
                 if ((Double) code == 200){
                     StringBuilder cookieString = new StringBuilder();
-                    Objects.requireNonNull(responseEntity.getHeaders().get("Set-Cookie")).forEach(item -> {
-                        cookieString.append(" ").append(item).append(";");
-                    });
+                    for (String item : Objects.requireNonNull(responseEntity.getHeaders().get("Set-Cookie"))) {
+                        try {
+                            String prefix = item.split("=")[0];
+                            if (StringUtils.hasLength(prefix) && Arrays.asList(WHITE_LIST_COOKIE_NAME).contains(prefix)) {
+                                cookieString.append(" ").append(item).append(";");
+                            }
+                        } catch (Exception exception) {
+                            exception.printStackTrace();
+                        }
+                    }
+                    cookieString.append(" __remember_me=true;");
                     cookieString.append(" appver=8.9.75;");
                     resp.put("cookie", cookieString.toString().trim());
                 }
