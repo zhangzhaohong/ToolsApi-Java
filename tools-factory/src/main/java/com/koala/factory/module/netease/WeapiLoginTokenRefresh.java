@@ -13,7 +13,7 @@ import java.util.Map;
  * @description
  */
 @Service
-public class LoginTokenRefreshGenerator implements BaseModuleWeApi {
+public class WeapiLoginTokenRefresh implements BaseModuleWeApi {
 
 
     @Override

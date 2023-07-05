@@ -54,7 +54,8 @@ public class BaseServiceImpl implements BaseService {
         if (baseModule instanceof BaseModuleEApi) {
             final String param = CryptoUtil.eapiEncrypt(baseModule.getOptionsUrl(), object.toString());
             return RestTemplateUtil.postEApi(param,
-                    baseModule.getUrl().replaceAll("api",baseModule.getOptionsUrl()),
+                    // baseModule.getUrl().replaceAll("api",baseModule.getOptionsUrl()),
+                    baseModule.getUrl().replaceAll("/api","/" + baseModule.getType()),
                     cookies,
                     restTemplate);
         }

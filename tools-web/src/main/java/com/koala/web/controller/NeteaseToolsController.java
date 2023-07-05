@@ -54,8 +54,6 @@ public class NeteaseToolsController {
 
     private static final Long EXPIRE_TIME = 12 * 60 * 60L;
 
-    private static final String[] WHITE_LIST_COOKIE_NAME = new String[]{"MUSIC_A_T", "MUSIC_R_T", "MUSIC_U", "__csrf"};
-
     private final RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
 
     @Resource(name = "getHost")
@@ -365,8 +363,8 @@ public class NeteaseToolsController {
     }
 
     @HttpRequestRecorder
-    @GetMapping("/login/token/refresh")
-    public void doLoginTokenRefresh(HttpServletRequest request, HttpServletResponse response) {
+    @PostMapping("/weapi/login/token/refresh")
+    public void doLoginWeapiTokenRefresh(HttpServletRequest request, HttpServletResponse response) {
         ResponseEntity<String> responseEntity = baseService.doRequest(request);
         PrintWriter writer = null;
         response.setCharacterEncoding("UTF-8");
@@ -384,38 +382,9 @@ public class NeteaseToolsController {
     }
 
     @HttpRequestRecorder
-    @PostMapping("/login/token/refresh/generator")
-    public Map<String, Object> doLoginTokenRefreshGenerator(HttpServletRequest request, HttpServletResponse response) {
-        ResponseEntity<String> responseEntity = baseService.doRequest(request);
-        Map<String, Object> resp = new HashMap<>();
-        try {
-            String body = responseEntity.getBody();
-            if (StringUtils.hasLength(body)) {
-                Object code = GsonUtil.toMaps(body).get("code");
-                resp.put("code", (int) Math.round((Double) code));
-                if ((Double) code == 200){
-                    StringBuilder cookieString = new StringBuilder();
-                    for (String item : Objects.requireNonNull(responseEntity.getHeaders().get("Set-Cookie"))) {
-                        try {
-                            String prefix = item.split("=")[0];
-                            if (StringUtils.hasLength(prefix) && Arrays.asList(WHITE_LIST_COOKIE_NAME).contains(prefix)) {
-                                cookieString.append(" ").append(item).append(";");
-                            }
-                        } catch (Exception exception) {
-                            exception.printStackTrace();
-                        }
-                    }
-                    cookieString.append(" __remember_me=true;");
-                    cookieString.append(" appver=8.9.75;");
-                    resp.put("cookie", cookieString.toString().trim());
-                }
-            } else {
-                resp.put("code", -1);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return resp;
+    @GetMapping("reset/cookie")
+    public void resetCookie(@RequestParam(required = false) String lock) {
+        redisService.set(NETEASE_COOKIE_LOCK, lock, 14 * 24 * 60 * 60L);
     }
 
 
