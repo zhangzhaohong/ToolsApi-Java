@@ -2,6 +2,7 @@ package com.koala.service.utils;
 
 import org.springframework.util.StringUtils;
 
+import javax.annotation.Nullable;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -194,6 +195,15 @@ public class HeaderUtil {
         return header;
     }
 
+    public static Map<String, String> getDouYinFeedSpecialHeader() {
+        HashMap<String, String> header = new HashMap<>(0);
+        header.put("User-Agent", "com.ss.android.ugc.aweme.lite/220 (Linux; U; Android 5.1.1; zh_CN; MT2-L05; Build/LMY47V; Cronet/58.0.2991.0)");
+        header.put("Accept-Encoding", "None");
+        header.put("X-FORWARDED-FOR", getRandomIpAddress());
+        header.put("CLIENT-IP", getRandomIpAddress());
+        return header;
+    }
+
     public static Map<String, String> getDouYinWebRequestSpecialHeader(String ticket) {
         HashMap<String, String> header = new HashMap<>(0);
         header.put("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36");
@@ -237,6 +247,19 @@ public class HeaderUtil {
         HashMap<String, String> header = new HashMap<>(0);
         header.put("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Safari/537.36 Chrome/91.0.4472.164 NeteaseMusicDesktop/2.10.2.200154");
         header.put("Referer", "");
+        header.put("X-FORWARDED-FOR", getRandomIpAddress());
+        header.put("CLIENT-IP", getRandomIpAddress());
+        return header;
+    }
+
+    public static Map<String, String> getNeteaseHttpHeader(@Nullable String cookies) {
+        HashMap<String, String> header = new HashMap<>(0);
+        header.put("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:46.0) Gecko/20100101 Firefox/46.0");
+        header.put("Referer", "http://music.163.com");
+        header.put("Host", "music.163.com");
+        if (StringUtils.hasLength(cookies)) {
+            header.put("Cookie", cookies);
+        }
         header.put("X-FORWARDED-FOR", getRandomIpAddress());
         header.put("CLIENT-IP", getRandomIpAddress());
         return header;

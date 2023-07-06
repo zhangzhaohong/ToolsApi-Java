@@ -131,7 +131,11 @@ public class DouYinApiProduct {
             if (this.url.contains(LIVE_TYPE_1.getPrefix())) {
                 this.directUrl = this.url;
             } else {
-                this.directUrl = HttpClientUtil.doGetRedirectLocation(this.url, null, HeaderUtil.getDouYinDownloadHeader());
+                if (this.url.contains("www.iesdouyin.com")) {
+                    this.directUrl = this.url;
+                } else {
+                    this.directUrl = HttpClientUtil.doGetRedirectLocation(this.url, null, HeaderUtil.getDouYinDownloadHeader());
+                }
                 if (Objects.equals(WEB_FROM, HttpClientUtil.getParam(this.directUrl, "from")) || Objects.equals(AWEME_HOTSOON_APP, HttpClientUtil.getParam(this.directUrl, "app"))) {
                     String ticket = getTicket();
                     String webDirectUrl = HttpClientUtil.doGetRedirectLocation(this.directUrl, HeaderUtil.getDouYinWebRequestSpecialHeader(ticket), HeaderUtil.getDouYinDownloadHeader());

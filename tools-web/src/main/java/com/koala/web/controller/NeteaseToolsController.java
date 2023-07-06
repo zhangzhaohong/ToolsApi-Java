@@ -16,6 +16,7 @@ import com.koala.factory.director.NeteaseApiManager;
 import com.koala.factory.extra.netease.NeteaseCookieUtil;
 import com.koala.factory.path.NeteaseWebPathCollector;
 import com.koala.factory.product.NeteaseApiProduct;
+import com.koala.factory.service.netease.BaseService;
 import com.koala.service.custom.http.annotation.HttpRequestRecorder;
 import com.koala.service.data.redis.service.RedisService;
 import com.koala.service.utils.*;
@@ -24,14 +25,14 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.web.DefaultRedirectStrategy;
 import org.springframework.security.web.RedirectStrategy;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
@@ -63,6 +64,9 @@ public class NeteaseToolsController {
 
     @Resource
     private NeteaseCookieUtil neteaseCookieUtil;
+
+    @Resource
+    private BaseService baseService;
 
     @HttpRequestRecorder
     @GetMapping(value = "api", produces = {"application/json;charset=utf-8"})
@@ -339,6 +343,55 @@ public class NeteaseToolsController {
         return formatRespData(GET_INFO_ERROR, null);
     }
 
+    @HttpRequestRecorder
+    @GetMapping("/login/cellphone")
+    public void doLogin(@RequestParam String phone, @RequestParam String password, HttpServletRequest request, HttpServletResponse response) {
+        ResponseEntity<String> responseEntity = baseService.doRequest(request);
+        PrintWriter writer = null;
+        response.setCharacterEncoding("UTF-8");
+        response.setContentType("text/html;charset=utf-8");
+        try {
+            writer = response.getWriter();
+            CookieUtil.setCookie(responseEntity.getHeaders(), response);
+            writer.print(responseEntity.getBody());
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            assert writer != null;
+            writer.close();
+        }
+    }
+
+    @HttpRequestRecorder
+    @PostMapping("/weapi/login/token/refresh")
+    public void doLoginWeapiTokenRefresh(HttpServletRequest request, HttpServletResponse response) {
+        ResponseEntity<String> responseEntity = baseService.doRequest(request);
+        PrintWriter writer = null;
+        response.setCharacterEncoding("UTF-8");
+        response.setContentType("text/html;charset=utf-8");
+        try {
+            writer = response.getWriter();
+            CookieUtil.setCookie(responseEntity.getHeaders(), response);
+            writer.print(responseEntity.getBody());
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            assert writer != null;
+            writer.close();
+        }
+    }
+
+    @HttpRequestRecorder
+    @GetMapping("reset/cookie")
+    public void resetCookie(@RequestParam(required = false) String lock) {
+        redisService.set(NETEASE_COOKIE_LOCK, lock, 14 * 24 * 60 * 60L);
+    }
+
+    @HttpRequestRecorder
+    @GetMapping("current/cookie")
+    public String getCookie() {
+        return redisService.get(NETEASE_COOKIE_DATA);
+    }
 
     private String getMvUrl(String url) {
         if (StringUtils.hasLength(url)) {

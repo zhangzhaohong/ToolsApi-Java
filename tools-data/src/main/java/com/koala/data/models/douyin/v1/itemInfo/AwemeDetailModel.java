@@ -89,7 +89,7 @@ public class AwemeDetailModel<Object extends Serializable> implements Serializab
     @SerializedName("img_bitrate")
     private Object imgBitrate;
     @SerializedName("impression_data")
-    private ImpressionDataModel impressionDataModel;
+    private ImpressionDataModel<?> impressionDataModel;
     @SerializedName("interaction_stickers")
     private Object interactionStickers;
     @SerializedName("is_ads")

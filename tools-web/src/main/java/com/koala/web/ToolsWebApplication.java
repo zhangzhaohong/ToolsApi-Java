@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.File;
+import java.util.TimeZone;
 
 @Slf4j
 @MapperScan(basePackages = {"com.koala.service.data.database.mapper"})
@@ -19,6 +20,7 @@ import java.io.File;
 public class ToolsWebApplication {
 
     public static void main(String[] args) {
+        TimeZone.setDefault(TimeZone.getTimeZone("Asia/Shanghai"));
         String dir = System.getProperty("user.dir");
         String folderDir = String.format("%s/ServiceData", dir);
         File folder = new File(folderDir);

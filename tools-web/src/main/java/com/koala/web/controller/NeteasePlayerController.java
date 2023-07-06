@@ -19,7 +19,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import static com.koala.service.data.redis.RedisKeyPrefix.*;
+import static com.koala.service.data.redis.RedisKeyPrefix.NETEASE_DATA_KEY_PREFIX;
+import static com.koala.service.data.redis.RedisKeyPrefix.NETEASE_MV_DATA_KEY_PREFIX;
 
 /**
  * @author koala

@@ -32,10 +32,9 @@ import jakarta.annotation.Resource;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 import static com.koala.base.enums.DouYinResponseEnums.*;
 import static com.koala.base.enums.DouYinTypeEnums.*;
@@ -195,8 +194,17 @@ public class DouYinToolsController {
 
     @HttpRequestRecorder
     @GetMapping(value = "api/feed", produces = {"application/json;charset=utf-8"})
-    public String getFeed(@RequestParam(value = "count", required = false, defaultValue = "10") Integer count) throws IOException, URISyntaxException {
-        String response = doGetXbogusRequest("https://www.douyin.com/aweme/v1/web/tab/feed/?count=" + count + "&device_platform=webapp&aid=6383&refresh_index=1&live_insert_type=&video_type_select=1");
+    public String getFeed() throws IOException, URISyntaxException {
+        String url = "https://aweme-hl.snssdk.com/aweme/v1/feed/";
+        Map<String, String> params = new HashMap<>();
+        params.put("cached_item_num", "0");
+        params.put("device_type", "MI 5s");
+        params.put("device_platform", "android");
+        params.put("version_code", "290");
+        params.put("app_name", "douyin_lite");
+        params.put("os_version", "12.0.0");
+        params.put("channel", "tengxun");
+        String response = HttpClientUtil.doGet(url, HeaderUtil.getDouYinFeedSpecialHeader(), params);
         return formatRespData(GET_DATA_SUCCESS, GsonUtil.toBean(response, Object.class));
     }
 
@@ -208,23 +216,4 @@ public class DouYinToolsController {
         return itemTypeId.equals(VIDEO_TYPE.getCode()) || itemTypeId.equals(LIVE_TYPE_1.getCode()) || itemTypeId.equals(LIVE_TYPE_2.getCode()) || itemTypeId.equals(MUSIC_TYPE.getCode());
     }
 
-    private String doGetXbogusRequest(String inputUrl) throws IOException, URISyntaxException {
-        XbogusDataModel xbogusDataModel = XbogusUtil.encrypt(inputUrl);
-        if (Objects.isNull(xbogusDataModel) || ObjectUtils.isEmpty(xbogusDataModel.getUrl())) {
-            logger.error("[DouYinApi] encrypt error, encryptResult: {}", xbogusDataModel);
-            throw new NullPointerException("encrypt error");
-        }
-        logger.info("[DouYinApi] encryptResult: {}", xbogusDataModel);
-        int retryTime = 0;
-        String response;
-        while (retryTime < MAX_RETRY_TIMES) {
-            response = HttpClientUtil.doGet(xbogusDataModel.getUrl(), HeaderUtil.getDouYinSpecialHeader(xbogusDataModel.getMstoken(), xbogusDataModel.getTtwid()), null);
-            if (StringUtils.hasLength(response)) {
-                return response;
-            }
-            retryTime++;
-            logger.info("[DouYinApi] Get data error, retry time: {}", retryTime);
-        }
-        return null;
-    }
 }

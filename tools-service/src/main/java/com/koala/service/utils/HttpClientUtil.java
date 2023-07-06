@@ -50,6 +50,36 @@ public class HttpClientUtil {
 
     public static final String COOKIE_SPECS_STANDARD = "standard";
 
+    public static List<Cookie> doGetCookie(String url, Map<String, String> headers, Map<String, String> params) throws IOException, URISyntaxException {
+        CookieStore cookieStore = new BasicCookieStore();
+        // 创建httpClient对象
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            // 创建访问地址
+            URIBuilder uriBuilder = new URIBuilder(url);
+            if (!ObjectUtils.isEmpty(params)) {
+                params.forEach(uriBuilder::setParameter);
+            }
+            // 创建http对象
+            HttpGet httpGet = new HttpGet(uriBuilder.build());
+            // 设置请求超时时间及响应超时时间
+            RequestConfig requestConfig = RequestConfig.custom().setConnectionRequestTimeout(CONNECT_TIMEOUT, TimeUnit.MILLISECONDS).setCookieSpec(COOKIE_SPECS_STANDARD).build();
+            httpGet.setConfig(requestConfig);
+            // 设置请求头
+            packageHeader(headers, httpGet);
+            // 执行请求获取响应体并释放资源
+            getHttpClientResult(httpClient, httpGet);
+            return cookieStore.getCookies();
+        }
+    }
+
+    public static List<Cookie> doGetCookie(String url, Map<String, String> params) throws IOException, URISyntaxException {
+        return doGetCookie(url, null, params);
+    }
+
+    public static List<Cookie> doGetCookie(String url) throws IOException, URISyntaxException {
+        return doGetCookie(url, null, null);
+    }
+
     /**
      * 发送get请求;带请求头和请求参数
      */
