@@ -20,6 +20,7 @@ import com.koala.factory.service.netease.BaseService;
 import com.koala.service.custom.http.annotation.HttpRequestRecorder;
 import com.koala.service.data.redis.service.RedisService;
 import com.koala.service.utils.*;
+import com.koala.web.HostManager;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -56,8 +57,8 @@ public class NeteaseToolsController {
 
     private final RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
 
-    @Resource(name = "getHost")
-    private String host;
+    @Resource
+    private HostManager hostManager;
 
     @Resource(name = "RedisService")
     private RedisService redisService;
@@ -91,9 +92,9 @@ public class NeteaseToolsController {
         try {
             NeteaseRequestQualityEnums qualityEnums = NeteaseRequestQualityEnums.getEnumsByType(quality);
             if (!Objects.isNull(qualityEnums)) {
-                product = manager.construct(redisService, host, neteaseCookieUtil.getNeteaseCookie(), url, qualityEnums.getType(), "true".equals(lyric), Integer.valueOf(version));
+                product = manager.construct(redisService, hostManager.getHost(), neteaseCookieUtil.getNeteaseCookie(), url, qualityEnums.getType(), "true".equals(lyric), Integer.valueOf(version));
             } else {
-                product = manager.construct(redisService, host, neteaseCookieUtil.getNeteaseCookie(), url, null, "true".equals(lyric), Integer.valueOf(version));
+                product = manager.construct(redisService, hostManager.getHost(), neteaseCookieUtil.getNeteaseCookie(), url, null, "true".equals(lyric), Integer.valueOf(version));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -146,7 +147,7 @@ public class NeteaseToolsController {
         NeteaseApiManager manager = new NeteaseApiManager(builder);
         NeteaseApiProduct product = null;
         try {
-            product = manager.construct(redisService, host, neteaseCookieUtil.getNeteaseCookie(), url, Integer.valueOf(version));
+            product = manager.construct(redisService, hostManager.getHost(), neteaseCookieUtil.getNeteaseCookie(), url, Integer.valueOf(version));
             NeteaseMusicDataRespModel publicData = product.generateItemInfoRespData();
             if (!Objects.isNull(publicData)) {
                 return formatRespData(GET_DATA_SUCCESS, publicData);
@@ -276,7 +277,7 @@ public class NeteaseToolsController {
                         getMvUrl(mvInfo.getData().getBrs().getBrs240())
                 );
                 redisService.set(NETEASE_MV_DATA_KEY_PREFIX + key, GsonUtil.toString(new ShortNeteaseMvItemDataModel(title, null, multiQualityInfo)), EXPIRE_TIME);
-                mvInfo.setMockPreviewPath(host + "tools/Netease/pro/player/mv/short?key=" + Base64Utils.encodeToUrlSafeString(key.getBytes(StandardCharsets.UTF_8)));
+                mvInfo.setMockPreviewPath(hostManager.getHost() + "tools/Netease/pro/player/mv/short?key=" + Base64Utils.encodeToUrlSafeString(key.getBytes(StandardCharsets.UTF_8)));
                 mvInfo.setMockMultiDownloadPath(getMockMvDownloadInfo(key, multiQualityInfo));
                 switch (Objects.requireNonNull(NeteaseRequestTypeEnums.getEnumsByType(type))) {
                     case INFO -> {
@@ -395,17 +396,17 @@ public class NeteaseToolsController {
 
     private String getMvUrl(String url) {
         if (StringUtils.hasLength(url)) {
-            return ShortKeyGenerator.generateShortUrl(url, EXPIRE_TIME, host, redisService).getUrl();
+            return ShortKeyGenerator.generateShortUrl(url, EXPIRE_TIME, hostManager.getHost(), redisService).getUrl();
         }
         return null;
     }
 
     private MultiMvQualityInfoModel getMockMvDownloadInfo(String key, MultiMvQualityInfoModel multiMvQualityInfo) {
         return new MultiMvQualityInfoModel(
-                Objects.isNull(multiMvQualityInfo.getHd1()) ? null : (host + "tools/Netease/download/mv/short?key=" + Base64Utils.encodeToUrlSafeString(key.getBytes(StandardCharsets.UTF_8)) + "&quality=hd1"),
-                Objects.isNull(multiMvQualityInfo.getFullHd1()) ? null : (host + "tools/Netease/download/mv/short?key=" + Base64Utils.encodeToUrlSafeString(key.getBytes(StandardCharsets.UTF_8)) + "&quality=fullHd1"),
-                Objects.isNull(multiMvQualityInfo.getSd1()) ? null : (host + "tools/Netease/download/mv/short?key=" + Base64Utils.encodeToUrlSafeString(key.getBytes(StandardCharsets.UTF_8)) + "&quality=sd1"),
-                Objects.isNull(multiMvQualityInfo.getSd2()) ? null : (host + "tools/Netease/download/mv/short?key=" + Base64Utils.encodeToUrlSafeString(key.getBytes(StandardCharsets.UTF_8)) + "&quality=sd2")
+                Objects.isNull(multiMvQualityInfo.getHd1()) ? null : (hostManager.getHost() + "tools/Netease/download/mv/short?key=" + Base64Utils.encodeToUrlSafeString(key.getBytes(StandardCharsets.UTF_8)) + "&quality=hd1"),
+                Objects.isNull(multiMvQualityInfo.getFullHd1()) ? null : (hostManager.getHost() + "tools/Netease/download/mv/short?key=" + Base64Utils.encodeToUrlSafeString(key.getBytes(StandardCharsets.UTF_8)) + "&quality=fullHd1"),
+                Objects.isNull(multiMvQualityInfo.getSd1()) ? null : (hostManager.getHost() + "tools/Netease/download/mv/short?key=" + Base64Utils.encodeToUrlSafeString(key.getBytes(StandardCharsets.UTF_8)) + "&quality=sd1"),
+                Objects.isNull(multiMvQualityInfo.getSd2()) ? null : (hostManager.getHost() + "tools/Netease/download/mv/short?key=" + Base64Utils.encodeToUrlSafeString(key.getBytes(StandardCharsets.UTF_8)) + "&quality=sd2")
         );
     }
 

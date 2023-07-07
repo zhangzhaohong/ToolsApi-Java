@@ -3,9 +3,9 @@ package com.koala.web.controller;
 import com.koala.service.custom.http.annotation.HttpRequestRecorder;
 import com.koala.service.data.redis.service.RedisService;
 import com.koala.service.utils.RespUtil;
+import com.koala.web.HostManager;
 import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -34,8 +34,8 @@ public class BackendConfigController {
     @Value("${spring.profiles.active}")
     private String env;
 
-    @Resource(name = "getHost")
-    private String host;
+    @Resource
+    private HostManager hostManager;
 
     @Resource
     private RedisService redisService;
@@ -58,11 +58,10 @@ public class BackendConfigController {
     @GetMapping("config/service/host/set")
     public String setServiceHost(@RequestParam(required = false) String host) {
         redisService.set(SERVICE_HOST, host);
-        this.host = redisService.getAndPersist(SERVICE_HOST);
         return RespUtil.formatRespDataWithCustomMsg(
                 200,
                 "SET_HOST_SUCCESS",
-                this.host
+                hostManager.getHost()
         );
     }
 
@@ -72,7 +71,8 @@ public class BackendConfigController {
         return RespUtil.formatRespDataWithCustomMsg(
                 200,
                 "GET_HOST_SUCCESS",
-                host
+                hostManager.getHost()
         );
     }
+
 }

@@ -15,6 +15,7 @@ import com.koala.data.models.douyin.v1.musicInfo.MusicInfoRespModel;
 import com.koala.data.models.douyin.v1.roomInfoData.RoomInfoDataRespModel;
 import com.koala.service.data.redis.service.RedisService;
 import com.koala.service.utils.*;
+import com.koala.web.HostManager;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
@@ -56,8 +57,8 @@ public class DouYinToolsController {
 
     private final RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
 
-    @Resource(name = "getHost")
-    private String host;
+    @Resource
+    private HostManager hostManager;
 
     @Resource(name = "RedisService")
     private RedisService redisService;
@@ -131,7 +132,7 @@ public class DouYinToolsController {
         DouYinApiManager manager = new DouYinApiManager(builder);
         DouYinApiProduct product = null;
         try {
-            product = manager.construct(redisService, host, url, version);
+            product = manager.construct(redisService, hostManager.getHost(), url, version);
         } catch (Exception e) {
             e.printStackTrace();
             return formatRespData(FAILURE, null);
