@@ -6,6 +6,7 @@ import com.alibaba.fastjson2.support.spring6.http.converter.FastJsonHttpMessageC
 import com.koala.service.custom.http.converter.CustomMessageConverter;
 import com.koala.service.custom.http.processor.MixedHttpRequestProcessor;
 import com.koala.service.custom.interceptor.FirewallInterceptor;
+import com.koala.service.data.redis.service.RedisService;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,6 +32,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
+import static com.koala.service.data.redis.RedisKeyPrefix.SERVICE_HOST;
+
 /**
  * @author koala
  * @version 1.0
@@ -39,11 +42,14 @@ import java.util.concurrent.TimeUnit;
  */
 @Configuration
 @EnableWebMvc
-@DependsOn({"beanContext"})
+@DependsOn({"beanContext", "RedisService"})
 public class CoreWebConfig implements WebMvcConfigurer {
 
     @Resource
     private ApplicationContext applicationContext;
+
+    @Resource
+    private RedisService redisService;
 
     @Bean(name = "customRequestMappingHandlerAdapter")
     public RequestMappingHandlerAdapter requestMappingHandlerAdapter() {
@@ -143,6 +149,10 @@ public class CoreWebConfig implements WebMvcConfigurer {
 
     @Bean
     public String getHost() {
+        String serviceHost = redisService.get(SERVICE_HOST);
+        if (StringUtils.hasLength(serviceHost)) {
+            return serviceHost;
+        }
         Environment env = applicationContext.getEnvironment();
         String active = env.getProperty("spring.profiles.active");
         String ip = env.getProperty("server.real.address");

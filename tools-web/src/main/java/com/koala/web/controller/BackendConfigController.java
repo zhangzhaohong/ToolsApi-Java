@@ -1,13 +1,19 @@
 package com.koala.web.controller;
 
 import com.koala.service.custom.http.annotation.HttpRequestRecorder;
+import com.koala.service.data.redis.service.RedisService;
 import com.koala.service.utils.RespUtil;
+import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
+
+import static com.koala.service.data.redis.RedisKeyPrefix.SERVICE_HOST;
 
 /**
  * @author koala
@@ -17,7 +23,7 @@ import java.util.HashMap;
  */
 @RestController
 @RequestMapping("backend")
-public class BackendInfoController {
+public class BackendConfigController {
 
     @Value("${spring.application.version}")
     private String version;
@@ -27,6 +33,12 @@ public class BackendInfoController {
 
     @Value("${spring.profiles.active}")
     private String env;
+
+    @Resource(name = "getHost")
+    private String host;
+
+    @Resource
+    private RedisService redisService;
 
     @HttpRequestRecorder
     @GetMapping("info")
@@ -39,6 +51,30 @@ public class BackendInfoController {
                 200,
                 "GET_INFO_SUCCESS",
                 info
+        );
+    }
+
+    @HttpRequestRecorder
+    @GetMapping("config/service/host/set")
+    public String setServiceHost(@RequestParam(required = false) String host) {
+        if (StringUtils.hasLength(host)) {
+            redisService.set(SERVICE_HOST, host);
+            this.host = redisService.getAndPersist(SERVICE_HOST);
+        }
+        return RespUtil.formatRespDataWithCustomMsg(
+                200,
+                "SET_HOST_SUCCESS",
+                this.host
+        );
+    }
+
+    @HttpRequestRecorder
+    @GetMapping("config/service/host/get")
+    public String getServiceHost() {
+        return RespUtil.formatRespDataWithCustomMsg(
+                200,
+                "GET_HOST_SUCCESS",
+                host
         );
     }
 }
