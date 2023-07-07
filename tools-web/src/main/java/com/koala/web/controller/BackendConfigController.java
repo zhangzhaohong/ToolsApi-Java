@@ -57,10 +57,8 @@ public class BackendConfigController {
     @HttpRequestRecorder
     @GetMapping("config/service/host/set")
     public String setServiceHost(@RequestParam(required = false) String host) {
-        if (StringUtils.hasLength(host)) {
-            redisService.set(SERVICE_HOST, host);
-            this.host = redisService.getAndPersist(SERVICE_HOST);
-        }
+        redisService.set(SERVICE_HOST, host);
+        this.host = redisService.getAndPersist(SERVICE_HOST);
         return RespUtil.formatRespDataWithCustomMsg(
                 200,
                 "SET_HOST_SUCCESS",
