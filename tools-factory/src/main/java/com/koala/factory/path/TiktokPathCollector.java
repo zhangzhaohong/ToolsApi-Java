@@ -9,4 +9,5 @@ package com.koala.factory.path;
 public class TiktokPathCollector {
     public static final String TIKTOK_FEED_RECOMMEND_V1 = "https://aweme-hl.snssdk.com/aweme/v1/feed/";
     public static final String TIKTOK_FEED_RECOMMEND_V2 = "https://aweme.snssdk.com/aweme/v1/feed/";
+    public static final String TIKTOK_FEED_NEARBY_V2 = "https://aweme.snssdk.com/aweme/v1/nearby/feed/";
 }

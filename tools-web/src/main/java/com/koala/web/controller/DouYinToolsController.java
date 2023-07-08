@@ -40,8 +40,7 @@ import java.util.*;
 
 import static com.koala.base.enums.DouYinResponseEnums.*;
 import static com.koala.base.enums.DouYinTypeEnums.*;
-import static com.koala.factory.path.TiktokPathCollector.TIKTOK_FEED_RECOMMEND_V1;
-import static com.koala.factory.path.TiktokPathCollector.TIKTOK_FEED_RECOMMEND_V2;
+import static com.koala.factory.path.TiktokPathCollector.*;
 import static com.koala.service.utils.RespUtil.formatRespData;
 
 /**
@@ -251,6 +250,45 @@ public class DouYinToolsController {
         params.put("as", "a1iosdfgh");
         params.put("cp", "androide1");
         String response = XGorgonUtil.doGetRequest(TIKTOK_FEED_RECOMMEND_V2, params);
+        return formatRespData(GET_DATA_SUCCESS, GsonUtil.toBean(response, Object.class));
+    }
+
+    @SuppressWarnings("SpellCheckingInspection")
+    @HttpRequestRecorder
+    @GetMapping(value = "api/feed/nearby/v2", produces = {"application/json;charset=utf-8"})
+    public String getNearbyFeedV2() throws IOException, URISyntaxException {
+        Map<String, String> params = new HashMap<>();
+        params.put("feed_style", "1");
+        params.put("max_cursor", "0");
+        params.put("min_cursor", "0");
+        params.put("count", "6");
+        params.put("retry_type", "no_retry");
+        params.put("iid", "84579705899");
+        params.put("device_id", "69367187550");
+        params.put("ac", "wifi");
+        params.put("channel", "douyin_lite_gw");
+        params.put("aid", "2329");
+        params.put("app_name", "douyin_lite");
+        params.put("version_code", "180");
+        params.put("version_name", "1.8.0");
+        params.put("device_platform", "android");
+        params.put("ssmix", "a");
+        params.put("device_type", "Redmi+Note+7+Pro");
+        params.put("device_brand", "Xiaomi");
+        params.put("language", "zh");
+        params.put("os_api", "28");
+        params.put("os_version", "9");
+        params.put("openudid", "e4680b0d0446ad09");
+        params.put("manifest_version_code", "180");
+        params.put("resolution", "1080*2119");
+        params.put("dpi", "440");
+        params.put("update_version_code", "1800");
+        params.put("_rticket", "");
+        params.put("ts", "");
+        params.put("js_sdk_version", "1.10.4");
+        params.put("as", "a1iosdfgh");
+        params.put("cp", "androide1");
+        String response = XGorgonUtil.doGetRequest(TIKTOK_FEED_NEARBY_V2, params);
         return formatRespData(GET_DATA_SUCCESS, GsonUtil.toBean(response, Object.class));
     }
 
