@@ -2,9 +2,9 @@ package com.koala.factory.extra.netease;
 
 import cn.hutool.json.JSONObject;
 import com.koala.service.data.redis.service.RedisService;
-import com.koala.service.utils.*;
+import com.koala.service.utils.GsonUtil;
+import com.koala.service.utils.RestTemplateUtil;
 import jakarta.annotation.Resource;
-import org.apache.hc.client5.http.cookie.Cookie;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -12,16 +12,12 @@ import org.springframework.util.StreamUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import static com.koala.service.data.redis.RedisKeyPrefix.NETEASE_COOKIE_DATA;
-import static com.koala.service.data.redis.RedisKeyPrefix.NETEASE_COOKIE_LOCK;
-import static com.koala.service.utils.HeaderUtil.getNeteaseHttpHeader;
+import static com.koala.service.data.redis.RedisKeyPrefix.*;
 
 /**
  * @author koala
@@ -92,7 +88,7 @@ public class NeteaseCookieUtil {
                 e.printStackTrace();
             }
         });
-        ResponseEntity<String> responseEntity = RestTemplateUtil.post(new JSONObject(), host + "tools/Netease/weapi/login/token/refresh", cookies, restTemplate);
+        ResponseEntity<String> responseEntity = RestTemplateUtil.post(new JSONObject(), getCurrentHost() + "tools/Netease/weapi/login/token/refresh", cookies, restTemplate);
         if (StringUtils.hasLength(responseEntity.getBody())) {
             Map<String, Object> data = GsonUtil.toMaps(responseEntity.getBody());
             if ((Double) data.get("code") == 200) {
@@ -119,6 +115,14 @@ public class NeteaseCookieUtil {
         Date currentTime = new Date();
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd");
         return formatter.format(currentTime);
+    }
+
+    public String getCurrentHost() {
+        String cachedHost = redisService.getAndPersist(SERVICE_HOST);
+        if (StringUtils.hasLength(cachedHost)) {
+            return cachedHost;
+        }
+        return host;
     }
 
 }

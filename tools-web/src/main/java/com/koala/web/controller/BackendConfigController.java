@@ -6,6 +6,7 @@ import com.koala.service.utils.RespUtil;
 import com.koala.web.HostManager;
 import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -57,7 +58,15 @@ public class BackendConfigController {
     @HttpRequestRecorder
     @GetMapping("config/service/host/set")
     public String setServiceHost(@RequestParam(required = false) String host) {
-        redisService.set(SERVICE_HOST, host);
+        if (StringUtils.hasLength(host)) {
+            if (host.endsWith("/")) {
+                redisService.set(SERVICE_HOST, host);
+            } else {
+                redisService.set(SERVICE_HOST, host + "/");
+            }
+        } else {
+            redisService.set(SERVICE_HOST, null);
+        }
         return RespUtil.formatRespDataWithCustomMsg(
                 200,
                 "SET_HOST_SUCCESS",

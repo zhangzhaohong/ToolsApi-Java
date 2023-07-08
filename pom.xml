@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.1.0</version>
+        <version>3.1.1</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.koala</groupId>
@@ -15,7 +15,7 @@
     <name>tools</name>
     <description>tools</description>
     <properties>
-        <revision>2.0.1.5</revision>
+        <revision>2.0.1.6</revision>
         <java.version>17</java.version>
     </properties>
 

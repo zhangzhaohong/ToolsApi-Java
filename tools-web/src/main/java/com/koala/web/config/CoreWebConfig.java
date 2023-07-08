@@ -31,8 +31,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
-import static com.koala.service.data.redis.RedisKeyPrefix.SERVICE_HOST;
-
 /**
  * @author koala
  * @version 1.0
