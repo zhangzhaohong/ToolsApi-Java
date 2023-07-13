@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="signature-web-api-docker" type="docker-deploy" factoryName="dockerfile" server-name="Docker-signature">
+  <configuration default="false" name="signature-web-api-docker" type="docker-deploy" factoryName="dockerfile" server-name="Docker-192.168.2.251">
     <deployment type="dockerfile">
       <settings>
         <option name="imageTag" value="signature-service-package:1.0.1" />
