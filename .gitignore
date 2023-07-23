@@ -50,4 +50,4 @@ tools-web/src/main/resources/params/custom.kugou.params.txt
 
 tools-web/src/main/resources/application-prod-local.properties
 
-tools-web/src/main/resources/application-docker-online.properties
+tools-web/src/main/resources/application-docker.properties
