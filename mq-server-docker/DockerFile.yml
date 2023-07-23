@@ -12,6 +12,7 @@ services:
       - JAVA_OPT_EXT=-server -Xms256m -Xmx256m -Xmn256m
     volumes:
       - /data/docker/rocketmq/192.168.1.1/logs:/root/logs
+      - /etc/localtime:/etc/localtime
     command: sh mqnamesrv
     deploy:
       resources:
@@ -39,6 +40,7 @@ services:
       - /data/docker/rocketmq/broker/logs:/home/rocketmq/logs
       - /data/docker/rocketmq/broker/store:/home/rocketmq/store
       - /data/docker/rocketmq/etc/broker/broker.conf:/home/rocketmq/conf/broker.conf
+      - /etc/localtime:/etc/localtime
     command: sh mqbroker -c /home/rocketmq/conf/broker.conf
     deploy:
       resources:
@@ -59,6 +61,8 @@ services:
     restart: always
     environment:
       - NAMESRV_ADDR=192.168.1.1:55002
+    volumes:
+      - /etc/localtime:/etc/localtime
     deploy:
       resources:
         limits:
