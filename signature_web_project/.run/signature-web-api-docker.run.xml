@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="signature-web-api-docker" type="docker-deploy" factoryName="dockerfile" server-name="Docker-signature">
+  <configuration default="false" name="signature-web-api-docker" type="docker-deploy" factoryName="dockerfile" server-name="Docker-111.223.15.82">
     <deployment type="dockerfile">
       <settings>
         <option name="imageTag" value="signature-service-package:1.0.1" />
@@ -9,11 +9,11 @@
             <DockerPortBindingImpl>
               <option name="containerPort" value="8080" />
               <option name="hostIp" value="0.0.0.0" />
-              <option name="hostPort" value="6000" />
+              <option name="hostPort" value="55012" />
             </DockerPortBindingImpl>
           </list>
         </option>
-        <option name="commandLineOptions" value="--restart=always --log-driver json-file --log-opt max-size=10m --log-opt max-file=3" />
+        <option name="commandLineOptions" value="--restart=always --cpus 8 -m 14GB" />
         <option name="sourceFilePath" value="signature_web_project/Dockerfile" />
       </settings>
     </deployment>
