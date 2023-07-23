@@ -1,66 +1,65 @@
 version: '4'
-# replace 192.168.1.1 to real server ip
 services:
   #Service for nameserver
-  192.168.1.1:
+  192.168.2.250:
     image: apache/rocketmq:5.1.3
-    container_name: rocketmq-192.168.1.1
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    container_name: rocketmq-192.168.2.250
     ports:
       - 55002:9876
     restart: always
     environment:
       - JAVA_OPT_EXT=-server -Xms256m -Xmx256m -Xmn256m
     volumes:
-      - /data/docker/rocketmq/192.168.1.1/logs:/root/logs
+      - /Users/koala/rocketmq/data/192.168.2.250/logs:/root/logs
     command: sh mqnamesrv
-    deploy:
-      resources:
-        limits:
-          memory: 14G
-          cpus: "8.00"
 
   #Service for broker
   broker:
     image: apache/rocketmq:5.1.3
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
     container_name: rocketmq-broker
     links:
-      - 192.168.1.1
+      - 192.168.2.250
     depends_on:
-      - 192.168.1.1
+      - 192.168.2.250
     ports:
       - 10909:10909
       - 10911:10911
       - 10912:10912
     restart: always
     environment:
-      - NAMESRV_ADDR=192.168.1.1:55002
+      - NAMESRV_ADDR=192.168.2.250:55002
       - JAVA_OPT_EXT=-server -Xms512m -Xmx512m -Xmn256m
     volumes:
-      - /data/docker/rocketmq/broker/logs:/home/rocketmq/logs
-      - /data/docker/rocketmq/broker/store:/home/rocketmq/store
-      - /data/docker/rocketmq/etc/broker/broker.conf:/home/rocketmq/conf/broker.conf
+      - /Users/koala/rocketmq/data/broker/logs:/home/rocketmq/logs
+      - /Users/koala/rocketmq/data/broker/store:/home/rocketmq/store
+      - /Users/koala/rocketmq/etc/broker/broker.conf:/home/rocketmq/conf/broker.conf
     command: sh mqbroker -c /home/rocketmq/conf/broker.conf
-    deploy:
-      resources:
-        limits:
-          memory: 14G
-          cpus: "8.00"
 
   #Service for rocketmq-dashboard
   dashboard:
     image: apacherocketmq/rocketmq-dashboard:1.0.0
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
     container_name: rocketmq-dashboard
     ports:
       - 55003:8080
     links:
-      - 192.168.1.1
+      - 192.168.2.250
     depends_on:
-      - 192.168.1.1
+      - 192.168.2.250
     restart: always
     environment:
-      - NAMESRV_ADDR=192.168.1.1:55002
-    deploy:
-      resources:
-        limits:
-          memory: 14G
-          cpus: "8.00"
+      - NAMESRV_ADDR=192.168.2.250:55002
