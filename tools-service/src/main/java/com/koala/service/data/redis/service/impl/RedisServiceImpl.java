@@ -1,15 +1,11 @@
 package com.koala.service.data.redis.service.impl;
 
 import com.koala.service.data.redis.service.RedisService;
-import com.koala.service.data.redis.utils.SerializeUtil;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-import jakarta.annotation.Resource;
-
-import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
@@ -44,5 +40,19 @@ public class RedisServiceImpl implements RedisService {
     @Override
     public void set(String key, String value, Long expireTime) {
         redisTemplate.opsForValue().set(key, value, expireTime, TimeUnit.SECONDS);
+    }
+
+    @Override
+    public String getAndPersist(String key) {
+        return getAndPersist(key, null);
+    }
+
+    @Override
+    public String getAndPersist(String key, String defaultValue) {
+        Object result = redisTemplate.opsForValue().getAndPersist(key);
+        if (!Objects.isNull(result)) {
+            return String.valueOf(result);
+        }
+        return defaultValue;
     }
 }

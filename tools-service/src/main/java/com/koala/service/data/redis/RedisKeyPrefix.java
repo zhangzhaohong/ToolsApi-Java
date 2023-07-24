@@ -22,4 +22,5 @@ public class RedisKeyPrefix {
     public static final String KUGOU_ALBUM_MUSIC_DATA_KEY_PREFIX = "KUGOU:ALBUM:MUSIC:DATA:";
     public static final String NETEASE_COOKIE_DATA = "NETEASE:COOKIE:DATA";
     public static final String NETEASE_COOKIE_LOCK = "NETEASE:COOKIE:LOCK";
+    public static final String SERVICE_HOST = "SERVICE_HOST";
 }

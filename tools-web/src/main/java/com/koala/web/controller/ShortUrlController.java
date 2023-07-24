@@ -4,6 +4,8 @@ import com.koala.service.custom.http.annotation.HttpRequestRecorder;
 import com.koala.service.data.redis.service.RedisService;
 import com.koala.service.utils.Base64Utils;
 import com.koala.service.utils.ShortKeyGenerator;
+import com.koala.web.HostManager;
+import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.hc.core5.http.HttpStatus;
@@ -15,7 +17,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import jakarta.annotation.Resource;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Objects;
@@ -33,11 +34,12 @@ import static com.koala.service.utils.RespUtil.formatRespData;
 @Controller
 public class ShortUrlController {
     private static final Logger logger = LoggerFactory.getLogger(ShortUrlController.class);
-    @Resource(name = "getHost")
-    private String host;
 
     @Resource(name = "RedisService")
     private RedisService redisService;
+
+    @Resource
+    private HostManager hostManager;
 
     @HttpRequestRecorder
     @GetMapping("/short")
@@ -69,7 +71,7 @@ public class ShortUrlController {
     public String generateShortUrl(@RequestParam(value = "url", required = false, defaultValue = "") String url, @RequestParam(value = "expire", required = false) Long expire) {
         try {
             if (StringUtils.hasLength(url)) {
-                return formatRespData(GET_DATA_SUCCESS, ShortKeyGenerator.generateShortUrl(url, expire, host, redisService));
+                return formatRespData(GET_DATA_SUCCESS, ShortKeyGenerator.generateShortUrl(url, expire, hostManager.getHost(), redisService));
             } else {
                 return formatRespData(INVALID_LINK, null);
             }

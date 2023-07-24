@@ -21,6 +21,7 @@ import com.koala.factory.product.KugouApiProduct;
 import com.koala.service.custom.http.annotation.HttpRequestRecorder;
 import com.koala.service.data.redis.service.RedisService;
 import com.koala.service.utils.*;
+import com.koala.web.HostManager;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -63,8 +64,8 @@ public class KugouToolsController {
 
     private final RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
 
-    @Resource(name = "getHost")
-    private String host;
+    @Resource
+    private HostManager hostManager;
 
     @Resource(name = "RedisService")
     private RedisService redisService;
@@ -139,7 +140,7 @@ public class KugouToolsController {
         KugouApiManager manager = new KugouApiManager(builder);
         KugouApiProduct product = null;
         try {
-            product = manager.construct(redisService, host, url, hash, albumId, version, customParams, config);
+            product = manager.construct(redisService, hostManager.getHost(), url, hash, albumId, version, customParams, config);
         } catch (Exception e) {
             e.printStackTrace();
             return formatRespData(FAILURE, null);
@@ -222,14 +223,14 @@ public class KugouToolsController {
                                 getLongDataFromMap(qualityEnum.getFilesizeKey(), tmp)
                         ));
                         if (qualityEnum.getCanPreview()) {
-                            String mvPath = ShortKeyGenerator.generateShortUrl(KUGOU_MV_VIDEO_SERVER_URL + "&hash=" + hashItem, EXPIRE_TIME, host, redisService).getUrl();
+                            String mvPath = ShortKeyGenerator.generateShortUrl(KUGOU_MV_VIDEO_SERVER_URL + "&hash=" + hashItem, EXPIRE_TIME, hostManager.getHost(), redisService).getUrl();
                             mvInfo.add(new MvInfoModel(mvPath, hashItem, qualityEnum.getTypeName(), qualityEnum.getType()));
                         }
                     });
                     redisService.set(KUGOU_DATA_KEY_PREFIX + key, GsonUtil.toString(new ShortKugouItemDataModel(getDataFromMap("video_name", tmp), getDataFromMap("author_name", tmp), null, mvInfo)), EXPIRE_TIME);
-                    respData.getMockPreviewPath().put(KugouMvRequestQualityEnums.QUALITY_DEFAULT.getType(), host + "tools/Kugou/pro/player/mv/short?key=" + Base64Utils.encodeToUrlSafeString(key.getBytes(StandardCharsets.UTF_8)));
+                    respData.getMockPreviewPath().put(KugouMvRequestQualityEnums.QUALITY_DEFAULT.getType(), hostManager.getHost() + "tools/Kugou/pro/player/mv/short?key=" + Base64Utils.encodeToUrlSafeString(key.getBytes(StandardCharsets.UTF_8)));
                     mvInfo.forEach(item -> {
-                        respData.getMockDownloadPath().put(item.getType(), host + "tools/Kugou/download/mv/short?key=" + Base64Utils.encodeToUrlSafeString(key.getBytes(StandardCharsets.UTF_8)) + "&quality=" + item.getType());
+                        respData.getMockDownloadPath().put(item.getType(), hostManager.getHost() + "tools/Kugou/download/mv/short?key=" + Base64Utils.encodeToUrlSafeString(key.getBytes(StandardCharsets.UTF_8)) + "&quality=" + item.getType());
                     });
                 }
                 return formatRespData(GET_DATA_SUCCESS, respData);

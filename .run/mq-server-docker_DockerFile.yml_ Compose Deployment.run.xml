@@ -1,0 +1,11 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="mq-server-docker/DockerFile.yml: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" server-name="Docker-111.223.15.82">
+    <deployment type="docker-compose.yml">
+      <settings>
+        <option name="envFilePath" value="" />
+        <option name="sourceFilePath" value="mq-server-docker/DockerFile.yml" />
+      </settings>
+    </deployment>
+    <method v="2" />
+  </configuration>
+</component>

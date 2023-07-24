@@ -3,6 +3,11 @@ const crypto = require('crypto');
 const express = require("express");
 const {sign} = require("./Signer.js");
 const cryptoJs = require('crypto-js');
+const {EventEmitter} = require('events');
+const emitter = new EventEmitter();
+
+//Setting the listeners to Infinity
+emitter.setMaxListeners(0);
 
 const app = express();
 app.use(express.json());

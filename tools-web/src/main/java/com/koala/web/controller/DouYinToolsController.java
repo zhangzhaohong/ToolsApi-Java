@@ -6,6 +6,7 @@ import com.koala.data.models.xbogus.XbogusDataModel;
 import com.koala.factory.builder.ConcreteDouYinApiBuilder;
 import com.koala.factory.builder.DouYinApiBuilder;
 import com.koala.factory.director.DouYinApiManager;
+import com.koala.factory.extra.tiktok.XGorgonUtil;
 import com.koala.factory.product.DouYinApiProduct;
 import com.koala.service.custom.http.annotation.HttpRequestRecorder;
 import com.koala.service.custom.http.annotation.MixedHttpRequest;
@@ -15,6 +16,7 @@ import com.koala.data.models.douyin.v1.musicInfo.MusicInfoRespModel;
 import com.koala.data.models.douyin.v1.roomInfoData.RoomInfoDataRespModel;
 import com.koala.service.data.redis.service.RedisService;
 import com.koala.service.utils.*;
+import com.koala.web.HostManager;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
@@ -38,6 +40,7 @@ import java.util.*;
 
 import static com.koala.base.enums.DouYinResponseEnums.*;
 import static com.koala.base.enums.DouYinTypeEnums.*;
+import static com.koala.factory.path.TiktokPathCollector.*;
 import static com.koala.service.utils.RespUtil.formatRespData;
 
 /**
@@ -56,8 +59,8 @@ public class DouYinToolsController {
 
     private final RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
 
-    @Resource(name = "getHost")
-    private String host;
+    @Resource
+    private HostManager hostManager;
 
     @Resource(name = "RedisService")
     private RedisService redisService;
@@ -131,7 +134,7 @@ public class DouYinToolsController {
         DouYinApiManager manager = new DouYinApiManager(builder);
         DouYinApiProduct product = null;
         try {
-            product = manager.construct(redisService, host, url, version);
+            product = manager.construct(redisService, hostManager.getHost(), url, version);
         } catch (Exception e) {
             e.printStackTrace();
             return formatRespData(FAILURE, null);
@@ -193,9 +196,8 @@ public class DouYinToolsController {
     }
 
     @HttpRequestRecorder
-    @GetMapping(value = "api/feed", produces = {"application/json;charset=utf-8"})
-    public String getFeed() throws IOException, URISyntaxException {
-        String url = "https://aweme-hl.snssdk.com/aweme/v1/feed/";
+    @GetMapping(value = "api/feed/v1", produces = {"application/json;charset=utf-8"})
+    public String getFeedV1() throws IOException, URISyntaxException {
         Map<String, String> params = new HashMap<>();
         params.put("cached_item_num", "0");
         params.put("device_type", "MI 5s");
@@ -204,7 +206,89 @@ public class DouYinToolsController {
         params.put("app_name", "douyin_lite");
         params.put("os_version", "12.0.0");
         params.put("channel", "tengxun");
-        String response = HttpClientUtil.doGet(url, HeaderUtil.getDouYinFeedSpecialHeader(), params);
+        String response = HttpClientUtil.doGet(TIKTOK_FEED_RECOMMEND_V1, HeaderUtil.getDouYinFeedSpecialHeader(), params);
+        return formatRespData(GET_DATA_SUCCESS, GsonUtil.toBean(response, Object.class));
+    }
+
+    @SuppressWarnings("SpellCheckingInspection")
+    @HttpRequestRecorder
+    @GetMapping(value = "api/feed/recommend/v2", produces = {"application/json;charset=utf-8"})
+    public String getRecommendFeedV2() throws IOException, URISyntaxException {
+        Map<String, String> params = new HashMap<>();
+        params.put("type", "0");
+        params.put("max_cursor", "0");
+        params.put("min_cursor", "0");
+        params.put("count", "6");
+        params.put("volume", "0.8666666666666667");
+        params.put("pull_type", "2");
+        params.put("need_relieve_aweme", "0");
+        params.put("filter_warn", "0");
+        params.put("req_from", "");
+        params.put("is_cold_start", "0");
+        params.put("iid", "84579705899");
+        params.put("device_id", "69367187550");
+        params.put("ac", "wifi");
+        params.put("channel", "douyin_lite_gw");
+        params.put("aid", "2329");
+        params.put("app_name", "douyin_lite");
+        params.put("version_code", "180");
+        params.put("version_name", "1.8.0");
+        params.put("device_platform", "android");
+        params.put("ssmix", "a");
+        params.put("device_type", "Redmi+Note+7+Pro");
+        params.put("device_brand", "Xiaomi");
+        params.put("language", "zh");
+        params.put("os_api", "28");
+        params.put("os_version", "9");
+        params.put("openudid", "e4680b0d0446ad09");
+        params.put("manifest_version_code", "180");
+        params.put("resolution", "1080*2119");
+        params.put("dpi", "440");
+        params.put("_rticket", "");
+        params.put("ts", "");
+        params.put("js_sdk_version", "1.10.4");
+        params.put("as", "a1iosdfgh");
+        params.put("cp", "androide1");
+        String response = XGorgonUtil.doGetRequest(TIKTOK_FEED_RECOMMEND_V2, params);
+        return formatRespData(GET_DATA_SUCCESS, GsonUtil.toBean(response, Object.class));
+    }
+
+    @SuppressWarnings("SpellCheckingInspection")
+    @HttpRequestRecorder
+    @GetMapping(value = "api/feed/nearby/v2", produces = {"application/json;charset=utf-8"})
+    public String getNearbyFeedV2() throws IOException, URISyntaxException {
+        Map<String, String> params = new HashMap<>();
+        params.put("feed_style", "1");
+        params.put("max_cursor", "0");
+        params.put("min_cursor", "0");
+        params.put("count", "6");
+        params.put("retry_type", "no_retry");
+        params.put("iid", "84579705899");
+        params.put("device_id", "69367187550");
+        params.put("ac", "wifi");
+        params.put("channel", "douyin_lite_gw");
+        params.put("aid", "2329");
+        params.put("app_name", "douyin_lite");
+        params.put("version_code", "180");
+        params.put("version_name", "1.8.0");
+        params.put("device_platform", "android");
+        params.put("ssmix", "a");
+        params.put("device_type", "Redmi+Note+7+Pro");
+        params.put("device_brand", "Xiaomi");
+        params.put("language", "zh");
+        params.put("os_api", "28");
+        params.put("os_version", "9");
+        params.put("openudid", "e4680b0d0446ad09");
+        params.put("manifest_version_code", "180");
+        params.put("resolution", "1080*2119");
+        params.put("dpi", "440");
+        params.put("update_version_code", "1800");
+        params.put("_rticket", "");
+        params.put("ts", "");
+        params.put("js_sdk_version", "1.10.4");
+        params.put("as", "a1iosdfgh");
+        params.put("cp", "androide1");
+        String response = XGorgonUtil.doGetRequest(TIKTOK_FEED_NEARBY_V2, params);
         return formatRespData(GET_DATA_SUCCESS, GsonUtil.toBean(response, Object.class));
     }
 
