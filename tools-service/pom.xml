@@ -45,7 +45,7 @@
         <dependency>
             <groupId>org.springframework.kafka</groupId>
             <artifactId>spring-kafka</artifactId>
-            <version>3.0.8</version>
+            <version>3.0.9</version>
         </dependency>
         <!-- Redis -->
         <dependency>
@@ -98,17 +98,17 @@
         <dependency>
             <groupId>com.alibaba.fastjson2</groupId>
             <artifactId>fastjson2</artifactId>
-            <version>2.0.34</version>
+            <version>2.0.37</version>
         </dependency>
         <dependency>
             <groupId>com.alibaba.fastjson2</groupId>
             <artifactId>fastjson2-extension</artifactId>
-            <version>2.0.34</version>
+            <version>2.0.37</version>
         </dependency>
         <dependency>
             <groupId>com.alibaba.fastjson2</groupId>
             <artifactId>fastjson2-extension-spring6</artifactId>
-            <version>2.0.34</version>
+            <version>2.0.37</version>
         </dependency>
         <!-- mybatis-plus 3.5.3 才支持 spring boot 3-->
         <dependency>
@@ -131,7 +131,7 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-elasticsearch</artifactId>
-            <version>3.1.1</version>
+            <version>3.1.2</version>
         </dependency>
         <!-- PKCS7padding -->
         <dependency>
