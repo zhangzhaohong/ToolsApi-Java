@@ -2,7 +2,7 @@
   <configuration default="false" name="tools-api-server-docker" type="docker-deploy" factoryName="dockerfile" server-name="Docker-111.223.15.82">
     <deployment type="dockerfile">
       <settings>
-        <option name="imageTag" value="tools-api-package:2.0.1.6-docker" />
+        <option name="imageTag" value="tools-api-package:2.0.1.7-docker" />
         <option name="containerName" value="tools-api-serveree" />
         <option name="envVars">
           <list>
