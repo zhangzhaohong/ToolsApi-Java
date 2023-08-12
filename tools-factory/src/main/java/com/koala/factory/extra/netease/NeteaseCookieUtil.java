@@ -43,7 +43,7 @@ public class NeteaseCookieUtil {
     private RestTemplate restTemplate;
 
     public void doRefreshNeteaseCookieTask() {
-        refreshNeteaseCookie(getLocalNeteaseCookie());
+        refreshNeteaseCookie(redisService.get(NETEASE_COOKIE_DATA));
     }
 
     public String getNeteaseCookie() {
