@@ -42,6 +42,10 @@ public class NeteaseCookieUtil {
     @Resource
     private RestTemplate restTemplate;
 
+    public void doRefreshNeteaseCookieTask() {
+        refreshNeteaseCookie(getLocalNeteaseCookie());
+    }
+
     public String getNeteaseCookie() {
         String lock = redisService.get(NETEASE_COOKIE_LOCK);
         String cookie = redisService.get(NETEASE_COOKIE_DATA);
