@@ -103,7 +103,7 @@ public class DouYinApiProduct {
                         e.printStackTrace();
                     }
                 }
-                case IMAGE_TYPE, default ->
+                case IMAGE_TYPE ->
                         logger.info("[DouYinApiProduct]({}, {}) Unsupported item type id: {}, current url: {}", id, itemId, itemTypeId, this.directUrl);
             }
         }
@@ -189,7 +189,7 @@ public class DouYinApiProduct {
                         e.printStackTrace();
                     }
                 }
-                case IMAGE_TYPE, default ->
+                case IMAGE_TYPE ->
                         logger.info("[DouYinApiProduct]({}, {}) Unsupported item type id: {}", id, itemId, itemTypeId);
             }
         }
@@ -338,7 +338,7 @@ public class DouYinApiProduct {
                         // logger.info("[DouYinApiProduct]({}, {}) realFile: {}", id, itemId,HttpClientUtil.doGetRedirectLocation(link, HeaderUtil.getDouYinDownloadHeader(), null));
                     }
                 }
-                case IMAGE_TYPE, default ->
+                case IMAGE_TYPE ->
                         logger.info("[DouYinApiProduct]({}, {}) Unsupported item type id: {}", id, itemId, itemTypeId);
             }
         } catch (Exception e) {

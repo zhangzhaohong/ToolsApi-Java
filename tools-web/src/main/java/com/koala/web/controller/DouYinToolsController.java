@@ -184,7 +184,7 @@ public class DouYinToolsController {
                             return formatRespData(UNSUPPORTED_OPERATION, null);
                         }
                         break;
-                    case INFO, INVALID_TYPE, default:
+                    case INFO, INVALID_TYPE:
                         break;
                 }
                 return formatRespData(GET_DATA_SUCCESS, productData);
