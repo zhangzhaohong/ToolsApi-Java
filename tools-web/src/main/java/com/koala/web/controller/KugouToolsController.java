@@ -45,7 +45,7 @@ import static com.koala.base.enums.KugouResponseEnums.*;
 import static com.koala.factory.extra.kugou.KugouSearchParamsGenerator.getSearchParams;
 import static com.koala.factory.extra.kugou.KugouSearchParamsGenerator.getSearchTextParams;
 import static com.koala.factory.path.KugouWebPathCollector.*;
-import static com.koala.service.data.redis.RedisKeyPrefix.KUGOU_DATA_KEY_PREFIX;
+import static com.koala.service.data.redis.RedisKeyPrefix.*;
 import static com.koala.service.utils.RespUtil.formatRespData;
 
 /**
@@ -449,6 +449,12 @@ public class KugouToolsController {
         return formatRespData(GET_INFO_ERROR, null);
     }
 
+    @HttpRequestRecorder
+    @GetMapping("set/token")
+    public String setToken(@RequestParam(required = false) String token) {
+        redisService.set(KUGOU_COOKIE_TOKEN, token);
+        return redisService.getAndPersist(KUGOU_COOKIE_TOKEN);
+    }
 
     private static String getDataFromMap(String key, Map<String, Object> data) {
         if (StringUtils.hasLength(key)) {
