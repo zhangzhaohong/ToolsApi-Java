@@ -12,7 +12,7 @@ import java.util.List;
  * @description
  */
 @Data
-public class SongModel implements Serializable {
+public class SongModel<Object extends Serializable> implements Serializable {
     private String name;
     private Long id;
     private Integer pst;
@@ -44,7 +44,7 @@ public class SongModel implements Serializable {
     private Integer s_id;
     private Long mark;
     private Integer originCoverType;
-    private String originSongSimpleData;
+    private Object originSongSimpleData;
     private String tagPicList;
     private Boolean resourceState;
     private Integer version;
