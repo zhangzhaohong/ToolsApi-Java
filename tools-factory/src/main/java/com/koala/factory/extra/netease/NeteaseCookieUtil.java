@@ -100,10 +100,10 @@ public class NeteaseCookieUtil {
                 List<String> cookieData = responseEntity.getHeaders().get("Set-Cookie");
                 StringBuilder cookieString = new StringBuilder();
                 if (!Objects.isNull(cookieData) && cookieData.stream().noneMatch(item -> item.startsWith("__csrf"))) {
-                    cookieString.append("__csrf=").append(PatternUtil.matchData("__csrf=(.*?);", cookieContent)).append(";");
+                    cookieString.append(" __csrf=").append(PatternUtil.matchData("__csrf=(.*?);", cookieContent)).append(";");
                 }
                 if (!Objects.isNull(cookieData) && cookieData.stream().noneMatch(item -> item.startsWith("MUSIC_U"))) {
-                    cookieString.append("MUSIC_U=").append(PatternUtil.matchData("MUSIC_U=(.*?);", cookieContent)).append(";");
+                    cookieString.append(" MUSIC_U=").append(PatternUtil.matchData("MUSIC_U=(.*?);", cookieContent)).append(";");
                 }
                 for (String item : Objects.requireNonNull(cookieData)) {
                     cookieString.append(" ").append(item).append(";");
