@@ -13,6 +13,6 @@ import java.util.List;
  */
 @Data
 public class NeteaseMusicItemInfoRespModel implements Serializable {
-    private List<DataModel> data;
+    private List<DataModel<?>> data;
     private Integer code;
 }

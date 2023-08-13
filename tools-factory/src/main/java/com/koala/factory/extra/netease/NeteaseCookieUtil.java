@@ -97,7 +97,7 @@ public class NeteaseCookieUtil {
             Map<String, Object> data = GsonUtil.toMaps(responseEntity.getBody());
             if ((Double) data.get("code") == 200) {
                 List<String> cookieData = responseEntity.getHeaders().get("Set-Cookie");
-                StringBuilder cookieString = new StringBuilder();
+                StringBuilder cookieString = new StringBuilder(getLocalNeteaseCookie());
                 for (String item : Objects.requireNonNull(cookieData)) {
                     cookieString.append(" ").append(item).append(";");
                 }
