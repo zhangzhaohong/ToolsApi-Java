@@ -3,6 +3,7 @@ package com.koala.factory.extra.netease;
 import cn.hutool.json.JSONObject;
 import com.koala.service.data.redis.service.RedisService;
 import com.koala.service.utils.GsonUtil;
+import com.koala.service.utils.PatternUtil;
 import com.koala.service.utils.RestTemplateUtil;
 import jakarta.annotation.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -43,7 +44,7 @@ public class NeteaseCookieUtil {
     private RestTemplate restTemplate;
 
     public void doRefreshNeteaseCookieTask() {
-        refreshNeteaseCookie(null);
+        refreshNeteaseCookie(redisService.get(NETEASE_COOKIE_DATA));
     }
 
     public String getNeteaseCookie() {
@@ -97,7 +98,10 @@ public class NeteaseCookieUtil {
             Map<String, Object> data = GsonUtil.toMaps(responseEntity.getBody());
             if ((Double) data.get("code") == 200) {
                 List<String> cookieData = responseEntity.getHeaders().get("Set-Cookie");
-                StringBuilder cookieString = new StringBuilder(getLocalNeteaseCookie());
+                StringBuilder cookieString = new StringBuilder();
+                if (!Objects.isNull(cookieData) && cookieData.stream().noneMatch(item -> item.startsWith("MUSIC_U"))) {
+                    cookieString.append("MUSIC_U=").append(PatternUtil.matchData("MUSIC_U=(.*?);", cookieContent)).append(";");
+                }
                 for (String item : Objects.requireNonNull(cookieData)) {
                     cookieString.append(" ").append(item).append(";");
                 }
