@@ -214,6 +214,7 @@ public class DouYinApiProduct {
                             String title = this.musicItemInfo.getAwemeMusicDetail().get(0).getMusic().getTitle();
                             String link = this.musicItemInfo.getAwemeMusicDetail().get(0).getMusic().getPlayUrl().getUri();
                             redisService.set(TIKTOK_DATA_KEY_PREFIX + key, GsonUtil.toString(new ShortDouYinItemDataModel(title, link, null, null)), EXPIRE_TIME);
+                            this.musicItemInfo.getAwemeMusicDetail().get(0).getMusic().setRealPath(ShortKeyGenerator.generateShortUrl(link, EXPIRE_TIME, host, redisService).getUrl());
                             this.musicItemInfo.getAwemeMusicDetail().get(0).getMusic().setMockPreviewMusicPath(host + "tools/DouYin/pro/player/music/short?key=" + Base64Utils.encodeToUrlSafeString(key.getBytes(StandardCharsets.UTF_8)));
                             this.musicItemInfo.getAwemeMusicDetail().get(0).getMusic().setMockDownloadMusicPath(ShortKeyGenerator.generateShortUrl(host + "tools/DouYin/download/music?path=" + Base64Utils.encodeToUrlSafeString(link.getBytes(StandardCharsets.UTF_8)), EXPIRE_TIME, host, redisService).getUrl());
                         } else if (this.version.equals(3)) {
