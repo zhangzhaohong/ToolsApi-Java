@@ -146,6 +146,8 @@ public class Music implements Serializable {
     private Integer userCount;
     @SerializedName("video_duration")
     private Integer videoDuration;
+    @SerializedName("real_path")
+    private String realPath = null;
     @SerializedName("mock_preview_music_path")
     private String mockPreviewMusicPath;
     @SerializedName("mock_download_music_path")

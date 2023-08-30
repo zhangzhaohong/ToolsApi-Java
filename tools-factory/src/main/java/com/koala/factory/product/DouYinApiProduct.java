@@ -219,6 +219,7 @@ public class DouYinApiProduct {
                         } else if (this.version.equals(3)) {
                             String title = this.musicItemInfo.getAwemeMusicDetail().get(0).getMusic().getTitle();
                             String link = this.musicItemInfo.getAwemeMusicDetail().get(0).getMusic().getPlayUrl().getUri();
+                            this.musicItemInfo.getAwemeMusicDetail().get(0).getMusic().setRealPath(ShortKeyGenerator.generateShortUrl(link, EXPIRE_TIME, host, redisService).getUrl());
                             this.musicItemInfo.getAwemeMusicDetail().get(0).getMusic().setMockPreviewMusicPath(host + "tools/DouYin/pro/player/music?" + (StringUtils.hasLength(title) ? "title=" + Base64Utils.encodeToUrlSafeString(title.getBytes(StandardCharsets.UTF_8)) + "&" : "") + "path=" + Base64Utils.encodeToUrlSafeString(link.getBytes(StandardCharsets.UTF_8)));
                             this.musicItemInfo.getAwemeMusicDetail().get(0).getMusic().setMockDownloadMusicPath(host + "tools/DouYin/download/music?path=" + Base64Utils.encodeToUrlSafeString(link.getBytes(StandardCharsets.UTF_8)));
                         }
