@@ -114,7 +114,7 @@ public class DouYinToolsController {
 
     @HttpRequestRecorder
     @GetMapping(value = "api", produces = {"application/json;charset=utf-8"})
-    public Object getDouYinInfos(@MixedHttpRequest(required = false) String link, @RequestParam(value = "type", required = false, defaultValue = "info") String type, @RequestParam(value = "version", required = false, defaultValue = "4") Integer version, HttpServletRequest request, HttpServletResponse response) {
+    public Object getDouYinInfos(@MixedHttpRequest(required = false) String link, @RequestParam(value = "type", required = false, defaultValue = "info") String type, @RequestParam(value = "version", required = false, defaultValue = "4") Integer version, @RequestParam(value = "isMobile", required = false, defaultValue = "false") String isMobile, HttpServletRequest request, HttpServletResponse response) {
         if (ObjectUtils.isEmpty(link)) {
             return formatRespData(INVALID_LINK, null);
         }
@@ -134,7 +134,7 @@ public class DouYinToolsController {
         DouYinApiManager manager = new DouYinApiManager(builder);
         DouYinApiProduct product = null;
         try {
-            product = manager.construct(redisService, hostManager.getHost(), url, version);
+            product = manager.construct(redisService, hostManager.getHost(), url, version, isMobile);
         } catch (Exception e) {
             e.printStackTrace();
             return formatRespData(FAILURE, null);
