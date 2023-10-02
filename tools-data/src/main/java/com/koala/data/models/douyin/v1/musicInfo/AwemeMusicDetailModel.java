@@ -18,7 +18,7 @@ public class AwemeMusicDetailModel<Object extends Serializable> implements Seria
     private AnchorInfoModel anchorInfo;
     @SerializedName("authentication_token")
     private String authenticationToken;
-    private Author author;
+    private Author<?> author;
     @SerializedName("author_mask_tag")
     private Integer authorMaskTag;
     @SerializedName("author_user_id")
