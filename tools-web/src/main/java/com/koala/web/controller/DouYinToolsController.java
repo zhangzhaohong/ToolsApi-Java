@@ -41,6 +41,8 @@ import java.util.*;
 import static com.koala.base.enums.DouYinResponseEnums.*;
 import static com.koala.base.enums.DouYinTypeEnums.*;
 import static com.koala.factory.path.TiktokPathCollector.*;
+import static com.koala.service.data.redis.RedisKeyPrefix.KUGOU_COOKIE_TOKEN;
+import static com.koala.service.data.redis.RedisKeyPrefix.TIKTOK_TTWID_DATA;
 import static com.koala.service.utils.RespUtil.formatRespData;
 
 /**
@@ -290,6 +292,13 @@ public class DouYinToolsController {
         params.put("cp", "androide1");
         String response = XGorgonUtil.doGetRequest(TIKTOK_FEED_NEARBY_V2, params);
         return formatRespData(GET_DATA_SUCCESS, GsonUtil.toBean(response, Object.class));
+    }
+
+    @HttpRequestRecorder
+    @GetMapping("set/ttwid")
+    public String setToken(@RequestParam(required = false) String ttwid) {
+        redisService.set(TIKTOK_TTWID_DATA, ttwid);
+        return redisService.getAndPersist(TIKTOK_TTWID_DATA);
     }
 
     private Boolean checkCanDownload(Integer itemTypeId) {

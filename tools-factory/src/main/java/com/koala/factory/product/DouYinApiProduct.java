@@ -32,8 +32,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static com.koala.base.enums.DouYinTypeEnums.LIVE_TYPE_1;
 import static com.koala.base.enums.DouYinTypeEnums.LIVE_TYPE_2;
-import static com.koala.service.data.redis.RedisKeyPrefix.TIKTOK_DATA_KEY_PREFIX;
-import static com.koala.service.data.redis.RedisKeyPrefix.TIKTOK_DIRECT_KEY_PREFIX;
+import static com.koala.service.data.redis.RedisKeyPrefix.*;
 
 /**
  * @author koala
@@ -372,7 +371,7 @@ public class DouYinApiProduct {
         String response;
         boolean isLive = Objects.equals(this.itemTypeId, LIVE_TYPE_1.getCode()) || Objects.equals(this.itemTypeId, LIVE_TYPE_2.getCode());
         while (retryTime < MAX_RETRY_TIMES) {
-            response = HttpClientUtil.doGet(xbogusDataModel.getUrl(), HeaderUtil.getDouYinSpecialHeader(xbogusDataModel.getMstoken(), xbogusDataModel.getTtwid(), isLive), null);
+            response = HttpClientUtil.doGet(xbogusDataModel.getUrl(), HeaderUtil.getDouYinSpecialHeader(xbogusDataModel.getMstoken(), xbogusDataModel.getTtwid(), redisService.getAndPersist(TIKTOK_TTWID_DATA), isLive), null);
             if (StringUtils.hasLength(response)) {
                 return response;
             }
