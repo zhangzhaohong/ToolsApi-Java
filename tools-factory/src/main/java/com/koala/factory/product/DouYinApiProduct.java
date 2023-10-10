@@ -370,8 +370,9 @@ public class DouYinApiProduct {
         logger.info("[DouYinApiProduct]({}, {}) encryptResult: {}", id, itemId, xbogusDataModel);
         int retryTime = 0;
         String response;
+        boolean isLive = Objects.equals(this.itemTypeId, LIVE_TYPE_1.getCode()) || Objects.equals(this.itemTypeId, LIVE_TYPE_2.getCode());
         while (retryTime < MAX_RETRY_TIMES) {
-            response = HttpClientUtil.doGet(xbogusDataModel.getUrl(), HeaderUtil.getDouYinSpecialHeader(xbogusDataModel.getMstoken(), xbogusDataModel.getTtwid(), cookieData), null);
+            response = HttpClientUtil.doGet(xbogusDataModel.getUrl(), HeaderUtil.getDouYinSpecialHeader(xbogusDataModel.getMstoken(), xbogusDataModel.getTtwid(), cookieData, isLive), null);
             if (StringUtils.hasLength(response)) {
                 return response;
             }
