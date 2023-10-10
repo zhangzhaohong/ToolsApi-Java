@@ -25,4 +25,6 @@ public class RedisKeyPrefix {
     public static final String KUGOU_COOKIE_TOKEN = "KUGOU:COOKIE:TOKEN";
     public static final String SERVICE_HOST = "SERVICE_HOST";
     public static final String TIKTOK_TTWID_DATA = "TIKTOK:TTWID:DATA";
+    public static final String TIKTOK_COOKIE_LOCK = "TIKTOK:COOKIE:LOCK";
+    public static final String TIKTOK_COOKIE_DATA = "TIKTOK:COOKIE:DATA";
 }

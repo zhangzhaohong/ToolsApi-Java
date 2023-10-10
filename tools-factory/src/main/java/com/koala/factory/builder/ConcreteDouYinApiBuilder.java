@@ -76,4 +76,10 @@ public class ConcreteDouYinApiBuilder extends DouYinApiBuilder {
         product.isMobile(isMobile);
         return this;
     }
+
+    @Override
+    public DouYinApiBuilder cookie(String cookie) {
+        product.setCookie(cookie);
+        return this;
+    }
 }

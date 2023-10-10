@@ -60,6 +60,7 @@ public class DouYinApiProduct {
     private MusicInfoRespModel musicItemInfo = null;
     private RoomInfoDataRespModel roomInfoData = null;
     private RedisService redisService;
+    private String cookieData;
 
     public void setUrl(String url) {
         this.url = url;
@@ -369,9 +370,8 @@ public class DouYinApiProduct {
         logger.info("[DouYinApiProduct]({}, {}) encryptResult: {}", id, itemId, xbogusDataModel);
         int retryTime = 0;
         String response;
-        boolean isLive = Objects.equals(this.itemTypeId, LIVE_TYPE_1.getCode()) || Objects.equals(this.itemTypeId, LIVE_TYPE_2.getCode());
         while (retryTime < MAX_RETRY_TIMES) {
-            response = HttpClientUtil.doGet(xbogusDataModel.getUrl(), HeaderUtil.getDouYinSpecialHeader(xbogusDataModel.getMstoken(), xbogusDataModel.getTtwid(), redisService.getAndPersist(TIKTOK_TTWID_DATA), isLive), null);
+            response = HttpClientUtil.doGet(xbogusDataModel.getUrl(), HeaderUtil.getDouYinSpecialHeader(xbogusDataModel.getMstoken(), xbogusDataModel.getTtwid(), cookieData), null);
             if (StringUtils.hasLength(response)) {
                 return response;
             }
@@ -414,5 +414,9 @@ public class DouYinApiProduct {
 
     public void isMobile(Boolean isMobile) {
         this.isMobile = isMobile;
+    }
+
+    public void setCookie(String cookie) {
+        this.cookieData = cookie;
     }
 }

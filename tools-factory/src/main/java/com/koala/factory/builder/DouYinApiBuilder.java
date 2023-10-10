@@ -59,4 +59,6 @@ public abstract class DouYinApiBuilder {
     public abstract DouYinApiBuilder redis(RedisService redisService);
 
     public abstract DouYinApiBuilder isMobile(Boolean isMobile);
+
+    public abstract DouYinApiBuilder cookie(String cookie);
 }

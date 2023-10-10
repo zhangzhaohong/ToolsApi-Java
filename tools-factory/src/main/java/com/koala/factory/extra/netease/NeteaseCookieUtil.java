@@ -137,7 +137,7 @@ public class NeteaseCookieUtil {
         return null;
     }
 
-    public static String getCurrentDate() {
+    private static String getCurrentDate() {
         Date currentTime = new Date();
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd");
         return formatter.format(currentTime);

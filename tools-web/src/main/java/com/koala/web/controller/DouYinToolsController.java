@@ -2,25 +2,30 @@ package com.koala.web.controller;
 
 import com.koala.base.enums.DouYinRequestTypeEnums;
 import com.koala.base.enums.DouYinTypeEnums;
-import com.koala.data.models.xbogus.XbogusDataModel;
-import com.koala.factory.builder.ConcreteDouYinApiBuilder;
-import com.koala.factory.builder.DouYinApiBuilder;
-import com.koala.factory.director.DouYinApiManager;
-import com.koala.factory.extra.tiktok.XGorgonUtil;
-import com.koala.factory.product.DouYinApiProduct;
-import com.koala.service.custom.http.annotation.HttpRequestRecorder;
-import com.koala.service.custom.http.annotation.MixedHttpRequest;
 import com.koala.data.models.douyin.v1.PublicTiktokDataRespModel;
 import com.koala.data.models.douyin.v1.itemInfo.ItemInfoRespModel;
 import com.koala.data.models.douyin.v1.musicInfo.MusicInfoRespModel;
 import com.koala.data.models.douyin.v1.roomInfoData.RoomInfoDataRespModel;
+import com.koala.factory.builder.ConcreteDouYinApiBuilder;
+import com.koala.factory.builder.DouYinApiBuilder;
+import com.koala.factory.director.DouYinApiManager;
+import com.koala.factory.extra.tiktok.TiktokCookieUtil;
+import com.koala.factory.extra.tiktok.XGorgonUtil;
+import com.koala.factory.product.DouYinApiProduct;
+import com.koala.service.custom.http.annotation.HttpRequestRecorder;
+import com.koala.service.custom.http.annotation.MixedHttpRequest;
 import com.koala.service.data.redis.service.RedisService;
-import com.koala.service.utils.*;
+import com.koala.service.utils.Base64Utils;
+import com.koala.service.utils.GsonUtil;
+import com.koala.service.utils.HeaderUtil;
+import com.koala.service.utils.HttpClientUtil;
 import com.koala.web.HostManager;
+import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.web.DefaultRedirectStrategy;
 import org.springframework.security.web.RedirectStrategy;
 import org.springframework.util.ObjectUtils;
@@ -30,19 +35,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import jakarta.annotation.Resource;
-
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import static com.koala.base.enums.DouYinResponseEnums.*;
 import static com.koala.base.enums.DouYinTypeEnums.*;
 import static com.koala.factory.path.TiktokPathCollector.*;
-import static com.koala.service.data.redis.RedisKeyPrefix.KUGOU_COOKIE_TOKEN;
-import static com.koala.service.data.redis.RedisKeyPrefix.TIKTOK_TTWID_DATA;
+import static com.koala.service.data.redis.RedisKeyPrefix.*;
 import static com.koala.service.utils.RespUtil.formatRespData;
 
 /**
@@ -66,6 +67,9 @@ public class DouYinToolsController {
 
     @Resource(name = "RedisService")
     private RedisService redisService;
+
+    @Resource
+    private TiktokCookieUtil tiktokCookieUtil;
 
     @HttpRequestRecorder
     @GetMapping("player/video")
@@ -136,7 +140,7 @@ public class DouYinToolsController {
         DouYinApiManager manager = new DouYinApiManager(builder);
         DouYinApiProduct product = null;
         try {
-            product = manager.construct(redisService, hostManager.getHost(), url, version, isMobile);
+            product = manager.construct(redisService, hostManager.getHost(), url, version, isMobile, tiktokCookieUtil.getTiktokCookie());
         } catch (Exception e) {
             e.printStackTrace();
             return formatRespData(FAILURE, null);
@@ -299,6 +303,23 @@ public class DouYinToolsController {
     public String setToken(@RequestParam(required = false) String ttwid) {
         redisService.set(TIKTOK_TTWID_DATA, ttwid);
         return redisService.getAndPersist(TIKTOK_TTWID_DATA);
+    }
+
+    @HttpRequestRecorder
+    @GetMapping("reset/cookie")
+    public void resetCookie(@RequestParam(required = false) String lock) {
+        redisService.set(TIKTOK_COOKIE_LOCK, lock, 14 * 24 * 60 * 60L);
+    }
+
+    @HttpRequestRecorder
+    @GetMapping("current/cookie")
+    public String getCookie() {
+        return redisService.get(TIKTOK_COOKIE_DATA);
+    }
+
+    @Scheduled(cron = "0 0 2 * * ?")
+    public void refreshToken() {
+        tiktokCookieUtil.doRefreshTiktokCookieTask();
     }
 
     private Boolean checkCanDownload(Integer itemTypeId) {

@@ -21,8 +21,8 @@ public class DouYinApiManager {
         this.builder = builder;
     }
 
-    public DouYinApiProduct construct(RedisService redisService, String host, String url, Integer version, String isMobile) throws IOException, URISyntaxException {
-        builder.isMobile(Objects.equals(isMobile, "true")).redis(redisService).host(host).url(url).getIdByUrl().getRedirectUrl().getItemTypeByDirectUrl().getItemIdByDirectUrl().getItemInfo();
+    public DouYinApiProduct construct(RedisService redisService, String host, String url, Integer version, String isMobile, String tiktokCookie) throws IOException, URISyntaxException {
+        builder.cookie(tiktokCookie).isMobile(Objects.equals(isMobile, "true")).redis(redisService).host(host).url(url).getIdByUrl().getRedirectUrl().getItemTypeByDirectUrl().getItemIdByDirectUrl().getItemInfo();
         builder.version(version);
         builder.printParams();
         return builder.getProduct();
