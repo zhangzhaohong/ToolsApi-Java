@@ -177,7 +177,7 @@ public class KugouToolsController {
     @GetMapping(value = "api/playInfo", produces = {"application/json;charset=utf-8"})
     public String playInfo(@RequestParam(required = false) String hash, @RequestParam(required = false) String albumId) throws IOException, URISyntaxException {
         String mid = KugouMidGenerator.getMid();
-        String cookie = customParams.getKugouCustomParams().get("kg_mid_cookie").toString();
+        String cookie = customParams.getKugouCustomParams().get("kg_cookie").toString();
         String response = HttpClientUtil.doGet(KUGOU_DETAIL_SERVER_URL_V2, HeaderUtil.getKugouPublicHeader(null, cookie), KugouPlayInfoParamsGenerator.getPlayInfoParams(hash, mid, albumId, customParams));
         if (StringUtils.hasLength(response)) {
             return formatRespData(GET_DATA_SUCCESS, GsonUtil.toBean(response, Object.class));
@@ -192,7 +192,7 @@ public class KugouToolsController {
             return formatRespData(UNSUPPORTED_PARAMS, null);
         }
         String mid = KugouMidGenerator.getMid();
-        String cookie = customParams.getKugouCustomParams().get("kg_mid_cookie").toString();
+        String cookie = customParams.getKugouCustomParams().get("kg_cookie").toString();
         Long timestamp = System.currentTimeMillis();
         HashMap<String, String> params = new HashMap<>();
         params.put("clienttime", String.valueOf(timestamp));
@@ -258,7 +258,7 @@ public class KugouToolsController {
                 String hash = tmp.getMusicInfo().getAudioInfo().getPlayInfoList().get(quality).getHash();
                 String albumId = tmp.getMusicInfo().getAlbumInfo().getAlbumId();
                 String mid = KugouMidGenerator.getMid();
-                String cookie = customParams.getKugouCustomParams().get("kg_mid_cookie").toString();
+                String cookie = customParams.getKugouCustomParams().get("kg_cookie").toString();
                 String resp = HttpClientUtil.doGet(KUGOU_DETAIL_SERVER_URL_V2, HeaderUtil.getKugouPublicHeader(null, cookie), KugouPlayInfoParamsGenerator.getPlayInfoParams(hash, mid, albumId, customParams));
                 KugouPlayInfoRespDataModel respData = null;
                 if (StringUtils.hasLength(resp)) {
