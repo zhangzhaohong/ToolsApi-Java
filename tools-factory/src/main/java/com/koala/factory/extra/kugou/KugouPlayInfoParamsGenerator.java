@@ -3,6 +3,7 @@ package com.koala.factory.extra.kugou;
 import com.koala.service.utils.MD5Utils;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -14,7 +15,7 @@ import java.util.Map;
 public class KugouPlayInfoParamsGenerator {
     public static Map<String, String> getPlayInfoParams(String hash, String mid, String albumId, KugouCustomParamsUtil customParams) {
         String userId = customParams.getKugouCustomParams().get("userId").toString();
-        HashMap<String, String> params = new HashMap<>();
+        LinkedHashMap<String, String> params = new LinkedHashMap<>();
         params.put("cmd", "26");
         params.put("pid", "4");
         params.put("authType", "1");
