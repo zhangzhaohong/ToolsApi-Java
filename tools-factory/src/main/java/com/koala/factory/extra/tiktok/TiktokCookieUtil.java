@@ -4,6 +4,7 @@ import cn.hutool.json.JSONObject;
 import com.koala.service.data.redis.service.RedisService;
 import com.koala.service.utils.RestTemplateUtil;
 import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -19,6 +20,7 @@ import java.util.*;
 import static com.koala.service.data.redis.RedisKeyPrefix.TIKTOK_COOKIE_DATA;
 import static com.koala.service.data.redis.RedisKeyPrefix.TIKTOK_COOKIE_LOCK;
 
+@Slf4j
 @Component
 public class TiktokCookieUtil {
 
@@ -36,6 +38,7 @@ public class TiktokCookieUtil {
     private RestTemplate restTemplate;
 
     public void doRefreshTiktokCookieTask() {
+        log.info("[tiktok] on refreshing tiktok cookie");
         refreshTiktokCookie(redisService.get(TIKTOK_COOKIE_DATA));
     }
 
@@ -89,6 +92,8 @@ public class TiktokCookieUtil {
         List<String> cookieData = responseEntity.getHeaders().get("Set-Cookie");
         StringBuilder cookieString = new StringBuilder(cookieContent);
         if (Objects.isNull(cookieData)) {
+            log.info("[tiktok] receive empty tiktok cookie, refresh failed");
+            redisService.set(TIKTOK_COOKIE_LOCK, getCurrentDate(), TIKTOK_COOKIE_CACHE_TIME);
             return cookieContent;
         }
         Objects.requireNonNull(cookieData).forEach(item -> {
@@ -102,6 +107,7 @@ public class TiktokCookieUtil {
         });
         redisService.set(TIKTOK_COOKIE_LOCK, getCurrentDate(), TIKTOK_COOKIE_CACHE_TIME);
         redisService.set(TIKTOK_COOKIE_DATA, cookieString.toString().trim(), TIKTOK_COOKIE_CACHE_TIME);
+        log.info("[tiktok] receive cookie, refresh success");
         return cookieString.toString().trim();
     }
 
