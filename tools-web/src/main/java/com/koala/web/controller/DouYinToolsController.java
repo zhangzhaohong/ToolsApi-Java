@@ -317,6 +317,13 @@ public class DouYinToolsController {
         return redisService.get(TIKTOK_COOKIE_DATA);
     }
 
+    @HttpRequestRecorder
+    @GetMapping("refresh/cookie")
+    public String refreshCookie() {
+        tiktokCookieUtil.doRefreshTiktokCookieTask();
+        return redisService.get(TIKTOK_COOKIE_DATA);
+    }
+
     @Scheduled(cron = "0 0 12 * * ?")
     public void refreshToken() {
         tiktokCookieUtil.doRefreshTiktokCookieTask();
