@@ -38,6 +38,10 @@ public class TiktokCookieUtil {
     private RestTemplate restTemplate;
 
     public void doRefreshTiktokCookieTask() {
+        String lock = redisService.get(TIKTOK_COOKIE_LOCK);
+        if (StringUtils.hasLength(lock) && Objects.equals(lock, getCurrentDate())) {
+            return;
+        }
         log.info("[tiktok] on refreshing tiktok cookie");
         refreshTiktokCookie(redisService.get(TIKTOK_COOKIE_DATA));
     }
