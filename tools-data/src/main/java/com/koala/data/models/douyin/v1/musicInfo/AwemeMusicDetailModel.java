@@ -18,7 +18,7 @@ public class AwemeMusicDetailModel<Object extends Serializable> implements Seria
     private AnchorInfoModel anchorInfo;
     @SerializedName("authentication_token")
     private String authenticationToken;
-    private Author author;
+    private Author<?> author;
     @SerializedName("author_mask_tag")
     private Integer authorMaskTag;
     @SerializedName("author_user_id")
@@ -70,8 +70,8 @@ public class AwemeMusicDetailModel<Object extends Serializable> implements Seria
     @SerializedName("image_comment")
     private ImageCommentModel imageComment;
     @SerializedName("image_list")
-    private String imageList;
-    private String images;
+    private Object imageList;
+    private Object images;
     @SerializedName("img_bitrate")
     private String imgBitrate;
     @SerializedName("impression_data")

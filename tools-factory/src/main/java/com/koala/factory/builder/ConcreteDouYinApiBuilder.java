@@ -70,4 +70,16 @@ public class ConcreteDouYinApiBuilder extends DouYinApiBuilder {
         product.setRedis(redisService);
         return this;
     }
+
+    @Override
+    public DouYinApiBuilder isMobile(Boolean isMobile) {
+        product.isMobile(isMobile);
+        return this;
+    }
+
+    @Override
+    public DouYinApiBuilder cookie(String cookie) {
+        product.setCookie(cookie);
+        return this;
+    }
 }

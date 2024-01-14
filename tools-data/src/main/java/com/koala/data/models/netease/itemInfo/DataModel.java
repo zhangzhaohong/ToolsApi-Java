@@ -12,7 +12,7 @@ import java.io.Serializable;
  * @description
  */
 @Data
-public class DataModel implements Serializable {
+public class DataModel<Object extends Serializable> implements Serializable {
     private Long id;
     private String url;
     private Long br;
@@ -22,7 +22,7 @@ public class DataModel implements Serializable {
     private Integer expi;
     private String type;
     private Integer gain;
-    private Integer peak;
+    private Object peak;
     private Integer fee;
     private String uf;
     private Integer payed;

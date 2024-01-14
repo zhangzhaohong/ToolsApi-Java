@@ -1,6 +1,7 @@
 package com.koala.service.custom.interceptor;
 
 import com.koala.service.data.redis.RedisLockUtil;
+import com.koala.service.data.redis.service.RedisService;
 import com.koala.service.utils.Base64Utils;
 import com.koala.service.utils.MD5Utils;
 import com.koala.service.utils.RemoteIpUtils;
@@ -41,18 +42,23 @@ public class FirewallInterceptor implements HandlerInterceptor {
 
     private static final String IP_REQUEST_KEY = "ip_request_key_";
 
+    private static final String IP_WHITE_PREFIX = "ip_white_";
+
     private static final Integer LIMIT_TIMES = 5;
 
     private static final Integer IP_LOCK_TIME = 60 * 60;
 
     private static final Integer REQUEST_KEY_LOCK_TIME = 6 * 60 * 60;
 
-    private static final String[] WHITE_LIST_HOST = new String[]{"127.0.0.1", "0:0:0:0:0:0:0:1", "192.168.2.250"};
+    private static final String[] WHITE_LIST_IP_LIST = new String[]{"127.0.0.1", "0:0:0:0:0:0:0:1"};
 
     private static final String[] WHITE_LIST_PATH = new String[]{"/assets/", "/actuator", "/favicon.ico", "/error"};
 
     @Resource
     private RedisLockUtil redisLockUtil;
+
+    @Resource
+    private RedisService redisService;
 
     @Override
     public boolean preHandle(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull Object handler) {
@@ -95,7 +101,12 @@ public class FirewallInterceptor implements HandlerInterceptor {
                 return true;
             }
         }
-        if (Arrays.asList(WHITE_LIST_HOST).contains(ip)) {
+        String ipWhiteState = redisService.get(IP_WHITE_PREFIX + ip);
+        if (!Objects.isNull(ipWhiteState) && ipWhiteState.equals("1")) {
+            log.info("[FirewallInterceptor] 白名单IP，自动放过={}", ip);
+            return true;
+        }
+        if (Arrays.asList(WHITE_LIST_IP_LIST).contains(ip)) {
             log.info("[FirewallInterceptor] 白名单IP，自动放过={}", ip);
             return true;
         }

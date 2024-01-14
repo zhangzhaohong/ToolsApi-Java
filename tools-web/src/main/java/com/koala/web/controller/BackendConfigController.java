@@ -35,6 +35,8 @@ public class BackendConfigController {
     @Value("${spring.profiles.active}")
     private String env;
 
+    private static final String IP_WHITE_PREFIX = "ip_white_";
+
     @Resource
     private HostManager hostManager;
 
@@ -81,6 +83,22 @@ public class BackendConfigController {
                 200,
                 "GET_HOST_SUCCESS",
                 hostManager.getHost()
+        );
+    }
+
+    @HttpRequestRecorder
+    @GetMapping("firewall/white")
+    public String setWhiteIp(@RequestParam(required = false) String ip, @RequestParam(required = false, defaultValue = "1") String value) {
+        if (StringUtils.hasLength(ip)) {
+            redisService.set(IP_WHITE_PREFIX + ip, value, 12 * 60 * 60L);
+        }
+        HashMap<String, String> data = new HashMap<>();
+        data.put("ip", ip);
+        data.put("value", value);
+        return RespUtil.formatRespDataWithCustomMsg(
+                200,
+                "SET_WHITE_SUCCESS",
+                data
         );
     }
 

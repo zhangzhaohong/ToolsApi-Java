@@ -31,8 +31,8 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static com.koala.base.enums.DouYinTypeEnums.LIVE_TYPE_1;
-import static com.koala.service.data.redis.RedisKeyPrefix.TIKTOK_DATA_KEY_PREFIX;
-import static com.koala.service.data.redis.RedisKeyPrefix.TIKTOK_DIRECT_KEY_PREFIX;
+import static com.koala.base.enums.DouYinTypeEnums.LIVE_TYPE_2;
+import static com.koala.service.data.redis.RedisKeyPrefix.*;
 
 /**
  * @author koala
@@ -55,10 +55,12 @@ public class DouYinApiProduct {
     private String id;
     private Integer itemTypeId = -1;
     private String itemId;
+    private Boolean isMobile = false;
     private ItemInfoRespModel itemInfo = null;
     private MusicInfoRespModel musicItemInfo = null;
     private RoomInfoDataRespModel roomInfoData = null;
     private RedisService redisService;
+    private String cookieData;
 
     public void setUrl(String url) {
         this.url = url;
@@ -103,7 +105,7 @@ public class DouYinApiProduct {
                         e.printStackTrace();
                     }
                 }
-                case IMAGE_TYPE, default ->
+                case IMAGE_TYPE ->
                         logger.info("[DouYinApiProduct]({}, {}) Unsupported item type id: {}, current url: {}", id, itemId, itemTypeId, this.directUrl);
             }
         }
@@ -189,7 +191,7 @@ public class DouYinApiProduct {
                         e.printStackTrace();
                     }
                 }
-                case IMAGE_TYPE, default ->
+                case IMAGE_TYPE ->
                         logger.info("[DouYinApiProduct]({}, {}) Unsupported item type id: {}", id, itemId, itemTypeId);
             }
         }
@@ -213,11 +215,17 @@ public class DouYinApiProduct {
                             String title = this.musicItemInfo.getAwemeMusicDetail().get(0).getMusic().getTitle();
                             String link = this.musicItemInfo.getAwemeMusicDetail().get(0).getMusic().getPlayUrl().getUri();
                             redisService.set(TIKTOK_DATA_KEY_PREFIX + key, GsonUtil.toString(new ShortDouYinItemDataModel(title, link, null, null)), EXPIRE_TIME);
+                            if (isMobile) {
+                                this.musicItemInfo.getAwemeMusicDetail().get(0).getMusic().setRealPath(link);
+                            } else {
+                                this.musicItemInfo.getAwemeMusicDetail().get(0).getMusic().setRealPath(ShortKeyGenerator.generateShortUrl(link, EXPIRE_TIME, host, redisService).getUrl());
+                            }
                             this.musicItemInfo.getAwemeMusicDetail().get(0).getMusic().setMockPreviewMusicPath(host + "tools/DouYin/pro/player/music/short?key=" + Base64Utils.encodeToUrlSafeString(key.getBytes(StandardCharsets.UTF_8)));
                             this.musicItemInfo.getAwemeMusicDetail().get(0).getMusic().setMockDownloadMusicPath(ShortKeyGenerator.generateShortUrl(host + "tools/DouYin/download/music?path=" + Base64Utils.encodeToUrlSafeString(link.getBytes(StandardCharsets.UTF_8)), EXPIRE_TIME, host, redisService).getUrl());
                         } else if (this.version.equals(3)) {
                             String title = this.musicItemInfo.getAwemeMusicDetail().get(0).getMusic().getTitle();
                             String link = this.musicItemInfo.getAwemeMusicDetail().get(0).getMusic().getPlayUrl().getUri();
+                            this.musicItemInfo.getAwemeMusicDetail().get(0).getMusic().setRealPath(ShortKeyGenerator.generateShortUrl(link, EXPIRE_TIME, host, redisService).getUrl());
                             this.musicItemInfo.getAwemeMusicDetail().get(0).getMusic().setMockPreviewMusicPath(host + "tools/DouYin/pro/player/music?" + (StringUtils.hasLength(title) ? "title=" + Base64Utils.encodeToUrlSafeString(title.getBytes(StandardCharsets.UTF_8)) + "&" : "") + "path=" + Base64Utils.encodeToUrlSafeString(link.getBytes(StandardCharsets.UTF_8)));
                             this.musicItemInfo.getAwemeMusicDetail().get(0).getMusic().setMockDownloadMusicPath(host + "tools/DouYin/download/music?path=" + Base64Utils.encodeToUrlSafeString(link.getBytes(StandardCharsets.UTF_8)));
                         }
@@ -314,7 +322,11 @@ public class DouYinApiProduct {
                                     getVideoUrl(Objects.isNull(playAddr265) ? null : playAddr265.getUrlList().get(0))
                             );
                             redisService.set(TIKTOK_DATA_KEY_PREFIX + key, GsonUtil.toString(new ShortDouYinItemDataModel(title, link, multiQualityInfo, null)), EXPIRE_TIME);
-                            this.itemInfo.getAwemeDetailModel().getVideo().setRealPath(ShortKeyGenerator.generateShortUrl(link, EXPIRE_TIME, host, redisService).getUrl());
+                            if (isMobile) {
+                                this.itemInfo.getAwemeDetailModel().getVideo().setRealPath(this.itemInfo.getAwemeDetailModel().getVideo().getPlayAddr().getUrlList().get(0));
+                            } else {
+                                this.itemInfo.getAwemeDetailModel().getVideo().setRealPath(ShortKeyGenerator.generateShortUrl(link, EXPIRE_TIME, host, redisService).getUrl());
+                            }
                             this.itemInfo.getAwemeDetailModel().getVideo().setMockPreviewVidPath(host + "tools/DouYin/pro/player/video/short?key=" + Base64Utils.encodeToUrlSafeString(key.getBytes(StandardCharsets.UTF_8)));
                             this.itemInfo.getAwemeDetailModel().getVideo().setMockDownloadVidPath(ShortKeyGenerator.generateShortUrl(host + "tools/DouYin/preview/video?path=" + Base64Utils.encodeToUrlSafeString(link.getBytes(StandardCharsets.UTF_8)) + "&isDownload=true", EXPIRE_TIME, host, redisService).getUrl());
                         } else if (this.version.equals(3)) {
@@ -338,7 +350,7 @@ public class DouYinApiProduct {
                         // logger.info("[DouYinApiProduct]({}, {}) realFile: {}", id, itemId,HttpClientUtil.doGetRedirectLocation(link, HeaderUtil.getDouYinDownloadHeader(), null));
                     }
                 }
-                case IMAGE_TYPE, default ->
+                case IMAGE_TYPE ->
                         logger.info("[DouYinApiProduct]({}, {}) Unsupported item type id: {}", id, itemId, itemTypeId);
             }
         } catch (Exception e) {
@@ -358,8 +370,9 @@ public class DouYinApiProduct {
         logger.info("[DouYinApiProduct]({}, {}) encryptResult: {}", id, itemId, xbogusDataModel);
         int retryTime = 0;
         String response;
+        boolean isLive = Objects.equals(this.itemTypeId, LIVE_TYPE_1.getCode()) || Objects.equals(this.itemTypeId, LIVE_TYPE_2.getCode());
         while (retryTime < MAX_RETRY_TIMES) {
-            response = HttpClientUtil.doGet(xbogusDataModel.getUrl(), HeaderUtil.getDouYinSpecialHeader(xbogusDataModel.getMstoken(), xbogusDataModel.getTtwid()), null);
+            response = HttpClientUtil.doGet(xbogusDataModel.getUrl(), HeaderUtil.getDouYinSpecialHeader(xbogusDataModel.getMstoken(), xbogusDataModel.getTtwid(), cookieData, isLive), null);
             if (StringUtils.hasLength(response)) {
                 return response;
             }
@@ -398,5 +411,13 @@ public class DouYinApiProduct {
             return ShortKeyGenerator.generateShortUrl(input.replaceFirst("http://", "https://"), EXPIRE_TIME, host, redisService).getUrl();
         }
         return null;
+    }
+
+    public void isMobile(Boolean isMobile) {
+        this.isMobile = isMobile;
+    }
+
+    public void setCookie(String cookie) {
+        this.cookieData = cookie;
     }
 }

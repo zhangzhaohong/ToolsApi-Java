@@ -45,7 +45,7 @@ import static com.koala.base.enums.KugouResponseEnums.*;
 import static com.koala.factory.extra.kugou.KugouSearchParamsGenerator.getSearchParams;
 import static com.koala.factory.extra.kugou.KugouSearchParamsGenerator.getSearchTextParams;
 import static com.koala.factory.path.KugouWebPathCollector.*;
-import static com.koala.service.data.redis.RedisKeyPrefix.KUGOU_DATA_KEY_PREFIX;
+import static com.koala.service.data.redis.RedisKeyPrefix.*;
 import static com.koala.service.utils.RespUtil.formatRespData;
 
 /**
@@ -177,7 +177,7 @@ public class KugouToolsController {
     @GetMapping(value = "api/playInfo", produces = {"application/json;charset=utf-8"})
     public String playInfo(@RequestParam(required = false) String hash, @RequestParam(required = false) String albumId) throws IOException, URISyntaxException {
         String mid = KugouMidGenerator.getMid();
-        String cookie = customParams.getKugouCustomParams().get("kg_mid_cookie").toString();
+        String cookie = customParams.getKugouCustomParams().get("kg_cookie").toString();
         String response = HttpClientUtil.doGet(KUGOU_DETAIL_SERVER_URL_V2, HeaderUtil.getKugouPublicHeader(null, cookie), KugouPlayInfoParamsGenerator.getPlayInfoParams(hash, mid, albumId, customParams));
         if (StringUtils.hasLength(response)) {
             return formatRespData(GET_DATA_SUCCESS, GsonUtil.toBean(response, Object.class));
@@ -192,7 +192,7 @@ public class KugouToolsController {
             return formatRespData(UNSUPPORTED_PARAMS, null);
         }
         String mid = KugouMidGenerator.getMid();
-        String cookie = customParams.getKugouCustomParams().get("kg_mid_cookie").toString();
+        String cookie = customParams.getKugouCustomParams().get("kg_cookie").toString();
         Long timestamp = System.currentTimeMillis();
         HashMap<String, String> params = new HashMap<>();
         params.put("clienttime", String.valueOf(timestamp));
@@ -258,7 +258,7 @@ public class KugouToolsController {
                 String hash = tmp.getMusicInfo().getAudioInfo().getPlayInfoList().get(quality).getHash();
                 String albumId = tmp.getMusicInfo().getAlbumInfo().getAlbumId();
                 String mid = KugouMidGenerator.getMid();
-                String cookie = customParams.getKugouCustomParams().get("kg_mid_cookie").toString();
+                String cookie = customParams.getKugouCustomParams().get("kg_cookie").toString();
                 String resp = HttpClientUtil.doGet(KUGOU_DETAIL_SERVER_URL_V2, HeaderUtil.getKugouPublicHeader(null, cookie), KugouPlayInfoParamsGenerator.getPlayInfoParams(hash, mid, albumId, customParams));
                 KugouPlayInfoRespDataModel respData = null;
                 if (StringUtils.hasLength(resp)) {
@@ -449,6 +449,12 @@ public class KugouToolsController {
         return formatRespData(GET_INFO_ERROR, null);
     }
 
+    @HttpRequestRecorder
+    @GetMapping("set/token")
+    public String setToken(@RequestParam(required = false) String token) {
+        redisService.set(KUGOU_COOKIE_TOKEN, token);
+        return redisService.getAndPersist(KUGOU_COOKIE_TOKEN);
+    }
 
     private static String getDataFromMap(String key, Map<String, Object> data) {
         if (StringUtils.hasLength(key)) {

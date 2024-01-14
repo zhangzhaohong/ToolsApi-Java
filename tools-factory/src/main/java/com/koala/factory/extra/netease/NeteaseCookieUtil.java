@@ -3,8 +3,11 @@ package com.koala.factory.extra.netease;
 import cn.hutool.json.JSONObject;
 import com.koala.service.data.redis.service.RedisService;
 import com.koala.service.utils.GsonUtil;
+import com.koala.service.utils.HttpClientUtil;
+import com.koala.service.utils.PatternUtil;
 import com.koala.service.utils.RestTemplateUtil;
 import jakarta.annotation.Resource;
+import org.apache.hc.client5.http.cookie.Cookie;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -12,12 +15,16 @@ import org.springframework.util.StreamUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static com.koala.service.data.redis.RedisKeyPrefix.*;
+import static com.koala.service.utils.HeaderUtil.getNeteaseHttpHeader;
 
 /**
  * @author koala
@@ -36,11 +43,17 @@ public class NeteaseCookieUtil {
 
     private static final Long NETEASE_COOKIE_CACHE_TIME = 14 * 24 * 60 * 60L;
 
+    private static final String BASE_URL_MUSIC_163 = "http://music.163.com";
+
     @Resource(name = "getHost")
     private String host;
 
     @Resource
     private RestTemplate restTemplate;
+
+    public void doRefreshNeteaseCookieTask() {
+        refreshNeteaseCookie(redisService.get(NETEASE_COOKIE_DATA));
+    }
 
     public String getNeteaseCookie() {
         String lock = redisService.get(NETEASE_COOKIE_LOCK);
@@ -94,6 +107,19 @@ public class NeteaseCookieUtil {
             if ((Double) data.get("code") == 200) {
                 List<String> cookieData = responseEntity.getHeaders().get("Set-Cookie");
                 StringBuilder cookieString = new StringBuilder();
+                if (!Objects.isNull(cookieData) && cookieData.stream().noneMatch(item -> item.startsWith("__csrf"))) {
+                    AtomicReference<String> csrf = new AtomicReference<>("");
+                    List<Cookie> baseCookies;
+                    try {
+                        baseCookies = HttpClientUtil.doGetCookie(BASE_URL_MUSIC_163, getNeteaseHttpHeader(null), null);
+                    } catch (IOException | URISyntaxException e) {
+                        throw new RuntimeException(e);
+                    }
+                    Optional<Cookie> baseCookie = baseCookies.stream().filter(item -> item.getName().equals("__csrf")).findFirst();
+                    baseCookie.ifPresent(value -> csrf.set(value.getValue()));
+                    cookieString.append(" __csrf=").append(csrf.get()).append(";");
+                }
+                cookieString.append(" MUSIC_U=").append(PatternUtil.matchData("MUSIC_U=(.*?);", getLocalNeteaseCookie())).append(";");
                 for (String item : Objects.requireNonNull(cookieData)) {
                     cookieString.append(" ").append(item).append(";");
                 }
@@ -111,7 +137,7 @@ public class NeteaseCookieUtil {
         return null;
     }
 
-    public static String getCurrentDate() {
+    private static String getCurrentDate() {
         Date currentTime = new Date();
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd");
         return formatter.format(currentTime);

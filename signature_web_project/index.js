@@ -163,7 +163,11 @@ app.post("/tiktok", async (req, res) => {
 
         const query = url.includes("?") ? url.split("?")[1] : "";
         const xbogus = sign(query, userAgent);
-        const newUrl = `${url}&X-Bogus=${xbogus}`;
+        let newUrl = "";
+        if (query.length === 0 && url.includes("?")) newUrl = `${url}X-Bogus=${xbogus}`
+        else if (query.length > 0) newUrl = `${url}&X-Bogus=${xbogus}`
+        else if (newUrl.endsWith("/")) newUrl = `${url}?X-Bogus=${xbogus}`
+        else newUrl = `${url}/?X-Bogus=${xbogus}`
         const [xbogusToken, ttwid] = await Promise.all([msToken(107), getTtwid()]);
 
         console.info({
