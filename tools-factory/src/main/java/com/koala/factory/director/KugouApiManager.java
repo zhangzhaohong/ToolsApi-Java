@@ -25,7 +25,7 @@ public class KugouApiManager {
 
     public KugouApiProduct construct(RedisService redisService, String host, String url, String hash, String albumId, Integer version, KugouCustomParamsUtil customParams, KugouProductConfigModel config) throws IOException, URISyntaxException {
         builder.redis(redisService).host(host).customParams(customParams);
-        if (StringUtils.hasLength(hash) && StringUtils.hasLength(albumId)) {
+        if (StringUtils.hasLength(hash)) {
             builder.hashAndAlbumId(hash, albumId);
         } else {
             builder.url(url).prepareItemIdByShareUrl();

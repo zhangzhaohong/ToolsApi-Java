@@ -27,6 +27,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.web.DefaultRedirectStrategy;
 import org.springframework.security.web.RedirectStrategy;
 import org.springframework.util.StringUtils;
@@ -408,6 +409,11 @@ public class NeteaseToolsController {
                 Objects.isNull(multiMvQualityInfo.getSd1()) ? null : (hostManager.getHost() + "tools/Netease/download/mv/short?key=" + Base64Utils.encodeToUrlSafeString(key.getBytes(StandardCharsets.UTF_8)) + "&quality=sd1"),
                 Objects.isNull(multiMvQualityInfo.getSd2()) ? null : (hostManager.getHost() + "tools/Netease/download/mv/short?key=" + Base64Utils.encodeToUrlSafeString(key.getBytes(StandardCharsets.UTF_8)) + "&quality=sd2")
         );
+    }
+
+    @Scheduled(cron = "0 0 2 * * ?")
+    public void refreshToken() {
+        neteaseCookieUtil.doRefreshNeteaseCookieTask();
     }
 
 }

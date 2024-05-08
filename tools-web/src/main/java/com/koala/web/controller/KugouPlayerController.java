@@ -66,7 +66,7 @@ public class KugouPlayerController {
                     String hash = tmp.getMusicInfo().getAudioInfo().getPlayInfoList().get(quality).getHash();
                     String albumId = tmp.getMusicInfo().getAlbumInfo().getAlbumId();
                     String mid = KugouMidGenerator.getMid();
-                    String cookie = customParams.getKugouCustomParams().get("kg_mid_cookie").toString();
+                    String cookie = customParams.getKugouCustomParams().get("kg_cookie").toString();
                     String resp = HttpClientUtil.doGet(KUGOU_DETAIL_SERVER_URL_V2, HeaderUtil.getKugouPublicHeader(null, cookie), KugouPlayInfoParamsGenerator.getPlayInfoParams(hash, mid, albumId, customParams));
                     KugouPlayInfoRespDataModel respData = null;
                     if (StringUtils.hasLength(resp)) {
@@ -78,7 +78,7 @@ public class KugouPlayerController {
                     }
                     model.addAttribute("type", "audio/" + respData.getExtName());
                     model.addAttribute("media", GsonUtil.toString(respData.getUrl()));
-                    model.addAttribute("thumb", tmp.getMusicInfo().getAlbumInfo().getSizableCover());
+                    model.addAttribute("thumb", tmp.getMusicInfo().getAlbumInfo().getSizableCover().replace("{size}", "1080"));
                     if ("1".equals(version)) {
                         return "music/dplayer/kugou/index";
                     }

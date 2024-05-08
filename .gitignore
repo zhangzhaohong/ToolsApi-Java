@@ -44,7 +44,7 @@ signature_web_project/.idea
 
 signature_web_project/node_modules
 
-tools-web/src/main/resources/cookie/custom.netease.cookie.txt
+tools-web/src/main/resources/cookie/*
 
 tools-web/src/main/resources/params/custom.kugou.params.txt
 

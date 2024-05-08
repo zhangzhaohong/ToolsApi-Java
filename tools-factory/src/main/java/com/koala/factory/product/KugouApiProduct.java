@@ -105,7 +105,7 @@ public class KugouApiProduct {
         }
         HashMap<String, String> params = new HashMap<>();
         params.put("data", getAlbumRequestPayload());
-        String response = HttpClientUtil.doGet(KUGOU_ALBUM_DETAIL_SERVER_URL, HeaderUtil.getKugouPublicHeader(null, this.customParams.get("kg_mid_cookie").toString()), params);
+        String response = HttpClientUtil.doGet(KUGOU_ALBUM_DETAIL_SERVER_URL, HeaderUtil.getKugouPublicHeader(null, this.customParams.get("kg_cookie").toString()), params);
         logger.info("[KugouApiProduct]({}) album info: {}", this.hash, response);
         try {
             this.albumInfoData = GsonUtil.toBean(response, KugouAlbumInfoRespDataModel.class);
@@ -141,7 +141,7 @@ public class KugouApiProduct {
         }
         HashMap<String, String> params = new HashMap<>();
         params.put("data", getAlbumRequestPayload());
-        String response = HttpClientUtil.doGet(KUGOU_ALBUM_MUSIC_DETAIL_SERVER_URL, HeaderUtil.getKugouPublicHeader(null, this.customParams.get("kg_mid_cookie").toString()), params);
+        String response = HttpClientUtil.doGet(KUGOU_ALBUM_MUSIC_DETAIL_SERVER_URL, HeaderUtil.getKugouPublicHeader(null, this.customParams.get("kg_cookie").toString()), params);
         logger.info("[KugouApiProduct]({}) album music info: {}", this.hash, response);
         try {
             result = GsonUtil.toBean(response, KugouAlbumMusicInfoRespDataModel.class);

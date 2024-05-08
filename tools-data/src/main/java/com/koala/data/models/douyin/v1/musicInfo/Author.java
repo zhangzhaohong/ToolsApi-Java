@@ -13,7 +13,7 @@ import java.util.List;
  * @description
  */
 @Data
-public class Author implements Serializable {
+public class Author<Object extends Serializable> implements Serializable {
     @SerializedName("accept_private_policy")
     private Boolean acceptPrivatePolicy;
     @SerializedName("account_region")
@@ -128,7 +128,7 @@ public class Author implements Serializable {
     @SerializedName("is_phone_binded")
     private Boolean isPhoneBinded;
     @SerializedName("ky_only_predict")
-    private Integer kyOnlyPredict;
+    private Object kyOnlyPredict;
     @SerializedName("link_item_list")
     private String linkItemList;
     @SerializedName("live_agreement")
